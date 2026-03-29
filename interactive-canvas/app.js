@@ -123,7 +123,7 @@ function parseYoutubeId(url) {
   return null;
 }
 
-function youtubeEmbedUrl(id, loop = true) {
+function youtubeEmbedUrl(id, loop = true, audio = true) {
   const params = {
     autoplay: '1',
     controls: '1',
@@ -134,6 +134,9 @@ function youtubeEmbedUrl(id, loop = true) {
   if (loop) {
     params.loop = '1';
     params.playlist = id; // required for loop to work
+  }
+  if (!audio) {
+    params.mute = '1';
   }
   return `https://www.youtube.com/embed/${id}?${new URLSearchParams(params)}`;
 }
@@ -500,7 +503,7 @@ function applyMedia(shape) {
 
   if (shape.media.type === 'youtube') {
     el = document.createElement('iframe');
-    el.src = youtubeEmbedUrl(shape.media.embedId, shape.media.loop !== false);
+    el.src = youtubeEmbedUrl(shape.media.embedId, shape.media.loop !== false, shape.media.audio !== false);
     el.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
     el.setAttribute('allowfullscreen', '');
     el.setAttribute('frameborder', '0');
@@ -703,9 +706,9 @@ function showMediaModal(shapeId) {
   mediaPreview.hidden = true;
   mediaPreview.innerHTML = '';
 
-  // Restore loop checkbox state from saved media
-  const loopCheckbox = document.getElementById('media-loop');
-  loopCheckbox.checked = shape?.media?.loop !== false; // default true
+  // Restore YouTube option checkboxes from saved media
+  document.getElementById('media-loop').checked  = shape?.media?.loop  !== false; // default true
+  document.getElementById('media-audio').checked = shape?.media?.audio !== false; // default true
 
   const btnRemove = document.getElementById('btn-media-remove');
   btnRemove.hidden = !shape?.media;
@@ -727,7 +730,7 @@ function updateMediaPreview() {
   const url = mediaInput.value.trim();
   mediaPreview.hidden = true;
   mediaPreview.innerHTML = '';
-  const loopRow = document.getElementById('media-loop-row');
+  const loopRow = document.getElementById('media-yt-options');
 
   if (!url) {
     loopRow.style.display = 'none';
@@ -783,9 +786,10 @@ document.getElementById('btn-media-attach').addEventListener('click', () => {
   const parsed = parseMediaUrl(url);
   if (!parsed) { hideMediaModal(); return; }
 
-  // Store loop preference for YouTube videos
+  // Store YouTube playback preferences
   if (parsed.type === 'youtube') {
-    parsed.loop = document.getElementById('media-loop').checked;
+    parsed.loop  = document.getElementById('media-loop').checked;
+    parsed.audio = document.getElementById('media-audio').checked;
   }
 
   const shape = state.shapes.find(s => s.id === state.modalShapeId);
