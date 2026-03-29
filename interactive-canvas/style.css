@@ -2,7 +2,7 @@
    CSS Custom Properties
    ============================================================ */
 :root {
-  --bg:              #0a0a0a;
+  --bg:              #000000;
   --toolbar-bg:      #141414;
   --toolbar-border:  #2a2a2a;
   --handle-color:    #00d4ff;
@@ -522,8 +522,18 @@ html, body {
 ::-webkit-scrollbar { width: 0; }
 
 /* ============================================================
-   Fullscreen adjustments
+   Presentation mode — press F11 to toggle.
+   Hides all UI; only shapes/media remain. Videos become interactive.
    ============================================================ */
+body.presentation-mode #main-toolbar        { display: none !important; }
+body.presentation-mode .shape-toolbar       { display: none !important; }
+body.presentation-mode .handle              { display: none !important; }
+body.presentation-mode .shape-outline       { display: none !important; }
+body.presentation-mode .move-handle         { display: none !important; }
+body.presentation-mode .iframe-shield       { pointer-events: none !important; }
+body.presentation-mode .media-el            { pointer-events: all !important; }
+
+/* Fullscreen adjustments (always — even without presentation class) */
 :fullscreen #main-toolbar,
 :-webkit-full-screen #main-toolbar {
   display: none;

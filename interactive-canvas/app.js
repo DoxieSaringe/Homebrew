@@ -613,13 +613,64 @@ canvas.addEventListener('pointerdown', e => {
   if (e.target === canvas) deselectAll();
 });
 
+/* ============================================================
+   Presentation mode — F11 toggles fullscreen + hides all UI.
+   Escape exits both presentation mode and fullscreen.
+   ============================================================ */
+function enterPresentationMode() {
+  document.body.classList.add('presentation-mode');
+  deselectAll();
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+}
+
+function exitPresentationMode() {
+  document.body.classList.remove('presentation-mode');
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+
+function togglePresentationMode() {
+  if (document.body.classList.contains('presentation-mode')) {
+    exitPresentationMode();
+  } else {
+    enterPresentationMode();
+  }
+}
+
+// Exit presentation mode automatically when browser exits fullscreen (e.g. Esc)
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement) {
+    document.body.classList.remove('presentation-mode');
+  }
+});
+
 // Keyboard shortcuts
 window.addEventListener('keydown', e => {
   if (e.target instanceof HTMLInputElement) return;
+
+  // F11 — toggle presentation mode (fullscreen + hide all UI)
+  if (e.key === 'F11') {
+    e.preventDefault();
+    togglePresentationMode();
+    return;
+  }
+
+  // Escape — exit presentation mode / deselect
+  if (e.key === 'Escape') {
+    if (document.body.classList.contains('presentation-mode')) {
+      exitPresentationMode();
+    } else {
+      deselectAll();
+    }
+    return;
+  }
+
   if ((e.key === 'Delete' || e.key === 'Backspace') && state.selectedId) {
     deleteShape(state.selectedId);
   }
-  if (e.key === 'Escape') deselectAll();
   if (e.key === 'f' || e.key === 'F') {
     if (state.selectedId) {
       const shape = state.shapes.find(s => s.id === state.selectedId);
@@ -787,11 +838,7 @@ document.getElementById('btn-add-circle').addEventListener('click', () => {
    Fullscreen
    ============================================================ */
 document.getElementById('btn-fullscreen').addEventListener('click', () => {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(() => {});
-  } else {
-    document.exitFullscreen().catch(() => {});
-  }
+  togglePresentationMode();
 });
 
 /* ============================================================
