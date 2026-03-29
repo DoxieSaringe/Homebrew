@@ -344,12 +344,13 @@ html, body {
   padding: 0 3px;
 }
 
-/* Move handle — the drag area for moving the whole shape */
+/* Move handle — the drag area for moving the whole shape.
+   z-index 8: above the iframe-shield (6) but below handles (10) */
 .move-handle {
   position: absolute;
   pointer-events: all;
   cursor: move;
-  z-index: 5;
+  z-index: 8;
 }
 
 /* iframe shield — covers iframe to allow drag events */

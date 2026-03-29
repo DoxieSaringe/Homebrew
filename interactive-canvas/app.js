@@ -384,15 +384,13 @@ function updateShapeDOM(shape) {
     h.style.top  = my + 'px';
   });
 
-  // Move handle — positioned over the bounding-box centre
+  // Move handle — covers the full bounding box (z-index 8, above shield 6, below handles 10)
   const bbox = getBBox(corners);
   const moveHandle = wrapper.querySelector('.move-handle');
-  const mw = Math.max(bbox.w * 0.5, 30);
-  const mh = Math.max(bbox.h * 0.5, 30);
-  moveHandle.style.left   = (bbox.minX + bbox.w / 2 - mw / 2) + 'px';
-  moveHandle.style.top    = (bbox.minY + bbox.h / 2 - mh / 2) + 'px';
-  moveHandle.style.width  = mw + 'px';
-  moveHandle.style.height = mh + 'px';
+  moveHandle.style.left   = bbox.minX + 'px';
+  moveHandle.style.top    = bbox.minY + 'px';
+  moveHandle.style.width  = bbox.w + 'px';
+  moveHandle.style.height = bbox.h + 'px';
 
   // Toolbar — above the TL corner
   const toolbar = wrapper.querySelector('.shape-toolbar');
