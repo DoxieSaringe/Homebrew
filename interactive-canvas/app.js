@@ -730,12 +730,12 @@ function updateMediaPreview() {
   const loopRow = document.getElementById('media-loop-row');
 
   if (!url) {
-    loopRow.hidden = true;
+    loopRow.style.display = 'none';
     return;
   }
 
   const ytId = parseYoutubeId(url);
-  loopRow.hidden = !ytId; // show loop option only for YouTube
+  loopRow.style.display = ytId ? 'block' : 'none';
 
   if (ytId) {
     mediaPreview.hidden = false;
@@ -762,6 +762,7 @@ function updateMediaPreview() {
 }
 
 mediaInput.addEventListener('input', updateMediaPreview);
+mediaInput.addEventListener('paste', () => setTimeout(updateMediaPreview, 0));
 
 document.getElementById('btn-media-cancel').addEventListener('click', hideMediaModal);
 
