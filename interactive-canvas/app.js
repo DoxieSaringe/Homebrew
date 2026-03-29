@@ -426,34 +426,47 @@ function applyContentTransform(shape) {
   const H = computeHomography(local);
   if (!H) return; // degenerate
 
-  const cssMatrix = homographyToCssMatrix(H);
+  // H maps the unit square (0..1) to local corners.
+  // The content div and media are bboxW × bboxH px, so we must scale
+  // H so it maps the pixel rectangle (0..bboxW, 0..bboxH) instead.
+  // This is equivalent to pre-multiplying by Scale(1/bboxW, 1/bboxH):
+  const w = bbox.w, h = bbox.h;
+  const Hs = [
+    H[0] / w,  H[1] / h,  H[2],
+    H[3] / w,  H[4] / h,  H[5],
+    H[6] / w,  H[7] / h,  H[8],
+  ];
 
-  // Position content div at bounding-box origin
+  const cssMatrix = homographyToCssMatrix(Hs);
+
+  // Size and position the content div to the bounding box
   content.style.left      = bbox.minX + 'px';
   content.style.top       = bbox.minY + 'px';
+  content.style.width     = w + 'px';
+  content.style.height    = h + 'px';
   content.style.transform = `matrix3d(${cssMatrix})`;
 
-  // Size the media / placeholder element
+  // Media element fills the content div exactly
   const mediaEl = content.querySelector('.media-el');
   if (mediaEl) {
-    mediaEl.style.width  = bbox.w + 'px';
-    mediaEl.style.height = bbox.h + 'px';
+    mediaEl.style.width  = w + 'px';
+    mediaEl.style.height = h + 'px';
   }
 
-  // Size placeholder
+  // Placeholder fills the content div
   const placeholder = content.querySelector('.shape-placeholder');
   if (placeholder) {
-    placeholder.style.width  = bbox.w + 'px';
-    placeholder.style.height = bbox.h + 'px';
+    placeholder.style.width  = w + 'px';
+    placeholder.style.height = h + 'px';
   }
 
-  // iframe shield mirrors media position
+  // Shield covers the bounding box area (blocks iframe interaction in edit mode)
   const shield = wrapper.querySelector('.iframe-shield');
   if (shield) {
     shield.style.left   = bbox.minX + 'px';
     shield.style.top    = bbox.minY + 'px';
-    shield.style.width  = bbox.w + 'px';
-    shield.style.height = bbox.h + 'px';
+    shield.style.width  = w + 'px';
+    shield.style.height = h + 'px';
   }
 }
 

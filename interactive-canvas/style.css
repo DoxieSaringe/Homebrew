@@ -142,13 +142,12 @@ html, body {
 
 /* ============================================================
    Shape Content (the warped layer with image/video)
+   Width/height are set dynamically by JS to the bounding box.
    ============================================================ */
 .shape-content {
   position: absolute;
-  width: 1px;
-  height: 1px;
   transform-origin: 0 0;
-  overflow: visible;
+  overflow: hidden;
   pointer-events: none;
 }
 
