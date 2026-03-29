@@ -485,10 +485,12 @@ function applyMedia(shape) {
   if (!shape.media) {
     if (placeholder) placeholder.style.display = '';
     wrapper.querySelector('.btn-play-toggle').style.display = 'none';
+    wrapper.classList.remove('has-media');
     applyContentTransform(shape);
     return;
   }
 
+  wrapper.classList.add('has-media');
   if (placeholder) placeholder.style.display = 'none';
 
   const bbox = getBBox(shape.corners);

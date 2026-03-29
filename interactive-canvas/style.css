@@ -213,6 +213,12 @@ html, body {
   opacity: 1;
 }
 
+/* Hide outline when media is attached — no border around image/video.
+   Still show on hover or select so editing is still discoverable. */
+.shape-wrapper.has-media:not(:hover):not(.selected) .quad-poly {
+  opacity: 0;
+}
+
 /* ============================================================
    Handles (corners + edges)
    ============================================================ */
