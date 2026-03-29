@@ -123,17 +123,19 @@ function parseYoutubeId(url) {
   return null;
 }
 
-function youtubeEmbedUrl(id) {
-  const p = new URLSearchParams({
+function youtubeEmbedUrl(id, loop = true) {
+  const params = {
     autoplay: '1',
     controls: '1',
     rel: '0',
     modestbranding: '1',
-    loop: '1',
-    playlist: id,
     enablejsapi: '0',
-  });
-  return `https://www.youtube.com/embed/${id}?${p}`;
+  };
+  if (loop) {
+    params.loop = '1';
+    params.playlist = id; // required for loop to work
+  }
+  return `https://www.youtube.com/embed/${id}?${new URLSearchParams(params)}`;
 }
 
 function isImageUrl(url) {
@@ -498,7 +500,7 @@ function applyMedia(shape) {
 
   if (shape.media.type === 'youtube') {
     el = document.createElement('iframe');
-    el.src = youtubeEmbedUrl(shape.media.embedId);
+    el.src = youtubeEmbedUrl(shape.media.embedId, shape.media.loop !== false);
     el.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
     el.setAttribute('allowfullscreen', '');
     el.setAttribute('frameborder', '0');
@@ -530,10 +532,11 @@ function applyMedia(shape) {
    ============================================================ */
 function setEditMode(wrapper, isEdit) {
   wrapper.classList.toggle('edit-mode', isEdit);
+  // In play mode: disable move-handle and shield so the iframe is reachable
+  const moveHandle = wrapper.querySelector('.move-handle');
+  if (moveHandle) moveHandle.style.pointerEvents = isEdit ? 'all' : 'none';
   const mediaEl = wrapper.querySelector('.media-el');
-  if (mediaEl) {
-    mediaEl.style.pointerEvents = isEdit ? 'none' : 'all';
-  }
+  if (mediaEl) mediaEl.style.pointerEvents = isEdit ? 'none' : 'all';
 }
 
 /* ============================================================
@@ -700,6 +703,10 @@ function showMediaModal(shapeId) {
   mediaPreview.hidden = true;
   mediaPreview.innerHTML = '';
 
+  // Restore loop checkbox state from saved media
+  const loopCheckbox = document.getElementById('media-loop');
+  loopCheckbox.checked = shape?.media?.loop !== false; // default true
+
   const btnRemove = document.getElementById('btn-media-remove');
   btnRemove.hidden = !shape?.media;
 
@@ -720,9 +727,16 @@ function updateMediaPreview() {
   const url = mediaInput.value.trim();
   mediaPreview.hidden = true;
   mediaPreview.innerHTML = '';
-  if (!url) return;
+  const loopRow = document.getElementById('media-loop-row');
+
+  if (!url) {
+    loopRow.hidden = true;
+    return;
+  }
 
   const ytId = parseYoutubeId(url);
+  loopRow.hidden = !ytId; // show loop option only for YouTube
+
   if (ytId) {
     mediaPreview.hidden = false;
     const div = document.createElement('div');
@@ -767,6 +781,11 @@ document.getElementById('btn-media-attach').addEventListener('click', () => {
 
   const parsed = parseMediaUrl(url);
   if (!parsed) { hideMediaModal(); return; }
+
+  // Store loop preference for YouTube videos
+  if (parsed.type === 'youtube') {
+    parsed.loop = document.getElementById('media-loop').checked;
+  }
 
   const shape = state.shapes.find(s => s.id === state.modalShapeId);
   if (shape) {
