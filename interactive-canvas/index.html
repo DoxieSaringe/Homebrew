@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shape Canvas</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header id="main-toolbar">
+      <div class="toolbar-left">
+        <span class="app-title">Shape Canvas</span>
+        <button id="btn-add-rect" title="Add Rectangle">+ Rect</button>
+        <button id="btn-add-circle" title="Add Circle">+ Circle</button>
+      </div>
+      <div class="toolbar-right">
+        <button id="btn-clear" title="Delete all shapes">Clear All</button>
+        <button id="btn-fullscreen" title="Toggle fullscreen">&#x26F6; Fullscreen</button>
+      </div>
+    </header>
+
+    <main id="canvas">
+      <!-- Shapes are inserted here by JavaScript -->
+    </main>
+  </div>
+
+  <!-- Media attach modal -->
+  <div id="media-modal" class="modal-overlay" hidden>
+    <div class="modal-box">
+      <h3 class="modal-title">Attach Media</h3>
+      <p class="modal-hint">Paste an image URL or a YouTube link</p>
+      <input
+        id="media-url-input"
+        type="text"
+        class="modal-input"
+        placeholder="https://example.com/image.jpg  or  https://youtu.be/..."
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <div class="modal-preview" id="media-preview" hidden></div>
+      <div class="modal-actions">
+        <button id="btn-media-remove" class="btn-danger" hidden>Remove Media</button>
+        <div class="modal-actions-right">
+          <button id="btn-media-cancel" class="btn-secondary">Cancel</button>
+          <button id="btn-media-attach" class="btn-primary">Attach</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm clear modal -->
+  <div id="confirm-modal" class="modal-overlay" hidden>
+    <div class="modal-box modal-box--small">
+      <h3 class="modal-title">Clear all shapes?</h3>
+      <p class="modal-hint">This cannot be undone.</p>
+      <div class="modal-actions">
+        <div class="modal-actions-right">
+          <button id="btn-confirm-cancel" class="btn-secondary">Cancel</button>
+          <button id="btn-confirm-ok" class="btn-danger">Clear All</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
