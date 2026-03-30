@@ -303,18 +303,6 @@ html, body {
 }
 
 /* ============================================================
-   Mesh Canvas
-   ============================================================ */
-.mesh-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  transition: opacity 0.1s;
-}
-
-/* ============================================================
    Placeholder
    ============================================================ */
 .shape-placeholder {
@@ -391,10 +379,6 @@ html, body {
 .shape-wrapper:hover .handle,
 .shape-wrapper.selected .handle { opacity: 1; }
 
-/* Hide corner/edge handles in mesh mode — mesh handles take over */
-.shape-wrapper.has-mesh .corner-handle,
-.shape-wrapper.has-mesh .edge-handle { display: none; }
-
 .corner-handle { width: var(--handle-size); height: var(--handle-size); border-radius: 2px; }
 .edge-handle   { width: var(--edge-handle-sz); height: var(--edge-handle-sz); border-radius: 50%; opacity: 0; }
 
@@ -423,19 +407,6 @@ html, body {
 .shape-wrapper:hover .rotation-handle,
 .shape-wrapper.selected .rotation-handle { opacity: 1; }
 .rotation-handle:hover { background: #fff; transform: translate(-50%,-50%) scale(1.2); }
-
-/* Mesh handles — orange dots on the grid */
-.mesh-handle {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #ffaa00;
-  border: 2px solid #000;
-  z-index: 9;
-  cursor: grab;
-}
-
-.mesh-handle:hover { background: #fff; transform: translate(-50%,-50%) scale(1.3); }
 
 /* ============================================================
    Shape Toolbar
@@ -481,7 +452,7 @@ html, body {
 .btn-media-attach:hover { color: #fff !important; }
 .btn-delete:hover { background: rgba(255,68,68,0.2) !important; color: var(--danger) !important; }
 .btn-play-toggle { font-size: 11px !important; width: auto !important; padding: 0 5px !important; border: 1px solid var(--toolbar-border) !important; border-radius: 3px !important; }
-.btn-mesh.active { color: #ffaa00 !important; }
+
 .btn-layer-up-1, .btn-layer-dn-1 { font-size: 11px !important; }
 
 /* Opacity slider inside toolbar */
