@@ -942,6 +942,71 @@ window.addEventListener('keydown', e => {
 });
 
 /* ============================================================
+   Drag-and-drop — local image files onto canvas or shapes
+   ============================================================ */
+function applyLocalFile(shape, file) {
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    shape.media = { type: 'image', url: ev.target.result };
+    if (shape.mesh) disableMesh(shape);
+    applyMedia(shape);
+    saveState();
+  };
+  reader.readAsDataURL(file);
+}
+
+// Drop onto an existing shape wrapper
+document.addEventListener('dragover', e => {
+  e.preventDefault();
+  const wrapper = e.target.closest('[data-id]');
+  if (wrapper) wrapper.classList.add('drag-over');
+  else canvas.classList.add('drag-over');
+});
+
+document.addEventListener('dragleave', e => {
+  const wrapper = e.target.closest('[data-id]');
+  if (wrapper) wrapper.classList.remove('drag-over');
+  if (!e.relatedTarget || !canvas.contains(e.relatedTarget)) {
+    canvas.classList.remove('drag-over');
+    document.querySelectorAll('[data-id].drag-over').forEach(el => el.classList.remove('drag-over'));
+  }
+});
+
+document.addEventListener('drop', e => {
+  e.preventDefault();
+  canvas.classList.remove('drag-over');
+  document.querySelectorAll('[data-id].drag-over').forEach(el => el.classList.remove('drag-over'));
+
+  const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
+  if (!files.length) return;
+
+  const wrapper = e.target.closest('[data-id]');
+  if (wrapper) {
+    // Drop onto existing shape
+    const shape = state.shapes.find(s => s.id === wrapper.dataset.id);
+    if (shape) applyLocalFile(shape, files[0]);
+  } else {
+    // Drop onto canvas — create new rect for each image
+    const canvasRect = canvas.getBoundingClientRect();
+    files.forEach((file, i) => {
+      const cx = e.clientX - canvasRect.left + i * 20;
+      const cy = e.clientY - canvasRect.top  + i * 20;
+      const hw = 160, hh = 120;
+      const shape = createShape('rect');
+      shape.corners = [
+        { x: cx - hw, y: cy - hh },
+        { x: cx + hw, y: cy - hh },
+        { x: cx + hw, y: cy + hh },
+        { x: cx - hw, y: cy + hh },
+      ];
+      state.shapes.push(shape);
+      renderShape(shape);
+      applyLocalFile(shape, file);
+    });
+  }
+});
+
+/* ============================================================
    Media Modal
    ============================================================ */
 const mediaModal   = document.getElementById('media-modal');
