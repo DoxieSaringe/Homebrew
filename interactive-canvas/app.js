@@ -21,6 +21,14 @@ const state = {
 const STORAGE_KEY = 'interactive-canvas-v1';
 const MESH_ROWS = 4, MESH_COLS = 4;
 
+function cornersCenter(corners) {
+  return { x: corners.reduce((s,c)=>s+c.x,0)/4, y: corners.reduce((s,c)=>s+c.y,0)/4 };
+}
+function rotatePoint(pt, center, angle) {
+  const cos=Math.cos(angle), sin=Math.sin(angle), dx=pt.x-center.x, dy=pt.y-center.y;
+  return { x: center.x+dx*cos-dy*sin, y: center.y+dx*sin+dy*cos };
+}
+
 /* ============================================================
    Mesh warp math
    ============================================================ */
@@ -347,6 +355,16 @@ function renderShape(shape) {
   moveHandle.className = 'move-handle';
   wrapper.appendChild(moveHandle);
 
+  // ── Rotation handle ───────────────────────────────────────
+  const rotHandle = document.createElement('div');
+  rotHandle.className = 'handle rotation-handle';
+  wrapper.appendChild(rotHandle);
+
+  // ── Rotation line in SVG (added after svg is created above) ─
+  const rotLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  rotLine.classList.add('rotation-line');
+  svg.appendChild(rotLine);
+
   // ── Corner handles ────────────────────────────────────────
   for (let i = 0; i < 4; i++) {
     const h = document.createElement('div');
@@ -508,6 +526,28 @@ function wireShapeEvents(shape, wrapper) {
     else            { enableMesh(shape);  e.currentTarget.classList.add('active'); }
     saveState();
   });
+
+  // Rotation handle drag
+  const rotHandle = wrapper.querySelector('.rotation-handle');
+  if (rotHandle) {
+    rotHandle.addEventListener('pointerdown', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      rotHandle.setPointerCapture(e.pointerId);
+      selectShape(shape.id);
+      const center = cornersCenter(shape.corners);
+      const pt = toCanvasCoords(e.clientX, e.clientY);
+      const startAngle = Math.atan2(pt.y - center.y, pt.x - center.x);
+      state.dragContext = {
+        type: 'rotate',
+        shapeId: shape.id,
+        center,
+        startAngle,
+        startCorners: shape.corners.map(p => ({ ...p })),
+        startMeshPts: shape.mesh ? shape.mesh.points.map(p => ({ ...p })) : null,
+      };
+    });
+  }
 }
 
 /* ============================================================
@@ -547,6 +587,14 @@ function updateShapeDOM(shape) {
   moveHandle.style.top    = bbox.minY + 'px';
   moveHandle.style.width  = bbox.w + 'px';
   moveHandle.style.height = bbox.h + 'px';
+
+  // Rotation handle — above midpoint of top edge
+  const topMidX = (corners[0].x + corners[1].x) / 2;
+  const topMidY = (corners[0].y + corners[1].y) / 2;
+  const rotH = wrapper.querySelector('.rotation-handle');
+  const rotL = wrapper.querySelector('.rotation-line');
+  if (rotH) { rotH.style.left = topMidX+'px'; rotH.style.top = (topMidY-38)+'px'; }
+  if (rotL) { rotL.setAttribute('x1',topMidX); rotL.setAttribute('y1',topMidY); rotL.setAttribute('x2',topMidX); rotL.setAttribute('y2',topMidY-38); }
 
   // Toolbar — above the TL corner
   const toolbar = wrapper.querySelector('.shape-toolbar');
@@ -770,6 +818,14 @@ window.addEventListener('pointermove', e => {
     shape.corners = dc.startCorners.map(c => ({ x: c.x + dx, y: c.y + dy }));
     if (shape.mesh && dc.startMeshPts) {
       shape.mesh.points = dc.startMeshPts.map(p => ({ x: p.x+dx, y: p.y+dy }));
+    }
+    updateShapeDOM(shape);
+  } else if (dc.type === 'rotate') {
+    const currentAngle = Math.atan2(pt.y - dc.center.y, pt.x - dc.center.x);
+    const delta = currentAngle - dc.startAngle;
+    shape.corners = dc.startCorners.map(c => rotatePoint(c, dc.center, delta));
+    if (shape.mesh && dc.startMeshPts) {
+      shape.mesh.points = dc.startMeshPts.map(p => rotatePoint(p, dc.center, delta));
     }
     updateShapeDOM(shape);
   } else if (dc.type === 'mesh-point') {
