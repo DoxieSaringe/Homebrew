@@ -15,6 +15,7 @@
         <button id="btn-add-circle" title="Add Circle">+ Circle</button>
       </div>
       <div class="toolbar-right">
+        <button id="btn-cast" title="Cast to Chromecast">&#8855; Cast</button>
         <button id="btn-music" title="Background music (Spotify)">&#9834; Music</button>
         <button id="btn-layers" title="Toggle layers panel">Layers</button>
         <button id="btn-clear" title="Delete all shapes">Clear All</button>
@@ -26,6 +27,12 @@
       <!-- drop zone hint -->
       <div id="canvas-hint">Drop an image file here to create a shape</div>
     </main>
+
+    <!-- Cast fallback message -->
+    <div id="cast-fallback" class="cast-fallback" hidden>
+      Chromecast ej tillgänglig i den här webbläsaren.<br>
+      Använd Chrome → <strong>⋮ → Cast → Cast tab</strong> för att spegla skärmen.
+    </div>
 
     <!-- Spotify music panel -->
     <div id="spotify-panel" class="spotify-panel" hidden>

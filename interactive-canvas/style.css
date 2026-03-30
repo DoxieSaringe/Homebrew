@@ -753,5 +753,41 @@ body.presentation-mode .layers-panel        { display: none !important; }
 body.presentation-mode .iframe-shield       { pointer-events: none !important; }
 body.presentation-mode #canvas-hint          { display: none !important; }
 
+/* ── Receiver mode (Chromecast) ────────────────────────────── */
+body.receiver-mode #main-toolbar    { display: none !important; }
+body.receiver-mode .shape-toolbar   { display: none !important; }
+body.receiver-mode .handle          { display: none !important; }
+body.receiver-mode .shape-outline   { display: none !important; }
+body.receiver-mode .move-handle     { display: none !important; }
+body.receiver-mode .layers-panel    { display: none !important; }
+body.receiver-mode .spotify-panel   { display: none !important; }
+body.receiver-mode .shape-name-label { display: none !important; }
+body.receiver-mode #canvas-hint     { display: none !important; }
+body.receiver-mode .iframe-shield   { pointer-events: none !important; }
+body.receiver-mode #canvas          { width: 100vw; height: 100vh; background: #000; }
+body.receiver-mode #app             { background: #000; }
+
+/* Cast button */
+#btn-cast.active { color: #1db954 !important; }
+
+/* Cast fallback toast */
+.cast-fallback {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30,30,30,0.97);
+  border: 1px solid var(--toolbar-border);
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-size: 13px;
+  color: var(--text);
+  z-index: 200;
+  text-align: center;
+  line-height: 1.6;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.cast-fallback[hidden] { display: none; }
+
 :fullscreen #main-toolbar, :-webkit-full-screen #main-toolbar { display: none; }
 :fullscreen #canvas, :-webkit-full-screen #canvas { width: 100vw; height: 100vh; }
