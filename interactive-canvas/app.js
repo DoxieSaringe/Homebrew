@@ -331,6 +331,7 @@ function renderShape(shape) {
   // ── Content layer ────────────────────────────────────────
   const content = document.createElement('div');
   content.className = 'shape-content' + (shape.type === 'circle' ? ' is-circle' : '');
+  if (shape.opacity !== undefined) content.style.opacity = shape.opacity;
 
   // Placeholder (shown when no media)
   const placeholder = document.createElement('div');
@@ -416,6 +417,15 @@ function renderShape(shape) {
   btnMesh.textContent = '⊞';
   btnMesh.style.display = 'none';
   toolbar.appendChild(btnMesh);
+
+  const opacitySlider = document.createElement('input');
+  opacitySlider.type = 'range';
+  opacitySlider.className = 'opacity-slider';
+  opacitySlider.min = '0';
+  opacitySlider.max = '100';
+  opacitySlider.value = shape.opacity !== undefined ? Math.round(shape.opacity * 100) : 100;
+  opacitySlider.title = 'Opacity';
+  toolbar.appendChild(opacitySlider);
 
   const label = document.createElement('span');
   label.className = 'shape-label';
@@ -524,6 +534,15 @@ function wireShapeEvents(shape, wrapper) {
     e.stopPropagation();
     if (shape.mesh) { disableMesh(shape); e.currentTarget.classList.remove('active'); }
     else            { enableMesh(shape);  e.currentTarget.classList.add('active'); }
+    saveState();
+  });
+
+  // Opacity slider
+  wrapper.querySelector('.opacity-slider').addEventListener('input', e => {
+    e.stopPropagation();
+    shape.opacity = parseInt(e.target.value) / 100;
+    const content = wrapper.querySelector('.shape-content');
+    if (content) content.style.opacity = shape.opacity;
     saveState();
   });
 
