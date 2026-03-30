@@ -1051,6 +1051,7 @@ function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       shapes: state.shapes,
       nextZ: state.nextZ,
+      spotifyUrl: state.spotifyUrl || null,
     }));
   } catch (e) {
     console.warn('Could not save state:', e);
@@ -1064,7 +1065,9 @@ function loadState() {
     const saved = JSON.parse(raw);
     state.shapes = saved.shapes || [];
     state.nextZ  = saved.nextZ  || 1;
+    state.spotifyUrl = saved.spotifyUrl || null;
     state.shapes.forEach(shape => renderShape(shape));
+    if (state.spotifyUrl) applySpotifyEmbed(state.spotifyUrl);
   } catch (e) {
     console.warn('Could not load saved state:', e);
   }
@@ -1194,6 +1197,79 @@ document.getElementById('btn-layers').addEventListener('click', () => {
 document.getElementById('btn-close-layers').addEventListener('click', () => {
   layersPanel.hidden = true;
 });
+
+/* ============================================================
+   Spotify background music
+   ============================================================ */
+function parseSpotifyUrl(url) {
+  // Accepts: open.spotify.com/track/ID, /playlist/ID, /album/ID
+  // Also accepts spotify:track:ID URIs
+  const webMatch = url.match(/open\.spotify\.com\/(track|playlist|album|episode)\/([A-Za-z0-9]+)/);
+  if (webMatch) return { type: webMatch[1], id: webMatch[2] };
+  const uriMatch = url.match(/spotify:(track|playlist|album|episode):([A-Za-z0-9]+)/);
+  if (uriMatch) return { type: uriMatch[1], id: uriMatch[2] };
+  return null;
+}
+
+function applySpotifyEmbed(url) {
+  const parsed = parseSpotifyUrl(url);
+  if (!parsed) return false;
+
+  const embedUrl = `https://open.spotify.com/embed/${parsed.type}/${parsed.id}?utm_source=generator&theme=0`;
+  const wrap = document.getElementById('spotify-embed-wrap');
+  wrap.innerHTML = '';
+
+  const iframe = document.createElement('iframe');
+  iframe.src = embedUrl;
+  iframe.width = '100%';
+  iframe.height = parsed.type === 'track' ? '80' : '152';
+  iframe.setAttribute('frameborder', '0');
+  iframe.setAttribute('allow', 'autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture');
+  iframe.setAttribute('loading', 'lazy');
+  wrap.appendChild(iframe);
+
+  document.getElementById('btn-spotify-remove').style.display = 'block';
+  state.spotifyUrl = url;
+  saveState();
+  return true;
+}
+
+function clearSpotifyEmbed() {
+  document.getElementById('spotify-embed-wrap').innerHTML = '';
+  document.getElementById('btn-spotify-remove').style.display = 'none';
+  document.getElementById('spotify-url-input').value = '';
+  state.spotifyUrl = null;
+  saveState();
+}
+
+const spotifyPanel = document.getElementById('spotify-panel');
+
+document.getElementById('btn-music').addEventListener('click', () => {
+  spotifyPanel.hidden = !spotifyPanel.hidden;
+  if (!spotifyPanel.hidden && state.spotifyUrl) {
+    document.getElementById('spotify-url-input').value = state.spotifyUrl;
+  }
+});
+
+document.getElementById('btn-close-spotify').addEventListener('click', () => {
+  spotifyPanel.hidden = true;
+});
+
+document.getElementById('btn-spotify-load').addEventListener('click', () => {
+  const url = document.getElementById('spotify-url-input').value.trim();
+  if (!url) return;
+  const ok = applySpotifyEmbed(url);
+  if (!ok) {
+    document.getElementById('spotify-url-input').style.borderColor = 'var(--danger)';
+    setTimeout(() => document.getElementById('spotify-url-input').style.borderColor = '', 1500);
+  }
+});
+
+document.getElementById('spotify-url-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('btn-spotify-load').click();
+});
+
+document.getElementById('btn-spotify-remove').addEventListener('click', clearSpotifyEmbed);
 
 /* ============================================================
    Init

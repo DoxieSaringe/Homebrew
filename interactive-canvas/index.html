@@ -15,6 +15,7 @@
         <button id="btn-add-circle" title="Add Circle">+ Circle</button>
       </div>
       <div class="toolbar-right">
+        <button id="btn-music" title="Background music (Spotify)">&#9834; Music</button>
         <button id="btn-layers" title="Toggle layers panel">Layers</button>
         <button id="btn-clear" title="Delete all shapes">Clear All</button>
         <button id="btn-fullscreen" title="Toggle fullscreen (F11)">&#x26F6; Fullscreen</button>
@@ -25,6 +26,21 @@
       <!-- drop zone hint -->
       <div id="canvas-hint">Drop an image file here to create a shape</div>
     </main>
+
+    <!-- Spotify music panel -->
+    <div id="spotify-panel" class="spotify-panel" hidden>
+      <div class="spotify-header">
+        <span>&#9834; Background Music</span>
+        <button id="btn-close-spotify" title="Close">&#x2715;</button>
+      </div>
+      <p class="spotify-hint">Paste a Spotify link (track, album or playlist)</p>
+      <div class="spotify-url-row">
+        <input id="spotify-url-input" type="text" class="modal-input" placeholder="https://open.spotify.com/playlist/…" autocomplete="off" spellcheck="false" />
+        <button id="btn-spotify-load" class="btn-primary">Load</button>
+      </div>
+      <div id="spotify-embed-wrap"></div>
+      <button id="btn-spotify-remove" class="btn-danger" style="display:none;margin-top:8px;width:100%">Remove music</button>
+    </div>
 
     <!-- Layers panel -->
     <div id="layers-panel" class="layers-panel" hidden>

@@ -154,6 +154,55 @@ html, body {
 /* ============================================================
    Layers Panel
    ============================================================ */
+/* ============================================================
+   Spotify panel
+   ============================================================ */
+.spotify-panel {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  width: 320px;
+  background: var(--toolbar-bg);
+  border: 1px solid var(--toolbar-border);
+  border-radius: 10px;
+  padding: 12px;
+  z-index: 50;
+  user-select: none;
+}
+.spotify-panel[hidden] { display: none; }
+
+.spotify-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #1db954;
+}
+.spotify-header button {
+  width: 20px; height: 20px;
+  background: transparent; border: none;
+  color: var(--text-muted); cursor: pointer;
+  font-size: 13px; border-radius: 3px;
+}
+.spotify-header button:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+.spotify-hint { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+
+.spotify-url-row { display: flex; gap: 6px; margin-bottom: 10px; }
+.spotify-url-row .modal-input { flex: 1; width: auto; margin-bottom: 0; height: 32px; font-size: 12px; }
+
+#spotify-embed-wrap iframe { border-radius: 8px; display: block; }
+
+/* Keep panel visible but slide it off-screen during presentation so audio continues */
+body.presentation-mode .spotify-panel {
+  transform: translateX(calc(-100% - 32px));
+  pointer-events: none;
+}
+
 .layers-panel {
   position: absolute;
   top: 0;
