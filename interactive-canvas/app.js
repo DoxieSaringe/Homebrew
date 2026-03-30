@@ -285,12 +285,24 @@ function renderShape(shape) {
   opacitySlider.title = 'Opacity';
   toolbar.appendChild(opacitySlider);
 
-  const label = document.createElement('span');
-  label.className = 'shape-label';
-  label.textContent = shape.type === 'circle' ? 'Circle' : 'Rect';
-  toolbar.appendChild(label);
-
   wrapper.appendChild(toolbar);
+
+  // ── Inline name label ─────────────────────────────────────
+  const nameLabel = document.createElement('input');
+  nameLabel.type = 'text';
+  nameLabel.className = 'shape-name-label';
+  const defaultName = shape.type === 'circle' ? 'Circle' : 'Rect';
+  nameLabel.value = shape.name || defaultName;
+  nameLabel.placeholder = defaultName;
+  nameLabel.addEventListener('click', e => e.stopPropagation());
+  nameLabel.addEventListener('pointerdown', e => e.stopPropagation());
+  nameLabel.addEventListener('change', e => {
+    shape.name = e.target.value.trim();
+    syncLayerName(shape);
+    saveState();
+  });
+  nameLabel.addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
+  wrapper.appendChild(nameLabel);
 
   canvas.appendChild(wrapper);
 
@@ -470,6 +482,18 @@ function updateShapeDOM(shape) {
   const tly = Math.min(corners[0].y, corners[1].y);
   toolbar.style.left = Math.max(0, tlx) + 'px';
   toolbar.style.top  = Math.max(0, tly - 34) + 'px';
+
+  // Keep inline name label in sync and positioned below shape
+  const nameLabel = wrapper.querySelector('.shape-name-label');
+  if (nameLabel) {
+    if (document.activeElement !== nameLabel) {
+      nameLabel.value = shape.name || '';
+      nameLabel.placeholder = shape.type === 'circle' ? 'Circle' : 'Rect';
+    }
+    nameLabel.style.left = Math.max(0, tlx) + 'px';
+    nameLabel.style.top  = (bbox.minY + bbox.h + 6) + 'px';
+    nameLabel.style.width = Math.max(60, bbox.w) + 'px';
+  }
 
   applyContentTransform(shape);
 }
@@ -1054,6 +1078,21 @@ window.addEventListener('beforeunload', saveState);
 const layersPanel = document.getElementById('layers-panel');
 const layersList  = document.getElementById('layers-list');
 
+// Sync the shape's inline name label with its layers-panel input
+function syncLayerName(shape) {
+  const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
+  if (wrapper) {
+    const nl = wrapper.querySelector('.shape-name-label');
+    if (nl && document.activeElement !== nl) nl.value = shape.name || '';
+  }
+  const layerInput = document.querySelector(`#layers-list [data-id="${shape.id}"] .layer-name-input`);
+  if (layerInput && document.activeElement !== layerInput) {
+    const typeLabel = shape.type === 'circle' ? 'Circle' : 'Rect';
+    const mediaLabel = shape.media ? (shape.media.type === 'youtube' ? ' (YT)' : ' (img)') : '';
+    layerInput.value = shape.name || (typeLabel + mediaLabel);
+  }
+}
+
 function renderLayersPanel() {
   if (!layersList) return;
   layersList.innerHTML = '';
@@ -1076,6 +1115,7 @@ function renderLayersPanel() {
     nameInput.addEventListener('click', e => e.stopPropagation());
     nameInput.addEventListener('change', e => {
       shape.name = e.target.value.trim();
+      syncLayerName(shape);
       saveState();
     });
     nameInput.addEventListener('keydown', e => {
