@@ -19,6 +19,136 @@ const state = {
 };
 
 const STORAGE_KEY = 'interactive-canvas-v1';
+const MESH_ROWS = 4, MESH_COLS = 4;
+
+/* ============================================================
+   Mesh warp math
+   ============================================================ */
+function initMeshPoints(corners, rows, cols) {
+  const [tl, tr, br, bl] = corners;
+  const pts = [];
+  for (let r = 0; r <= rows; r++) {
+    for (let c = 0; c <= cols; c++) {
+      const u = c / cols, v = r / rows;
+      pts.push({
+        x: (1-u)*(1-v)*tl.x + u*(1-v)*tr.x + u*v*br.x + (1-u)*v*bl.x,
+        y: (1-u)*(1-v)*tl.y + u*(1-v)*tr.y + u*v*br.y + (1-u)*v*bl.y,
+      });
+    }
+  }
+  return pts;
+}
+
+function drawWarpedTriangle(ctx, img, x0,y0,u0,v0, x1,y1,u1,v1, x2,y2,u2,v2) {
+  const iw = img.naturalWidth || img.width;
+  const ih = img.naturalHeight || img.height;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x0,y0); ctx.lineTo(x1,y1); ctx.lineTo(x2,y2);
+  ctx.closePath(); ctx.clip();
+  const px0=u0*iw, py0=v0*ih, px1=u1*iw, py1=v1*ih, px2=u2*iw, py2=v2*ih;
+  const det = (px1-px0)*(py2-py0) - (px2-px0)*(py1-py0);
+  if (Math.abs(det) < 0.001) { ctx.restore(); return; }
+  const a=((x1-x0)*(py2-py0)-(x2-x0)*(py1-py0))/det;
+  const b=((x2-x0)*(px1-px0)-(x1-x0)*(px2-px0))/det;
+  const c_=x0-a*px0-b*py0;
+  const d=((y1-y0)*(py2-py0)-(y2-y0)*(py1-py0))/det;
+  const e=((y2-y0)*(px1-px0)-(y1-y0)*(px2-px0))/det;
+  const f=y0-d*px0-e*py0;
+  ctx.transform(a,d,b,e,c_,f);
+  ctx.drawImage(img,0,0);
+  ctx.restore();
+}
+
+function renderMeshCanvas(shape) {
+  if (!shape.mesh || shape.media?.type !== 'image') return;
+  const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
+  if (!wrapper) return;
+  const canvasEl = wrapper.querySelector('.mesh-canvas');
+  if (!canvasEl) return;
+  if (!shape._img) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { shape._img = img; renderMeshCanvas(shape); };
+    img.src = shape.media.url;
+    return;
+  }
+  const cw = canvas.offsetWidth, ch = canvas.offsetHeight;
+  if (canvasEl.width !== cw || canvasEl.height !== ch) { canvasEl.width=cw; canvasEl.height=ch; }
+  const ctx = canvasEl.getContext('2d');
+  ctx.clearRect(0,0,cw,ch);
+  const {rows, cols, points} = shape.mesh;
+  const stride = cols+1;
+  if (shape.type === 'circle') {
+    const xs=points.map(p=>p.x), ys=points.map(p=>p.y);
+    ctx.save(); ctx.beginPath();
+    ctx.ellipse((Math.min(...xs)+Math.max(...xs))/2,(Math.min(...ys)+Math.max(...ys))/2,
+      (Math.max(...xs)-Math.min(...xs))/2,(Math.max(...ys)-Math.min(...ys))/2,0,0,Math.PI*2);
+    ctx.clip();
+  }
+  for (let r=0; r<rows; r++) {
+    for (let c=0; c<cols; c++) {
+      const tl=points[r*stride+c], tr=points[r*stride+c+1];
+      const br=points[(r+1)*stride+c+1], bl=points[(r+1)*stride+c];
+      const u0=c/cols, u1=(c+1)/cols, v0=r/rows, v1=(r+1)/rows;
+      drawWarpedTriangle(ctx,shape._img, tl.x,tl.y,u0,v0, tr.x,tr.y,u1,v0, br.x,br.y,u1,v1);
+      drawWarpedTriangle(ctx,shape._img, tl.x,tl.y,u0,v0, br.x,br.y,u1,v1, bl.x,bl.y,u0,v1);
+    }
+  }
+  if (shape.type === 'circle') ctx.restore();
+}
+
+function enableMesh(shape) {
+  if (shape.media?.type !== 'image') return;
+  if (!shape.mesh) {
+    shape.mesh = { rows: MESH_ROWS, cols: MESH_COLS, points: initMeshPoints(shape.corners, MESH_ROWS, MESH_COLS) };
+  }
+  const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
+  if (!wrapper) return;
+  wrapper.classList.add('has-mesh');
+  wrapper.querySelector('.shape-content').style.display = 'none';
+  wrapper.querySelector('.mesh-canvas').style.display = 'block';
+  buildMeshHandles(shape, wrapper);
+  renderMeshCanvas(shape);
+}
+
+function disableMesh(shape) {
+  shape.mesh = null; shape._img = null;
+  const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
+  if (!wrapper) return;
+  wrapper.classList.remove('has-mesh');
+  wrapper.querySelector('.shape-content').style.display = '';
+  const ce = wrapper.querySelector('.mesh-canvas');
+  if (ce) { ce.style.display='none'; const ctx=ce.getContext('2d'); ctx.clearRect(0,0,ce.width,ce.height); }
+  wrapper.querySelectorAll('.mesh-handle').forEach(h => h.remove());
+  applyMedia(shape);
+}
+
+function buildMeshHandles(shape, wrapper) {
+  wrapper.querySelectorAll('.mesh-handle').forEach(h => h.remove());
+  shape.mesh.points.forEach((pt, idx) => {
+    const h = document.createElement('div');
+    h.className = 'handle mesh-handle';
+    h.dataset.meshIdx = idx;
+    h.style.left = pt.x+'px'; h.style.top = pt.y+'px';
+    h.addEventListener('pointerdown', e => {
+      e.stopPropagation(); e.preventDefault();
+      h.setPointerCapture(e.pointerId);
+      selectShape(shape.id);
+      state.dragContext = { type:'mesh-point', shapeId:shape.id, meshIdx:idx };
+    });
+    wrapper.appendChild(h);
+  });
+}
+
+function syncMeshHandles(shape) {
+  const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
+  if (!wrapper || !shape.mesh) return;
+  shape.mesh.points.forEach((pt, idx) => {
+    const h = wrapper.querySelector(`.mesh-handle[data-mesh-idx="${idx}"]`);
+    if (h) { h.style.left=pt.x+'px'; h.style.top=pt.y+'px'; }
+  });
+}
 
 /* ============================================================
    Homography math
@@ -201,6 +331,12 @@ function renderShape(shape) {
 
   wrapper.appendChild(content);
 
+  // ── Mesh canvas ───────────────────────────────────────────
+  const meshCanvas = document.createElement('canvas');
+  meshCanvas.className = 'mesh-canvas';
+  meshCanvas.style.display = 'none';
+  wrapper.appendChild(meshCanvas);
+
   // ── iframe shield ────────────────────────────────────────
   const shield = document.createElement('div');
   shield.className = 'iframe-shield';
@@ -253,8 +389,15 @@ function renderShape(shape) {
   btnPlay.className = 'btn-play-toggle';
   btnPlay.title = 'Switch between edit and play mode';
   btnPlay.textContent = '▶ Play';
-  btnPlay.style.display = 'none'; // hidden until media attached
+  btnPlay.style.display = 'none';
   toolbar.appendChild(btnPlay);
+
+  const btnMesh = document.createElement('button');
+  btnMesh.className = 'btn-mesh';
+  btnMesh.title = 'Mesh warp (images only)';
+  btnMesh.textContent = '⊞';
+  btnMesh.style.display = 'none';
+  toolbar.appendChild(btnMesh);
 
   const label = document.createElement('span');
   label.className = 'shape-label';
@@ -330,6 +473,7 @@ function wireShapeEvents(shape, wrapper) {
       shapeId: shape.id,
       startPointer: c,
       startCorners: shape.corners.map(p => ({ ...p })),
+      startMeshPts: shape.mesh ? shape.mesh.points.map(p => ({ ...p })) : null,
     };
   });
 
@@ -356,6 +500,13 @@ function wireShapeEvents(shape, wrapper) {
     const isEdit = wrapper.classList.contains('edit-mode');
     setEditMode(wrapper, !isEdit);
     e.currentTarget.textContent = isEdit ? '✎ Edit' : '▶ Play';
+  });
+
+  wrapper.querySelector('.btn-mesh').addEventListener('click', e => {
+    e.stopPropagation();
+    if (shape.mesh) { disableMesh(shape); e.currentTarget.classList.remove('active'); }
+    else            { enableMesh(shape);  e.currentTarget.classList.add('active'); }
+    saveState();
   });
 }
 
@@ -404,8 +555,12 @@ function updateShapeDOM(shape) {
   toolbar.style.left = Math.max(0, tlx) + 'px';
   toolbar.style.top  = Math.max(0, tly - 34) + 'px';
 
-  // Placeholder inside content div (no media state)
-  applyContentTransform(shape);
+  if (shape.mesh) {
+    syncMeshHandles(shape);
+    renderMeshCanvas(shape);
+  } else {
+    applyContentTransform(shape);
+  }
 }
 
 /* ============================================================
@@ -497,6 +652,12 @@ function applyMedia(shape) {
 
   wrapper.classList.add('has-media');
   if (placeholder) placeholder.style.display = 'none';
+  // Show mesh button only for images
+  const btnMesh = wrapper.querySelector('.btn-mesh');
+  if (btnMesh) {
+    btnMesh.style.display = shape.media.type === 'image' ? '' : 'none';
+    btnMesh.classList.toggle('active', !!shape.mesh);
+  }
 
   const bbox = getBBox(shape.corners);
   let el;
@@ -523,9 +684,11 @@ function applyMedia(shape) {
 
   // Show play toggle
   wrapper.querySelector('.btn-play-toggle').style.display = '';
-  // Default: edit mode (shield active, video draggable)
   setEditMode(wrapper, true);
   wrapper.querySelector('.btn-play-toggle').textContent = '▶ Play';
+
+  // Restore mesh if previously enabled
+  if (shape.mesh) { enableMesh(shape); return; }
 
   applyContentTransform(shape);
 }
@@ -605,7 +768,18 @@ window.addEventListener('pointermove', e => {
     const dx = pt.x - dc.startPointer.x;
     const dy = pt.y - dc.startPointer.y;
     shape.corners = dc.startCorners.map(c => ({ x: c.x + dx, y: c.y + dy }));
+    if (shape.mesh && dc.startMeshPts) {
+      shape.mesh.points = dc.startMeshPts.map(p => ({ x: p.x+dx, y: p.y+dy }));
+    }
     updateShapeDOM(shape);
+  } else if (dc.type === 'mesh-point') {
+    shape.mesh.points[dc.meshIdx] = { ...pt };
+    const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
+    if (wrapper) {
+      const h = wrapper.querySelector(`.mesh-handle[data-mesh-idx="${dc.meshIdx}"]`);
+      if (h) { h.style.left=pt.x+'px'; h.style.top=pt.y+'px'; }
+    }
+    renderMeshCanvas(shape);
   }
 });
 
