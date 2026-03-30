@@ -24,6 +24,7 @@
   --toolbar-h:       48px;
   --handle-size:     12px;
   --edge-handle-sz:  10px;
+  --layers-w:        220px;
 }
 
 /* ============================================================
@@ -53,6 +54,7 @@ html, body {
   flex-direction: column;
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 /* ============================================================
@@ -118,6 +120,12 @@ html, body {
   background: rgba(255, 68, 68, 0.1);
 }
 
+#btn-layers.active {
+  background: var(--btn-hover);
+  border-color: var(--handle-color);
+  color: var(--handle-color);
+}
+
 /* ============================================================
    Canvas
    ============================================================ */
@@ -129,26 +137,156 @@ html, body {
   cursor: default;
 }
 
+#canvas-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #1e1e1e;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ============================================================
+   Layers Panel
+   ============================================================ */
+.layers-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--layers-w);
+  height: 100%;
+  background: var(--toolbar-bg);
+  border-left: 1px solid var(--toolbar-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+  user-select: none;
+}
+
+.layers-panel[hidden] { display: none; }
+
+.layers-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--toolbar-border);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.layers-header button {
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.layers-header button:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+#layers-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.layer-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 1px 4px;
+  transition: background 0.1s;
+}
+
+.layer-item:hover { background: rgba(255,255,255,0.05); }
+.layer-item.selected { background: rgba(0,212,255,0.12); }
+.layer-item.hidden-shape { opacity: 0.4; }
+
+.layer-type {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  background: rgba(0,212,255,0.2);
+  border: 1px solid var(--btn-border);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--handle-color);
+  flex-shrink: 0;
+}
+
+.layer-name {
+  flex: 1;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layer-actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.layer-item:hover .layer-actions { opacity: 1; }
+
+.layer-actions button {
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.layer-actions button:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.layer-actions .btn-layer-del:hover { color: var(--danger); }
+
 /* ============================================================
    Shape Wrapper
-   Each shape lives inside one of these. It is sized to fill
-   the whole canvas so corner coordinates are canvas-relative.
    ============================================================ */
 .shape-wrapper {
   position: absolute;
   inset: 0;
-  pointer-events: none; /* children opt-in */
+  pointer-events: none;
 }
 
 /* ============================================================
-   Shape Content (the warped layer with image/video)
-   Width/height are set dynamically by JS to the bounding box.
+   Shape Content (warped layer)
    ============================================================ */
 .shape-content {
   position: absolute;
   transform-origin: 0 0;
   overflow: hidden;
   pointer-events: none;
+  transition: opacity 0.1s;
 }
 
 .shape-content .media-el {
@@ -157,7 +295,7 @@ html, body {
   left: 0;
   display: block;
   border: none;
-  pointer-events: none; /* overridden in play mode */
+  pointer-events: none;
 }
 
 .shape-content.is-circle .media-el {
@@ -165,7 +303,19 @@ html, body {
 }
 
 /* ============================================================
-   Placeholder (shown when no media is attached)
+   Mesh Canvas
+   ============================================================ */
+.mesh-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transition: opacity 0.1s;
+}
+
+/* ============================================================
+   Placeholder
    ============================================================ */
 .shape-placeholder {
   position: absolute;
@@ -194,6 +344,7 @@ html, body {
   height: 100%;
   pointer-events: none;
   overflow: visible;
+  transition: opacity 0.1s;
 }
 
 .quad-poly {
@@ -204,23 +355,23 @@ html, body {
   transition: stroke 0.15s, opacity 0.15s;
 }
 
-.shape-wrapper.selected .quad-poly {
-  stroke: var(--outline-sel);
-  opacity: 1;
-}
+.shape-wrapper.selected .quad-poly { stroke: var(--outline-sel); opacity: 1; }
+.shape-wrapper:hover .quad-poly { opacity: 1; }
+.shape-wrapper.has-media:not(:hover):not(.selected) .quad-poly { opacity: 0; }
 
-.shape-wrapper:hover .quad-poly {
-  opacity: 1;
-}
-
-/* Hide outline when media is attached — no border around image/video.
-   Still show on hover or select so editing is still discoverable. */
-.shape-wrapper.has-media:not(:hover):not(.selected) .quad-poly {
+.rotation-line {
+  stroke: var(--outline-color);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
   opacity: 0;
+  transition: opacity 0.15s;
 }
+
+.shape-wrapper:hover .rotation-line,
+.shape-wrapper.selected .rotation-line { opacity: 0.5; }
 
 /* ============================================================
-   Handles (corners + edges)
+   Handles
    ============================================================ */
 .handle {
   position: absolute;
@@ -234,43 +385,57 @@ html, body {
   z-index: 10;
 }
 
-.handle:hover {
-  background: var(--handle-hover);
-  transform: translate(-50%, -50%) scale(1.25);
-}
-
-.handle:active {
-  cursor: grabbing;
-}
+.handle:hover { background: var(--handle-hover); transform: translate(-50%, -50%) scale(1.25); }
+.handle:active { cursor: grabbing; }
 
 .shape-wrapper:hover .handle,
-.shape-wrapper.selected .handle {
-  opacity: 1;
-}
+.shape-wrapper.selected .handle { opacity: 1; }
 
-.corner-handle {
-  width: var(--handle-size);
-  height: var(--handle-size);
-  border-radius: 2px;
-}
+/* Hide corner/edge handles in mesh mode — mesh handles take over */
+.shape-wrapper.has-mesh .corner-handle,
+.shape-wrapper.has-mesh .edge-handle { display: none; }
 
-.edge-handle {
-  width: var(--edge-handle-sz);
-  height: var(--edge-handle-sz);
-  border-radius: 50%;
-  opacity: 0;
-}
+.corner-handle { width: var(--handle-size); height: var(--handle-size); border-radius: 2px; }
+.edge-handle   { width: var(--edge-handle-sz); height: var(--edge-handle-sz); border-radius: 50%; opacity: 0; }
 
 .shape-wrapper:hover .edge-handle,
-.shape-wrapper.selected .edge-handle {
-  opacity: 0.75;
+.shape-wrapper.selected .edge-handle { opacity: 0.75; }
+
+.edge-handle[data-edge="0"], .edge-handle[data-edge="2"] { cursor: ns-resize; }
+.edge-handle[data-edge="1"], .edge-handle[data-edge="3"] { cursor: ew-resize; }
+
+/* Rotation handle */
+.rotation-handle {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #aaffaa;
+  border: 2px solid #000;
+  cursor: crosshair;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: all;
+  opacity: 0;
+  z-index: 10;
+  transition: background 0.1s, opacity 0.15s;
 }
 
-/* Cursor hints per edge */
-.edge-handle[data-edge="0"],
-.edge-handle[data-edge="2"] { cursor: ns-resize; }
-.edge-handle[data-edge="1"],
-.edge-handle[data-edge="3"] { cursor: ew-resize; }
+.shape-wrapper:hover .rotation-handle,
+.shape-wrapper.selected .rotation-handle { opacity: 1; }
+.rotation-handle:hover { background: #fff; transform: translate(-50%,-50%) scale(1.2); }
+
+/* Mesh handles — orange dots on the grid */
+.mesh-handle {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ffaa00;
+  border: 2px solid #000;
+  z-index: 9;
+  cursor: grab;
+}
+
+.mesh-handle:hover { background: #fff; transform: translate(-50%,-50%) scale(1.3); }
 
 /* ============================================================
    Shape Toolbar
@@ -292,9 +457,7 @@ html, body {
 }
 
 .shape-wrapper:hover .shape-toolbar,
-.shape-wrapper.selected .shape-toolbar {
-  opacity: 1;
-}
+.shape-wrapper.selected .shape-toolbar { opacity: 1; }
 
 .shape-toolbar button {
   width: 22px;
@@ -312,34 +475,37 @@ html, body {
   flex-shrink: 0;
 }
 
-.shape-toolbar button:hover {
-  background: var(--btn-hover);
-  color: #fff;
+.shape-toolbar button:hover { background: var(--btn-hover); color: #fff; }
+
+.btn-media-attach { font-size: 16px !important; font-weight: bold !important; color: var(--handle-color) !important; }
+.btn-media-attach:hover { color: #fff !important; }
+.btn-delete:hover { background: rgba(255,68,68,0.2) !important; color: var(--danger) !important; }
+.btn-play-toggle { font-size: 11px !important; width: auto !important; padding: 0 5px !important; border: 1px solid var(--toolbar-border) !important; border-radius: 3px !important; }
+.btn-mesh.active { color: #ffaa00 !important; }
+.btn-layer-up-1, .btn-layer-dn-1 { font-size: 11px !important; }
+
+/* Opacity slider inside toolbar */
+.opacity-slider {
+  width: 52px;
+  height: 4px;
+  cursor: pointer;
+  accent-color: var(--handle-color);
+  border-radius: 2px;
+  outline: none;
+  border: none;
+  background: var(--toolbar-border);
+  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-.btn-media-attach {
-  width: 22px !important;
-  height: 22px !important;
-  font-size: 16px !important;
-  font-weight: bold !important;
-  color: var(--handle-color) !important;
-}
-
-.btn-media-attach:hover {
-  color: #fff !important;
-}
-
-.btn-delete:hover {
-  background: rgba(255, 68, 68, 0.2) !important;
-  color: var(--danger) !important;
-}
-
-.btn-play-toggle {
-  font-size: 11px !important;
-  width: auto !important;
-  padding: 0 5px !important;
-  border: 1px solid var(--toolbar-border) !important;
-  border-radius: 3px !important;
+.opacity-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--handle-color);
+  cursor: grab;
 }
 
 .shape-label {
@@ -350,8 +516,7 @@ html, body {
   padding: 0 3px;
 }
 
-/* Move handle — the drag area for moving the whole shape.
-   z-index 8: above the iframe-shield (6) but below handles (10) */
+/* Move handle */
 .move-handle {
   position: absolute;
   pointer-events: all;
@@ -359,17 +524,21 @@ html, body {
   z-index: 8;
 }
 
-/* iframe shield — covers iframe to allow drag events */
+/* iframe shield */
 .iframe-shield {
   position: absolute;
-  inset: 0;
   z-index: 6;
-  pointer-events: none; /* enabled in edit mode */
+  pointer-events: none;
   background: transparent;
 }
 
-.shape-wrapper.edit-mode .iframe-shield {
-  pointer-events: all;
+.shape-wrapper.edit-mode .iframe-shield { pointer-events: all; }
+
+/* Drag-over state when dropping a file onto a shape */
+.shape-wrapper.drag-over .shape-outline .quad-poly {
+  stroke: #ffaa00;
+  stroke-width: 2.5px;
+  opacity: 1;
 }
 
 /* ============================================================
@@ -378,7 +547,7 @@ html, body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0,0,0,0.7);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -386,9 +555,7 @@ html, body {
   z-index: 1000;
 }
 
-.modal-overlay[hidden] {
-  display: none;
-}
+.modal-overlay[hidden] { display: none; }
 
 .modal-box {
   background: var(--modal-bg);
@@ -397,25 +564,13 @@ html, body {
   padding: 24px;
   width: 440px;
   max-width: 92vw;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
 
-.modal-box--small {
-  width: 300px;
-}
+.modal-box--small { width: 300px; }
 
-.modal-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #fff;
-  margin-bottom: 6px;
-}
-
-.modal-hint {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 14px;
-}
+.modal-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+.modal-hint  { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
 
 .modal-input {
   width: 100%;
@@ -430,17 +585,10 @@ html, body {
   transition: border-color 0.15s;
 }
 
-.modal-input:focus {
-  border-color: var(--handle-color);
-}
+.modal-input:focus { border-color: var(--handle-color); }
 
-.modal-loop-row {
-  margin-top: 10px;
-}
-
-.modal-loop-row[hidden] {
-  display: none;
-}
+.modal-loop-row { margin-top: 10px; }
+.modal-loop-row[hidden] { display: none; }
 
 .loop-label {
   display: flex;
@@ -470,11 +618,7 @@ html, body {
   justify-content: center;
 }
 
-.modal-preview img {
-  max-width: 100%;
-  max-height: 120px;
-  object-fit: contain;
-}
+.modal-preview img { max-width: 100%; max-height: 120px; object-fit: contain; }
 
 .modal-preview .preview-yt {
   font-size: 12px;
@@ -485,9 +629,7 @@ html, body {
   gap: 8px;
 }
 
-.modal-preview .preview-yt svg {
-  flex-shrink: 0;
-}
+.modal-preview .preview-yt svg { flex-shrink: 0; }
 
 .modal-actions {
   display: flex;
@@ -497,15 +639,9 @@ html, body {
   gap: 8px;
 }
 
-.modal-actions-right {
-  display: flex;
-  gap: 8px;
-  margin-left: auto;
-}
+.modal-actions-right { display: flex; gap: 8px; margin-left: auto; }
 
-.btn-primary,
-.btn-secondary,
-.btn-danger {
+.btn-primary, .btn-secondary, .btn-danger {
   height: 32px;
   padding: 0 14px;
   border-radius: 5px;
@@ -516,62 +652,31 @@ html, body {
   transition: background 0.15s, color 0.15s;
 }
 
-.btn-primary {
-  background: var(--handle-color);
-  color: #000;
-  border-color: var(--handle-color);
-}
-
-.btn-primary:hover {
-  background: #33ddff;
-}
-
-.btn-secondary {
-  background: transparent;
-  color: var(--text);
-  border-color: var(--modal-border);
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: #fff;
-}
-
-.btn-danger {
-  background: transparent;
-  color: var(--danger);
-  border-color: rgba(255, 68, 68, 0.4);
-}
-
-.btn-danger:hover {
-  background: rgba(255, 68, 68, 0.15);
-}
+.btn-primary  { background: var(--handle-color); color: #000; border-color: var(--handle-color); }
+.btn-primary:hover { background: #33ddff; }
+.btn-secondary { background: transparent; color: var(--text); border-color: var(--modal-border); }
+.btn-secondary:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.btn-danger   { background: transparent; color: var(--danger); border-color: rgba(255,68,68,0.4); }
+.btn-danger:hover { background: rgba(255,68,68,0.15); }
 
 /* ============================================================
    Scrollbar hiding
    ============================================================ */
-::-webkit-scrollbar { width: 0; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
 
 /* ============================================================
-   Presentation mode — press F11 to toggle.
-   Hides all UI; only shapes/media remain. Videos become interactive.
+   Presentation mode
    ============================================================ */
 body.presentation-mode #main-toolbar        { display: none !important; }
 body.presentation-mode .shape-toolbar       { display: none !important; }
 body.presentation-mode .handle              { display: none !important; }
 body.presentation-mode .shape-outline       { display: none !important; }
 body.presentation-mode .move-handle         { display: none !important; }
+body.presentation-mode .layers-panel        { display: none !important; }
 body.presentation-mode .iframe-shield       { pointer-events: none !important; }
 body.presentation-mode .media-el            { pointer-events: all !important; }
 
-/* Fullscreen adjustments (always — even without presentation class) */
-:fullscreen #main-toolbar,
-:-webkit-full-screen #main-toolbar {
-  display: none;
-}
-
-:fullscreen #canvas,
-:-webkit-full-screen #canvas {
-  width: 100vw;
-  height: 100vh;
-}
+:fullscreen #main-toolbar, :-webkit-full-screen #main-toolbar { display: none; }
+:fullscreen #canvas, :-webkit-full-screen #canvas { width: 100vw; height: 100vh; }

@@ -15,21 +15,32 @@
         <button id="btn-add-circle" title="Add Circle">+ Circle</button>
       </div>
       <div class="toolbar-right">
+        <button id="btn-layers" title="Toggle layers panel">Layers</button>
         <button id="btn-clear" title="Delete all shapes">Clear All</button>
-        <button id="btn-fullscreen" title="Toggle fullscreen">&#x26F6; Fullscreen</button>
+        <button id="btn-fullscreen" title="Toggle fullscreen (F11)">&#x26F6; Fullscreen</button>
       </div>
     </header>
 
     <main id="canvas">
-      <!-- Shapes are inserted here by JavaScript -->
+      <!-- drop zone hint -->
+      <div id="canvas-hint">Drop an image file here to create a shape</div>
     </main>
+
+    <!-- Layers panel -->
+    <div id="layers-panel" class="layers-panel" hidden>
+      <div class="layers-header">
+        <span>Layers</span>
+        <button id="btn-close-layers" title="Close">&#x2715;</button>
+      </div>
+      <div id="layers-list"></div>
+    </div>
   </div>
 
   <!-- Media attach modal -->
   <div id="media-modal" class="modal-overlay" hidden>
     <div class="modal-box">
       <h3 class="modal-title">Attach Media</h3>
-      <p class="modal-hint">Paste an image URL or a YouTube link</p>
+      <p class="modal-hint">Paste an image URL or a YouTube link — or drag an image file onto the shape</p>
       <input
         id="media-url-input"
         type="text"
