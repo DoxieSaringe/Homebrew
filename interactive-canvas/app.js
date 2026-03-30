@@ -17,14 +17,7 @@ const state = {
   dragContext: null,  // active drag info
   modalShapeId: null, // which shape the media modal is for
   spotifyUrl: null,
-  castConnection: null,
 };
-
-// ── Receiver mode (Chromecast) ─────────────────────────────
-const IS_RECEIVER = new URLSearchParams(location.search).has('receiver');
-if (IS_RECEIVER) {
-  document.body.classList.add('receiver-mode');
-}
 
 const STORAGE_KEY = 'interactive-canvas-v1';
 
@@ -1065,10 +1058,6 @@ function saveState() {
   } catch (e) {
     console.warn('Could not save state:', e);
   }
-  // Sync to Chromecast if connected
-  if (state.castConnection) {
-    try { state.castConnection.send(JSON.stringify(data)); } catch {}
-  }
 }
 
 function loadState() {
@@ -1212,64 +1201,43 @@ document.getElementById('btn-close-layers').addEventListener('click', () => {
 });
 
 /* ============================================================
-   Chromecast — Presentation API sender
+   Cast — fullscreen + guide overlay för Chrome "Cast tab"
    ============================================================ */
-const castReceiverUrl = location.origin + location.pathname + '?receiver=1';
+let _castActive = false;
 
-function setCastButtonState(connected) {
-  const btn = document.getElementById('btn-cast');
-  if (!btn) return;
-  btn.classList.toggle('active', connected);
-  btn.title = connected ? 'Stop casting' : 'Cast to Chromecast';
-  btn.textContent = connected ? '⊿ Casting…' : '⊿ Cast';
-}
-
-async function startCast() {
-  if (!('presentation' in navigator)) {
-    showCastFallback();
-    return;
-  }
-  try {
-    const request = new PresentationRequest([castReceiverUrl]);
-    const connection = await request.start();
-    state.castConnection = connection;
-    setCastButtonState(true);
-
-    // Send current state immediately
-    const data = { shapes: state.shapes, nextZ: state.nextZ, spotifyUrl: state.spotifyUrl || null };
-    setTimeout(() => {
-      try { connection.send(JSON.stringify(data)); } catch {}
-    }, 1500); // small delay for receiver page to load
-
-    connection.onclose = () => {
-      state.castConnection = null;
-      setCastButtonState(false);
-    };
-    connection.onterminate = () => {
-      state.castConnection = null;
-      setCastButtonState(false);
-    };
-  } catch (err) {
-    if (err.name !== 'NotAllowedError') showCastFallback();
-  }
+function startCast() {
+  _castActive = true;
+  enterPresentationMode();
+  document.getElementById('btn-cast').textContent = '↩ Avsluta cast';
+  document.getElementById('btn-cast').classList.add('active');
+  const guide = document.getElementById('cast-guide');
+  if (guide) { guide.hidden = false; }
 }
 
 function stopCast() {
-  if (state.castConnection) {
-    state.castConnection.terminate();
-    state.castConnection = null;
-  }
-  setCastButtonState(false);
-}
-
-function showCastFallback() {
-  const d = document.getElementById('cast-fallback');
-  if (d) { d.hidden = false; setTimeout(() => { d.hidden = true; }, 6000); }
+  _castActive = false;
+  exitPresentationMode();
+  document.getElementById('btn-cast').textContent = '⊿ Cast';
+  document.getElementById('btn-cast').classList.remove('active');
+  const guide = document.getElementById('cast-guide');
+  if (guide) guide.hidden = true;
 }
 
 document.getElementById('btn-cast')?.addEventListener('click', () => {
-  if (state.castConnection) stopCast();
-  else startCast();
+  if (_castActive) stopCast(); else startCast();
+});
+
+document.getElementById('btn-cast-ok')?.addEventListener('click', () => {
+  document.getElementById('cast-guide').hidden = true;
+});
+
+// If user exits fullscreen (Esc) while casting, also clear cast state
+document.addEventListener('fullscreenchange', () => {
+  if (!document.fullscreenElement && _castActive) {
+    _castActive = false;
+    document.getElementById('btn-cast').textContent = '⊿ Cast';
+    document.getElementById('btn-cast').classList.remove('active');
+  }
 });
 
 /* ============================================================
@@ -1348,38 +1316,8 @@ document.getElementById('btn-spotify-remove').addEventListener('click', clearSpo
 /* ============================================================
    Init
    ============================================================ */
-function applyReceivedState(data) {
-  // Remove all current shapes from DOM
-  document.querySelectorAll('[data-id]').forEach(el => el.remove());
-  state.shapes = data.shapes || [];
-  state.nextZ  = data.nextZ  || 1;
-  state.shapes.forEach(shape => renderShape(shape));
-  if (data.spotifyUrl && data.spotifyUrl !== state.spotifyUrl) {
-    state.spotifyUrl = data.spotifyUrl;
-    applySpotifyEmbed(data.spotifyUrl);
-  } else if (!data.spotifyUrl) {
-    clearSpotifyEmbed();
-  }
-}
-
-function initReceiver() {
-  if (!navigator.presentation?.receiver) return;
-  navigator.presentation.receiver.connectionList.then(list => {
-    list.connections.forEach(conn => {
-      conn.onmessage = e => { try { applyReceivedState(JSON.parse(e.data)); } catch {} };
-    });
-    list.onconnectionavailable = e => {
-      e.connection.onmessage = e2 => { try { applyReceivedState(JSON.parse(e2.data)); } catch {} };
-    };
-  }).catch(() => {});
-}
-
 function init() {
-  if (IS_RECEIVER) {
-    initReceiver();
-  } else {
-    loadState();
-  }
+  loadState();
 }
 
 init();

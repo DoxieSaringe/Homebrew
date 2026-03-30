@@ -753,41 +753,50 @@ body.presentation-mode .layers-panel        { display: none !important; }
 body.presentation-mode .iframe-shield       { pointer-events: none !important; }
 body.presentation-mode #canvas-hint          { display: none !important; }
 
-/* ── Receiver mode (Chromecast) ────────────────────────────── */
-body.receiver-mode #main-toolbar    { display: none !important; }
-body.receiver-mode .shape-toolbar   { display: none !important; }
-body.receiver-mode .handle          { display: none !important; }
-body.receiver-mode .shape-outline   { display: none !important; }
-body.receiver-mode .move-handle     { display: none !important; }
-body.receiver-mode .layers-panel    { display: none !important; }
-body.receiver-mode .spotify-panel   { display: none !important; }
-body.receiver-mode .shape-name-label { display: none !important; }
-body.receiver-mode #canvas-hint     { display: none !important; }
-body.receiver-mode .iframe-shield   { pointer-events: none !important; }
-body.receiver-mode #canvas          { width: 100vw; height: 100vh; background: #000; }
-body.receiver-mode #app             { background: #000; }
-
 /* Cast button */
 #btn-cast.active { color: #1db954 !important; }
 
-/* Cast fallback toast */
-.cast-fallback {
+/* Cast guide overlay */
+.cast-guide {
   position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(30,30,30,0.97);
-  border: 1px solid var(--toolbar-border);
-  border-radius: 8px;
-  padding: 12px 18px;
-  font-size: 13px;
-  color: var(--text);
-  z-index: 200;
-  text-align: center;
-  line-height: 1.6;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  background: rgba(0,0,0,0.6);
 }
-.cast-fallback[hidden] { display: none; }
+.cast-guide[hidden] { display: none; }
+
+.cast-guide-box {
+  background: #1a1a1a;
+  border: 1px solid var(--toolbar-border);
+  border-radius: 12px;
+  padding: 28px 32px;
+  max-width: 360px;
+  width: 90%;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+}
+.cast-guide-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1db954;
+  margin-bottom: 16px;
+}
+.cast-guide-steps {
+  padding-left: 20px;
+  margin: 0 0 14px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 2;
+}
+.cast-guide-steps strong { color: #fff; }
+.cast-guide-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+.cast-guide-box .btn-primary { width: 100%; }
 
 :fullscreen #main-toolbar, :-webkit-full-screen #main-toolbar { display: none; }
 :fullscreen #canvas, :-webkit-full-screen #canvas { width: 100vw; height: 100vh; }

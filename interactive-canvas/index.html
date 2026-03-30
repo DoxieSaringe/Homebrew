@@ -28,10 +28,19 @@
       <div id="canvas-hint">Drop an image file here to create a shape</div>
     </main>
 
-    <!-- Cast fallback message -->
-    <div id="cast-fallback" class="cast-fallback" hidden>
-      Chromecast ej tillgänglig i den här webbläsaren.<br>
-      Använd Chrome → <strong>⋮ → Cast → Cast tab</strong> för att spegla skärmen.
+    <!-- Cast guide overlay -->
+    <div id="cast-guide" class="cast-guide" hidden>
+      <div class="cast-guide-box">
+        <div class="cast-guide-title">&#8855; Så här castar du till TV:n</div>
+        <ol class="cast-guide-steps">
+          <li>Klicka på <strong>⋮</strong> i Chrome (uppe till höger)</li>
+          <li>Välj <strong>Cast…</strong></li>
+          <li>Klicka <strong>Cast tab</strong> (inte Cast desktop)</li>
+          <li>Välj din Chromecast i listan</li>
+        </ol>
+        <p class="cast-guide-note">&#9834; Spotify-musik ingår automatiskt i tab-castingen</p>
+        <button id="btn-cast-ok" class="btn-primary">OK, fattat!</button>
+      </div>
     </div>
 
     <!-- Spotify music panel -->
