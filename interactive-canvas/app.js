@@ -787,6 +787,8 @@ function selectShape(id) {
     const wrapper = document.querySelector(`[data-id="${id}"]`);
     if (wrapper) wrapper.classList.add('selected');
   }
+  const lp = document.getElementById('layers-panel');
+  if (lp && !lp.hidden) renderLayersPanel();
 }
 
 function deselectAll() {
@@ -1209,6 +1211,101 @@ function loadState() {
 }
 
 window.addEventListener('beforeunload', saveState);
+
+/* ============================================================
+   Layers panel
+   ============================================================ */
+const layersPanel = document.getElementById('layers-panel');
+const layersList  = document.getElementById('layers-list');
+
+function renderLayersPanel() {
+  if (!layersList) return;
+  layersList.innerHTML = '';
+  // Sorted top-to-bottom by z-index descending
+  const sorted = [...state.shapes].sort((a, b) => b.zIndex - a.zIndex);
+  sorted.forEach(shape => {
+    const item = document.createElement('div');
+    item.className = 'layer-item' + (shape.id === state.selectedId ? ' selected' : '');
+    item.dataset.id = shape.id;
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'layer-name';
+    const typeLabel = shape.type === 'circle' ? 'Circle' : 'Rect';
+    const mediaLabel = shape.media ? (shape.media.type === 'youtube' ? ' (YT)' : ' (img)') : '';
+    nameSpan.textContent = typeLabel + mediaLabel;
+    item.appendChild(nameSpan);
+
+    const actions = document.createElement('div');
+    actions.className = 'layer-actions';
+
+    const btnUp = document.createElement('button');
+    btnUp.title = 'Bring forward';
+    btnUp.innerHTML = '&#8679;';
+    btnUp.addEventListener('click', e => {
+      e.stopPropagation();
+      shape.zIndex = state.nextZ++;
+      const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
+      if (wrapper) wrapper.style.zIndex = shape.zIndex;
+      saveState();
+      renderLayersPanel();
+    });
+
+    const btnDown = document.createElement('button');
+    btnDown.title = 'Send backward';
+    btnDown.innerHTML = '&#8681;';
+    btnDown.addEventListener('click', e => {
+      e.stopPropagation();
+      // Find the shape just below and swap z-indices
+      const allZ = state.shapes.map(s => s.zIndex).sort((a,b) => a-b);
+      const currentIdx = allZ.indexOf(shape.zIndex);
+      if (currentIdx > 0) {
+        const targetZ = allZ[currentIdx - 1];
+        const other = state.shapes.find(s => s.zIndex === targetZ);
+        if (other) {
+          [shape.zIndex, other.zIndex] = [other.zIndex, shape.zIndex];
+          const wA = document.querySelector(`[data-id="${shape.id}"]`);
+          const wB = document.querySelector(`[data-id="${other.id}"]`);
+          if (wA) wA.style.zIndex = shape.zIndex;
+          if (wB) wB.style.zIndex = other.zIndex;
+        }
+      }
+      saveState();
+      renderLayersPanel();
+    });
+
+    const btnDel = document.createElement('button');
+    btnDel.title = 'Delete';
+    btnDel.innerHTML = '&times;';
+    btnDel.addEventListener('click', e => {
+      e.stopPropagation();
+      deleteShape(shape.id);
+      renderLayersPanel();
+    });
+
+    actions.appendChild(btnUp);
+    actions.appendChild(btnDown);
+    actions.appendChild(btnDel);
+    item.appendChild(actions);
+
+    item.addEventListener('click', () => {
+      selectShape(shape.id);
+      renderLayersPanel();
+    });
+
+    layersList.appendChild(item);
+  });
+}
+
+document.getElementById('btn-layers').addEventListener('click', () => {
+  const hidden = layersPanel.hidden;
+  layersPanel.hidden = !hidden;
+  if (!hidden) return;
+  renderLayersPanel();
+});
+
+document.getElementById('btn-close-layers').addEventListener('click', () => {
+  layersPanel.hidden = true;
+});
 
 /* ============================================================
    Init
