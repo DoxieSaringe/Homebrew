@@ -171,6 +171,7 @@ function createShape(type) {
   return {
     id: crypto.randomUUID(),
     type,                       // 'rect' | 'circle'
+    name: '',
     corners: defaultCorners(),
     media: null,
     zIndex: state.nextZ++,
@@ -1047,12 +1048,24 @@ function renderLayersPanel() {
     item.className = 'layer-item' + (shape.id === state.selectedId ? ' selected' : '');
     item.dataset.id = shape.id;
 
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'layer-name';
     const typeLabel = shape.type === 'circle' ? 'Circle' : 'Rect';
     const mediaLabel = shape.media ? (shape.media.type === 'youtube' ? ' (YT)' : ' (img)') : '';
-    nameSpan.textContent = typeLabel + mediaLabel;
-    item.appendChild(nameSpan);
+    const displayName = shape.name || (typeLabel + mediaLabel);
+
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.className = 'layer-name-input';
+    nameInput.value = displayName;
+    nameInput.title = 'Click to rename';
+    nameInput.addEventListener('click', e => e.stopPropagation());
+    nameInput.addEventListener('change', e => {
+      shape.name = e.target.value.trim();
+      saveState();
+    });
+    nameInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.target.blur(); }
+    });
+    item.appendChild(nameInput);
 
     const actions = document.createElement('div');
     actions.className = 'layer-actions';
