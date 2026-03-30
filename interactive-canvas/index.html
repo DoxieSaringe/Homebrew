@@ -41,14 +41,18 @@
     <div class="modal-box">
       <h3 class="modal-title">Attach Media</h3>
       <p class="modal-hint">Paste an image URL or a YouTube link — or drag an image file onto the shape</p>
-      <input
-        id="media-url-input"
-        type="text"
-        class="modal-input"
-        placeholder="https://example.com/image.jpg  or  https://youtu.be/..."
-        autocomplete="off"
-        spellcheck="false"
-      />
+      <div class="modal-url-row">
+        <input
+          id="media-url-input"
+          type="text"
+          class="modal-input"
+          placeholder="https://example.com/image.jpg  or  https://youtu.be/..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="btn-media-browse" class="btn-secondary" title="Browse local file">Browse…</button>
+        <input id="media-file-input" type="file" accept="image/*" style="display:none" />
+      </div>
       <div class="modal-preview" id="media-preview" hidden></div>
       <div id="media-yt-options" style="display:none">
         <label class="loop-label">

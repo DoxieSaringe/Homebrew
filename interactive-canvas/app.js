@@ -905,6 +905,22 @@ mediaInput.addEventListener('paste', () => setTimeout(updateMediaPreview, 0));
 
 document.getElementById('btn-media-cancel').addEventListener('click', hideMediaModal);
 
+// Browse local file
+document.getElementById('btn-media-browse').addEventListener('click', () => {
+  document.getElementById('media-file-input').click();
+});
+document.getElementById('media-file-input').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    mediaInput.value = ev.target.result;
+    updateMediaPreview();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = ''; // reset so same file can be picked again
+});
+
 document.getElementById('btn-media-remove').addEventListener('click', () => {
   const shape = state.shapes.find(s => s.id === state.modalShapeId);
   if (shape) {
