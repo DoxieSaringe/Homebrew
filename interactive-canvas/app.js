@@ -1251,6 +1251,54 @@ document.getElementById('btn-close-layers').addEventListener('click', () => {
 });
 
 /* ============================================================
+   JSON Export / Import
+   ============================================================ */
+function exportScene() {
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    shapes: state.shapes.map(s => s.media?.blobUrl ? { ...s, media: null } : s),
+    nextZ: state.nextZ,
+    spotifyUrl: state.spotifyUrl || null,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'canvas-scene.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importScene(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      document.querySelectorAll('[data-id]').forEach(el => el.remove());
+      state.shapes = data.shapes || [];
+      state.nextZ  = data.nextZ  || 1;
+      state.spotifyUrl = data.spotifyUrl || null;
+      state.shapes.forEach(s => renderShape(s));
+      if (state.spotifyUrl) applySpotifyEmbed(state.spotifyUrl);
+      saveState();
+    } catch (e) {
+      alert('Kunde inte läsa filen — är det en giltig canvas-scene.json?');
+    }
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('btn-export').addEventListener('click', exportScene);
+document.getElementById('btn-import').addEventListener('click', () =>
+  document.getElementById('import-file-input').click()
+);
+document.getElementById('import-file-input').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (f) importScene(f);
+  e.target.value = '';
+});
+
+/* ============================================================
    Cast — fullscreen + guide overlay för Chrome "Cast tab"
    ============================================================ */
 let _castActive = false;
