@@ -608,8 +608,8 @@ function applyMedia(shape) {
     el.src = shape.media.url;
     el.autoplay = true;
     el.loop = true;
-    el.muted = false;
-    el.setAttribute('playsinline', '');
+    el.muted = true;           // required for autoplay on iOS Safari
+    el.setAttribute('playsinline', ''); // prevents iOS fullscreen takeover
     el.setAttribute('preload', 'auto');
     el.draggable = false;
   } else {
@@ -625,6 +625,9 @@ function applyMedia(shape) {
   el.style.pointerEvents = 'none'; // controlled by shield
 
   content.appendChild(el);
+
+  // iOS Safari needs an explicit play() call after appending to DOM
+  if (el.tagName === 'VIDEO') el.play().catch(() => {});
 
   // Show play toggle
   wrapper.querySelector('.btn-play-toggle').style.display = '';
