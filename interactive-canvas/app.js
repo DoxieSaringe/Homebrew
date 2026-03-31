@@ -911,6 +911,10 @@ function hideMediaModal() {
   mediaInput.value = '';
   mediaPreview.hidden = true;
   mediaPreview.innerHTML = '';
+  const ts = document.getElementById('theme-select');
+  const tg = document.getElementById('theme-grid');
+  if (ts) ts.value = '';
+  if (tg) { tg.hidden = true; tg.innerHTML = ''; }
 }
 
 function updateMediaPreview() {
@@ -962,6 +966,67 @@ function updateMediaPreview() {
 
 mediaInput.addEventListener('input', updateMediaPreview);
 mediaInput.addEventListener('paste', () => setTimeout(updateMediaPreview, 0));
+
+/* ============================================================
+   Theme picker
+   ============================================================ */
+(function initThemePicker() {
+  if (typeof CANVAS_THEMES === 'undefined') return;
+
+  const themeSelect = document.getElementById('theme-select');
+  const themeGrid   = document.getElementById('theme-grid');
+
+  // Populate dropdown
+  CANVAS_THEMES.forEach(theme => {
+    const opt = document.createElement('option');
+    opt.value = theme.id;
+    opt.textContent = theme.label;
+    themeSelect.appendChild(opt);
+  });
+
+  themeSelect.addEventListener('change', () => {
+    const themeId = themeSelect.value;
+    themeGrid.innerHTML = '';
+    if (!themeId) { themeGrid.hidden = true; return; }
+
+    const theme = CANVAS_THEMES.find(t => t.id === themeId);
+    if (!theme) { themeGrid.hidden = true; return; }
+
+    themeGrid.hidden = false;
+    theme.videos.forEach(video => {
+      const cell = document.createElement('div');
+      cell.className = 'theme-thumb';
+      cell.title = video.title;
+
+      const img = document.createElement('img');
+      img.src = `https://img.youtube.com/vi/${video.id}/mqdefault.jpg`;
+      img.alt = video.title;
+      img.loading = 'lazy';
+      img.onerror = () => cell.classList.add('theme-thumb-error');
+
+      const label = document.createElement('div');
+      label.className = 'theme-thumb-title';
+      label.textContent = video.title;
+
+      cell.appendChild(img);
+      cell.appendChild(label);
+
+      cell.addEventListener('click', () => {
+        // Attach YouTube video directly to the shape and close modal
+        const shape = state.shapes.find(s => s.id === state.modalShapeId);
+        if (!shape) { hideMediaModal(); return; }
+        const loop  = document.getElementById('media-loop').checked;
+        const audio = document.getElementById('media-audio').checked;
+        shape.media = { type: 'youtube', url: `https://www.youtube.com/watch?v=${video.id}`, embedId: video.id, loop, audio };
+        applyMedia(shape);
+        saveState();
+        hideMediaModal();
+      });
+
+      themeGrid.appendChild(cell);
+    });
+  });
+})();
 
 document.getElementById('btn-media-cancel').addEventListener('click', hideMediaModal);
 

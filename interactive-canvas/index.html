@@ -99,6 +99,18 @@
           Spela ljud
         </label>
       </div>
+
+      <!-- Theme picker -->
+      <div class="theme-picker">
+        <div class="theme-picker-header">
+          <span class="theme-picker-label">Or pick a theme</span>
+          <select id="theme-select">
+            <option value="">— Choose theme —</option>
+          </select>
+        </div>
+        <div id="theme-grid" class="theme-grid" hidden></div>
+      </div>
+
       <div class="modal-actions">
         <button id="btn-media-remove" class="btn-danger" hidden>Remove Media</button>
         <div class="modal-actions-right">
@@ -123,6 +135,7 @@
     </div>
   </div>
 
+  <script src="themes.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
