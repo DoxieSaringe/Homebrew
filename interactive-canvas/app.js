@@ -180,6 +180,11 @@ function createShape(type) {
     corners: defaultCorners(),
     media: null,
     zIndex: state.nextZ++,
+    blendMode: 'normal',
+    flipH: false,
+    flipV: false,
+    locked: false,
+    filters: null,              // null = all defaults; { brightness, contrast, saturation, hue }
   };
 }
 
@@ -270,6 +275,42 @@ function renderShape(shape) {
   if (shape.warpMode) btnWarp.classList.add('active');
   toolbar.appendChild(btnWarp);
 
+  // Blend mode
+  const blendSelect = document.createElement('select');
+  blendSelect.className = 'blend-select';
+  blendSelect.title = 'Blend mode (Screen = svart blir transparent)';
+  [['normal','Normal'],['screen','Screen'],['multiply','Multiply'],
+   ['overlay','Overlay'],['lighten','Lighten'],['difference','Difference']]
+    .forEach(([v, l]) => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = l;
+      if (v === (shape.blendMode || 'normal')) o.selected = true;
+      blendSelect.appendChild(o);
+    });
+  toolbar.appendChild(blendSelect);
+
+  // Flip H / V
+  const btnFlipH = document.createElement('button');
+  btnFlipH.className = 'btn-flip-h';
+  btnFlipH.title = 'Flip horisontellt';
+  btnFlipH.textContent = '↔';
+  if (shape.flipH) btnFlipH.classList.add('active');
+  toolbar.appendChild(btnFlipH);
+
+  const btnFlipV = document.createElement('button');
+  btnFlipV.className = 'btn-flip-v';
+  btnFlipV.title = 'Flip vertikalt';
+  btnFlipV.textContent = '↕';
+  if (shape.flipV) btnFlipV.classList.add('active');
+  toolbar.appendChild(btnFlipV);
+
+  // FX (colour correction filters)
+  const btnFx = document.createElement('button');
+  btnFx.className = 'btn-fx';
+  btnFx.title = 'Färgkorrigering (brightness, contrast, saturation, hue)';
+  btnFx.textContent = 'FX';
+  toolbar.appendChild(btnFx);
+
   const btnFront = document.createElement('button');
   btnFront.className = 'btn-front';
   btnFront.title = 'Bring to front';
@@ -317,6 +358,32 @@ function renderShape(shape) {
   nameLabel.addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
   wrapper.appendChild(nameLabel);
 
+  // ── Filter panel (hidden by default, toggled by FX button) ─
+  const filterPanel = document.createElement('div');
+  filterPanel.className = 'filter-panel';
+  filterPanel.hidden = true;
+  [['brightness','☀','0','200','100'],['contrast','◑','0','200','100'],
+   ['saturation','◈','0','200','100'],['hue','⊙','0','360','0']]
+    .forEach(([name, icon, min, max, def]) => {
+      const row = document.createElement('label');
+      row.className = 'filter-row';
+      const val = shape.filters?.[name] ?? +def;
+      const span = document.createElement('span');
+      span.textContent = icon;
+      span.className = 'filter-icon';
+      const sl = document.createElement('input');
+      sl.type = 'range'; sl.min = min; sl.max = max; sl.value = val;
+      sl.dataset.filter = name;
+      sl.title = name;
+      row.appendChild(span);
+      row.appendChild(sl);
+      filterPanel.appendChild(row);
+    });
+  wrapper.appendChild(filterPanel);
+
+  // Apply locked class from saved state
+  if (shape.locked) wrapper.classList.add('locked');
+
   canvas.appendChild(wrapper);
 
   // ── Wire events ───────────────────────────────────────────
@@ -340,6 +407,7 @@ function wireShapeEvents(shape, wrapper) {
   // Corner handle drag
   wrapper.querySelectorAll('.corner-handle').forEach(h => {
     h.addEventListener('pointerdown', e => {
+      if (shape.locked) return;
       e.stopPropagation();
       e.preventDefault();
       h.setPointerCapture(e.pointerId);
@@ -356,6 +424,7 @@ function wireShapeEvents(shape, wrapper) {
   // Edge handle drag
   wrapper.querySelectorAll('.edge-handle').forEach(h => {
     h.addEventListener('pointerdown', e => {
+      if (shape.locked) return;
       e.stopPropagation();
       e.preventDefault();
       h.setPointerCapture(e.pointerId);
@@ -375,6 +444,7 @@ function wireShapeEvents(shape, wrapper) {
   // Move handle drag
   const moveHandle = wrapper.querySelector('.move-handle');
   moveHandle.addEventListener('pointerdown', e => {
+    if (shape.locked) return;
     e.stopPropagation();
     e.preventDefault();
     moveHandle.setPointerCapture(e.pointerId);
@@ -429,6 +499,52 @@ function wireShapeEvents(shape, wrapper) {
     if (content) content.style.opacity = shape.opacity;
     saveState();
   });
+
+  // Blend mode
+  wrapper.querySelector('.blend-select').addEventListener('change', e => {
+    e.stopPropagation();
+    shape.blendMode = e.target.value;
+    applyContentEffects(shape);
+    saveState();
+  });
+
+  // Flip H
+  wrapper.querySelector('.btn-flip-h').addEventListener('click', e => {
+    e.stopPropagation();
+    shape.flipH = !shape.flipH;
+    e.currentTarget.classList.toggle('active', shape.flipH);
+    applyContentTransform(shape);
+    saveState();
+  });
+
+  // Flip V
+  wrapper.querySelector('.btn-flip-v').addEventListener('click', e => {
+    e.stopPropagation();
+    shape.flipV = !shape.flipV;
+    e.currentTarget.classList.toggle('active', shape.flipV);
+    applyContentTransform(shape);
+    saveState();
+  });
+
+  // FX panel toggle
+  wrapper.querySelector('.btn-fx').addEventListener('click', e => {
+    e.stopPropagation();
+    const panel = wrapper.querySelector('.filter-panel');
+    panel.hidden = !panel.hidden;
+    e.currentTarget.classList.toggle('active', !panel.hidden);
+  });
+
+  // Filter sliders
+  wrapper.querySelector('.filter-panel').addEventListener('input', e => {
+    const name = e.target.dataset.filter;
+    if (!name) return;
+    e.stopPropagation();
+    if (!shape.filters) shape.filters = { brightness: 100, contrast: 100, saturation: 100, hue: 0 };
+    shape.filters[name] = +e.target.value;
+    applyContentEffects(shape);
+    saveState();
+  });
+  wrapper.querySelector('.filter-panel').addEventListener('pointerdown', e => e.stopPropagation());
 
   // Rotation handle drag
   const rotHandle = wrapper.querySelector('.rotation-handle');
@@ -564,7 +680,15 @@ function applyContentTransform(shape) {
   content.style.top       = bbox.minY + 'px';
   content.style.width     = w + 'px';
   content.style.height    = h + 'px';
-  content.style.transform = `matrix3d(${cssMatrix})`;
+  const flipStr = [
+    shape.flipH ? 'scaleX(-1)' : '',
+    shape.flipV ? 'scaleY(-1)' : '',
+  ].filter(Boolean).join(' ');
+  content.style.transform = flipStr
+    ? `matrix3d(${cssMatrix}) ${flipStr}`
+    : `matrix3d(${cssMatrix})`;
+
+  applyContentEffects(shape);
 
   // Media element fills the content div (cover for YouTube, exact for others)
   const mediaEl = content.querySelector('.media-el');
@@ -592,6 +716,23 @@ function applyContentTransform(shape) {
     shield.style.width  = w + 'px';
     shield.style.height = h + 'px';
   }
+}
+
+/* ============================================================
+   applyContentEffects — blend mode + CSS filters on .shape-content
+   ============================================================ */
+function applyContentEffects(shape) {
+  const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
+  if (!wrapper) return;
+  const content = wrapper.querySelector('.shape-content');
+  if (!content) return;
+
+  content.style.mixBlendMode = shape.blendMode || 'normal';
+
+  const f = shape.filters;
+  content.style.filter = f
+    ? `brightness(${f.brightness ?? 100}%) contrast(${f.contrast ?? 100}%) saturate(${f.saturation ?? 100}%) hue-rotate(${f.hue ?? 0}deg)`
+    : '';
 }
 
 /* ============================================================
@@ -645,7 +786,23 @@ function applyMedia(shape) {
   const bbox = getBBox(shape.corners);
   let el;
 
-  if (shape.media.type === 'youtube') {
+  if (shape.media.type === 'pattern') {
+    el = document.createElement('div');
+    el.className = 'media-el';
+    el.style.width  = bbox.w + 'px';
+    el.style.height = bbox.h + 'px';
+    const p = shape.media;
+    if (p.kind === 'solid') {
+      el.style.background = p.color || '#ffffff';
+    } else if (p.kind === 'gradient') {
+      el.style.background = `linear-gradient(${p.angle ?? 135}deg, ${p.color1 || '#ff0000'}, ${p.color2 || '#0000ff'})`;
+    } else if (p.kind === 'grid') {
+      const c = p.color || '#00d4ff', sz = p.size || 24;
+      el.style.backgroundImage = `linear-gradient(${c}55 1px,transparent 1px),linear-gradient(90deg,${c}55 1px,transparent 1px)`;
+      el.style.backgroundSize  = `${sz}px ${sz}px`;
+      el.style.backgroundColor = 'rgba(255,255,255,0.04)';
+    }
+  } else if (shape.media.type === 'youtube') {
     // Wrap iframe in a cover div so it fills the shape without black bars
     const iframe = document.createElement('iframe');
     iframe.src = youtubeEmbedUrl(shape.media.embedId, shape.media.loop !== false, shape.media.audio !== false);
@@ -687,10 +844,13 @@ function applyMedia(shape) {
   // iOS Safari needs an explicit play() call after appending to DOM
   if (el.tagName === 'VIDEO') el.play().catch(() => {});
 
-  // Show play toggle
-  wrapper.querySelector('.btn-play-toggle').style.display = '';
-  setEditMode(wrapper, true);
-  wrapper.querySelector('.btn-play-toggle').textContent = '▶ Play';
+  // Show play toggle only for interactive media (not for patterns)
+  const showPlay = shape.media.type === 'youtube' || shape.media.type === 'video';
+  wrapper.querySelector('.btn-play-toggle').style.display = showPlay ? '' : 'none';
+  if (showPlay) {
+    setEditMode(wrapper, true);
+    wrapper.querySelector('.btn-play-toggle').textContent = '▶ Play';
+  }
 
   applyContentTransform(shape);
 }
@@ -850,7 +1010,8 @@ document.addEventListener('fullscreenchange', () => {
 
 // Keyboard shortcuts
 window.addEventListener('keydown', e => {
-  if (e.target instanceof HTMLInputElement) return;
+  const tag = e.target.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
   // F11 — toggle presentation mode (fullscreen + hide all UI)
   if (e.key === 'F11') {
@@ -882,6 +1043,19 @@ window.addEventListener('keydown', e => {
         saveState();
       }
     }
+  }
+
+  // Arrow key nudge — move selected shape 1px (or 10px with Shift)
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key) && state.selectedId) {
+    const shape = state.shapes.find(s => s.id === state.selectedId);
+    if (!shape || shape.locked) return;
+    e.preventDefault();
+    const step = e.shiftKey ? 10 : 1;
+    const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
+    const dy = e.key === 'ArrowUp'   ? -step : e.key === 'ArrowDown'  ? step : 0;
+    shape.corners = shape.corners.map(c => ({ x: c.x + dx, y: c.y + dy }));
+    updateShapeDOM(shape);
+    saveState();
   }
 });
 
@@ -994,6 +1168,14 @@ function hideMediaModal() {
   const tg = document.getElementById('theme-grid');
   if (ts) ts.value = '';
   if (tg) { tg.hidden = true; tg.innerHTML = ''; }
+  // Reset pattern picker
+  document.querySelectorAll('.btn-pattern').forEach(b => b.classList.remove('active'));
+  ['pattern-solid-opts','pattern-gradient-opts','pattern-grid-opts'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.hidden = true;
+  });
+  const bap = document.getElementById('btn-apply-pattern');
+  if (bap) bap.hidden = true;
 }
 
 function updateMediaPreview() {
@@ -1104,6 +1286,59 @@ mediaInput.addEventListener('paste', () => setTimeout(updateMediaPreview, 0));
 
       themeGrid.appendChild(cell);
     });
+  });
+})();
+
+/* ============================================================
+   Test pattern picker
+   ============================================================ */
+(function initPatternPicker() {
+  let activeKind = null;
+
+  document.querySelectorAll('.btn-pattern').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const kind = btn.dataset.kind;
+      // Toggle: clicking active button deactivates
+      activeKind = activeKind === kind ? null : kind;
+
+      // Update button active state
+      document.querySelectorAll('.btn-pattern').forEach(b =>
+        b.classList.toggle('active', b.dataset.kind === activeKind)
+      );
+
+      // Show/hide option rows
+      document.getElementById('pattern-solid-opts').hidden    = activeKind !== 'solid';
+      document.getElementById('pattern-gradient-opts').hidden = activeKind !== 'gradient';
+      document.getElementById('pattern-grid-opts').hidden     = activeKind !== 'grid';
+
+      document.getElementById('btn-apply-pattern').hidden = !activeKind;
+    });
+  });
+
+  document.getElementById('btn-apply-pattern').addEventListener('click', () => {
+    if (!activeKind) return;
+    const shape = state.shapes.find(s => s.id === state.modalShapeId);
+    if (!shape) { hideMediaModal(); return; }
+
+    if (activeKind === 'solid') {
+      shape.media = { type: 'pattern', kind: 'solid', color: document.getElementById('pat-solid-color').value };
+    } else if (activeKind === 'gradient') {
+      shape.media = {
+        type: 'pattern', kind: 'gradient',
+        color1: document.getElementById('pat-grad-c1').value,
+        color2: document.getElementById('pat-grad-c2').value,
+        angle: +document.getElementById('pat-grad-angle').value,
+      };
+    } else if (activeKind === 'grid') {
+      shape.media = {
+        type: 'pattern', kind: 'grid',
+        color: document.getElementById('pat-grid-color').value,
+        size: +document.getElementById('pat-grid-size').value,
+      };
+    }
+    applyMedia(shape);
+    saveState();
+    hideMediaModal();
   });
 })();
 
@@ -1372,6 +1607,20 @@ function renderLayersPanel() {
       renderLayersPanel();
     });
 
+    const isLocked = shape.locked === true;
+    const btnLock = document.createElement('button');
+    btnLock.title = isLocked ? 'Lås upp' : 'Lås shape';
+    btnLock.textContent = isLocked ? '🔒' : '🔓';
+    btnLock.addEventListener('click', e => {
+      e.stopPropagation();
+      shape.locked = !shape.locked;
+      const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
+      if (wrapper) wrapper.classList.toggle('locked', shape.locked);
+      saveState();
+      renderLayersPanel();
+    });
+
+    actions.appendChild(btnLock);
     actions.appendChild(btnVis);
     actions.appendChild(btnUp);
     actions.appendChild(btnDown);

@@ -553,6 +553,75 @@ body.presentation-mode .spotify-panel {
 
 .btn-layer-up-1, .btn-layer-dn-1 { font-size: 11px !important; }
 
+/* Active state for toggle buttons */
+.shape-toolbar button.active {
+  background: rgba(0, 212, 255, 0.2);
+  color: var(--handle-color);
+  border: 1px solid rgba(0, 212, 255, 0.5);
+}
+
+/* Blend mode select in toolbar */
+.blend-select {
+  height: 22px;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--toolbar-border);
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0 2px;
+  max-width: 72px;
+  flex-shrink: 0;
+}
+.blend-select:focus { outline: 1px solid var(--handle-color); }
+
+/* FX / flip buttons */
+.btn-fx, .btn-flip-h, .btn-flip-v { font-size: 12px !important; }
+.btn-fx { font-weight: 600 !important; }
+
+/* Filter panel — absolute, appears below the shape toolbar */
+.filter-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 25;
+  background: var(--toolbar-bg);
+  border: 1px solid var(--toolbar-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+  pointer-events: all;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: default;
+}
+.filter-icon {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+.filter-row input[type="range"] {
+  flex: 1;
+  height: 4px;
+  accent-color: var(--handle-color);
+  cursor: pointer;
+}
+
+/* Locked shape */
+.shape-wrapper.locked .move-handle { cursor: not-allowed; }
+.shape-wrapper.locked .corner-handle,
+.shape-wrapper.locked .edge-handle { opacity: 0.3 !important; pointer-events: none !important; }
+.shape-wrapper.locked .rotation-handle { opacity: 0.3 !important; pointer-events: none !important; }
+
 /* Opacity slider inside toolbar */
 .opacity-slider {
   width: 52px;
@@ -832,6 +901,65 @@ body.presentation-mode #canvas-hint          { display: none !important; }
 
 :fullscreen #main-toolbar, :-webkit-full-screen #main-toolbar { display: none; }
 :fullscreen #canvas, :-webkit-full-screen #canvas { width: 100vw; height: 100vh; }
+
+/* ============================================================
+   Test Pattern Picker (in media modal)
+   ============================================================ */
+.pattern-picker {
+  margin-top: 14px;
+  border-top: 1px solid var(--modal-border);
+  padding-top: 12px;
+}
+.pattern-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.btn-pattern {
+  flex: 1;
+  padding: 6px 8px;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-pattern:hover { border-color: var(--handle-color); color: #fff; }
+.btn-pattern.active { border-color: var(--handle-color); color: var(--handle-color); background: rgba(0,212,255,0.08); }
+
+.pattern-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+.pattern-opts label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.pattern-opts input[type="color"] {
+  width: 32px;
+  height: 24px;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+.pattern-opts .pat-wide { flex: 1 0 100%; }
+.pattern-opts input[type="range"] {
+  flex: 1;
+  accent-color: var(--handle-color);
+  height: 4px;
+  cursor: pointer;
+}
 
 /* ============================================================
    Theme picker (inside media modal)

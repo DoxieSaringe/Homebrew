@@ -111,6 +111,31 @@
         <div id="theme-grid" class="theme-grid" hidden></div>
       </div>
 
+      <!-- Test patterns -->
+      <div class="pattern-picker">
+        <div class="theme-picker-header">
+          <span class="theme-picker-label">Or use test pattern</span>
+        </div>
+        <div class="pattern-buttons">
+          <button class="btn-pattern" data-kind="solid">■ Solid</button>
+          <button class="btn-pattern" data-kind="gradient">▦ Gradient</button>
+          <button class="btn-pattern" data-kind="grid">⊞ Grid</button>
+        </div>
+        <div id="pattern-solid-opts" class="pattern-opts" hidden>
+          <label>Color <input type="color" id="pat-solid-color" value="#ffffff"></label>
+        </div>
+        <div id="pattern-gradient-opts" class="pattern-opts" hidden>
+          <label>Color 1 <input type="color" id="pat-grad-c1" value="#ff0000"></label>
+          <label>Color 2 <input type="color" id="pat-grad-c2" value="#0000ff"></label>
+          <label class="pat-wide">Angle <input type="range" id="pat-grad-angle" min="0" max="360" value="135"></label>
+        </div>
+        <div id="pattern-grid-opts" class="pattern-opts" hidden>
+          <label>Color <input type="color" id="pat-grid-color" value="#00d4ff"></label>
+          <label class="pat-wide">Size <input type="range" id="pat-grid-size" min="8" max="80" value="24"></label>
+        </div>
+        <button id="btn-apply-pattern" class="btn-primary" hidden style="margin-top:8px">Apply Pattern</button>
+      </div>
+
       <div class="modal-actions">
         <button id="btn-media-remove" class="btn-danger" hidden>Remove Media</button>
         <div class="modal-actions-right">
