@@ -195,6 +195,7 @@ function renderShape(shape) {
   wrapper.className = 'shape-wrapper edit-mode';
   wrapper.dataset.id = shape.id;
   wrapper.style.zIndex = shape.zIndex;
+  if (shape.visible === false) wrapper.style.visibility = 'hidden';
 
   // ── SVG outline ─────────────────────────────────────────
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -1137,8 +1138,11 @@ function renderLayersPanel() {
   // Sorted top-to-bottom by z-index descending
   const sorted = [...state.shapes].sort((a, b) => b.zIndex - a.zIndex);
   sorted.forEach(shape => {
+    const isHidden = shape.visible === false;
     const item = document.createElement('div');
-    item.className = 'layer-item' + (shape.id === state.selectedId ? ' selected' : '');
+    item.className = 'layer-item' +
+      (shape.id === state.selectedId ? ' selected' : '') +
+      (isHidden ? ' hidden-shape' : '');
     item.dataset.id = shape.id;
 
     const typeLabel = shape.type === 'circle' ? 'Circle' : 'Rect';
@@ -1208,6 +1212,19 @@ function renderLayersPanel() {
       renderLayersPanel();
     });
 
+    const btnVis = document.createElement('button');
+    btnVis.title = isHidden ? 'Visa shape' : 'Dölj shape';
+    btnVis.textContent = isHidden ? '🙈' : '👁';
+    btnVis.addEventListener('click', e => {
+      e.stopPropagation();
+      shape.visible = isHidden ? true : false;
+      const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
+      if (wrapper) wrapper.style.visibility = shape.visible === false ? 'hidden' : '';
+      saveState();
+      renderLayersPanel();
+    });
+
+    actions.appendChild(btnVis);
     actions.appendChild(btnUp);
     actions.appendChild(btnDown);
     actions.appendChild(btnDel);
