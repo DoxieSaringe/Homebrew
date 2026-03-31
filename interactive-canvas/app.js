@@ -263,6 +263,13 @@ function renderShape(shape) {
   btnMedia.textContent = '+';
   toolbar.appendChild(btnMedia);
 
+  const btnWarp = document.createElement('button');
+  btnWarp.className = 'btn-warp-toggle';
+  btnWarp.title = 'Warp mode — drag corners freely to skew shape';
+  btnWarp.textContent = '⊹ Warp';
+  if (shape.warpMode) btnWarp.classList.add('active');
+  toolbar.appendChild(btnWarp);
+
   const btnFront = document.createElement('button');
   btnFront.className = 'btn-front';
   btnFront.title = 'Bring to front';
@@ -341,6 +348,7 @@ function wireShapeEvents(shape, wrapper) {
         type: 'corner',
         shapeId: shape.id,
         cornerIndex: parseInt(h.dataset.corner),
+        startCorners: shape.corners.map(c => ({ ...c })),
       };
     });
   });
@@ -384,6 +392,14 @@ function wireShapeEvents(shape, wrapper) {
   wrapper.querySelector('.btn-media-attach').addEventListener('click', e => {
     e.stopPropagation();
     showMediaModal(shape.id);
+  });
+
+  wrapper.querySelector('.btn-warp-toggle').addEventListener('click', e => {
+    e.stopPropagation();
+    shape.warpMode = !shape.warpMode;
+    e.currentTarget.classList.toggle('active', shape.warpMode);
+    wrapper.classList.toggle('warp-mode', shape.warpMode);
+    saveState();
   });
 
   wrapper.querySelector('.btn-front').addEventListener('click', e => {
@@ -443,6 +459,11 @@ function updateShapeDOM(shape) {
   const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
   if (!wrapper) return;
   const corners = shape.corners;
+
+  // Sync warp mode class + button state
+  wrapper.classList.toggle('warp-mode', shape.warpMode === true);
+  const btnWarp = wrapper.querySelector('.btn-warp-toggle');
+  if (btnWarp) btnWarp.classList.toggle('active', shape.warpMode === true);
 
   // SVG outline
   const poly = wrapper.querySelector('.quad-poly');
@@ -545,11 +566,15 @@ function applyContentTransform(shape) {
   content.style.height    = h + 'px';
   content.style.transform = `matrix3d(${cssMatrix})`;
 
-  // Media element fills the content div exactly
+  // Media element fills the content div (cover for YouTube, exact for others)
   const mediaEl = content.querySelector('.media-el');
   if (mediaEl) {
-    mediaEl.style.width  = w + 'px';
-    mediaEl.style.height = h + 'px';
+    if (mediaEl.classList.contains('yt-cover')) {
+      sizeYtCover(mediaEl, w, h);
+    } else {
+      mediaEl.style.width  = w + 'px';
+      mediaEl.style.height = h + 'px';
+    }
   }
 
   // Placeholder fills the content div
@@ -567,6 +592,29 @@ function applyContentTransform(shape) {
     shield.style.width  = w + 'px';
     shield.style.height = h + 'px';
   }
+}
+
+/* ============================================================
+   sizeYtCover — size YouTube cover wrapper + iframe to fill w×h
+   ============================================================ */
+function sizeYtCover(coverDiv, w, h) {
+  coverDiv.style.width  = w + 'px';
+  coverDiv.style.height = h + 'px';
+  const iframe = coverDiv.querySelector('iframe');
+  if (!iframe) return;
+  const aspect = 16 / 9;
+  let iw, ih;
+  if (w / h > aspect) {
+    iw = w;
+    ih = w / aspect;
+  } else {
+    ih = h;
+    iw = h * aspect;
+  }
+  iframe.style.width  = iw + 'px';
+  iframe.style.height = ih + 'px';
+  iframe.style.left   = ((w - iw) / 2) + 'px';
+  iframe.style.top    = ((h - ih) / 2) + 'px';
 }
 
 /* ============================================================
@@ -598,11 +646,17 @@ function applyMedia(shape) {
   let el;
 
   if (shape.media.type === 'youtube') {
-    el = document.createElement('iframe');
-    el.src = youtubeEmbedUrl(shape.media.embedId, shape.media.loop !== false, shape.media.audio !== false);
-    el.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
-    el.setAttribute('allowfullscreen', '');
-    el.setAttribute('frameborder', '0');
+    // Wrap iframe in a cover div so it fills the shape without black bars
+    const iframe = document.createElement('iframe');
+    iframe.src = youtubeEmbedUrl(shape.media.embedId, shape.media.loop !== false, shape.media.audio !== false);
+    iframe.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.setAttribute('frameborder', '0');
+    iframe.style.pointerEvents = 'none';
+    el = document.createElement('div');
+    el.className = 'media-el yt-cover';
+    el.appendChild(iframe);
+    sizeYtCover(el, bbox.w, bbox.h);
   } else if (shape.media.type === 'video') {
     el = document.createElement('video');
     el.src = shape.media.url;
@@ -612,16 +666,20 @@ function applyMedia(shape) {
     el.setAttribute('playsinline', ''); // prevents iOS fullscreen takeover
     el.setAttribute('preload', 'auto');
     el.draggable = false;
+    el.className = 'media-el';
+    el.style.width  = bbox.w + 'px';
+    el.style.height = bbox.h + 'px';
   } else {
     el = document.createElement('img');
     el.src = shape.media.url;
     el.alt = '';
     el.draggable = false;
+    el.className = 'media-el';
+    el.style.width  = bbox.w + 'px';
+    el.style.height = bbox.h + 'px';
   }
 
-  el.className = 'media-el';
-  el.style.width  = bbox.w + 'px';
-  el.style.height = bbox.h + 'px';
+  if (!el.className.includes('media-el')) el.className = 'media-el';
   el.style.pointerEvents = 'none'; // controlled by shield
 
   content.appendChild(el);
@@ -642,11 +700,16 @@ function applyMedia(shape) {
    ============================================================ */
 function setEditMode(wrapper, isEdit) {
   wrapper.classList.toggle('edit-mode', isEdit);
-  // In play mode: disable move-handle and shield so the iframe is reachable
+  // In play mode: disable move-handle and shield so the media is reachable
   const moveHandle = wrapper.querySelector('.move-handle');
   if (moveHandle) moveHandle.style.pointerEvents = isEdit ? 'all' : 'none';
   const mediaEl = wrapper.querySelector('.media-el');
-  if (mediaEl) mediaEl.style.pointerEvents = isEdit ? 'none' : 'all';
+  if (mediaEl) {
+    mediaEl.style.pointerEvents = isEdit ? 'none' : 'all';
+    // For YouTube cover, also enable pointer events on the iframe itself
+    const iframe = mediaEl.querySelector('iframe');
+    if (iframe) iframe.style.pointerEvents = isEdit ? 'none' : 'all';
+  }
 }
 
 /* ============================================================
@@ -696,7 +759,23 @@ window.addEventListener('pointermove', e => {
   const pt = toCanvasCoords(e.clientX, e.clientY);
 
   if (dc.type === 'corner') {
-    shape.corners[dc.cornerIndex] = pt;
+    if (shape.warpMode) {
+      // Free warp — move only the dragged corner
+      shape.corners[dc.cornerIndex] = pt;
+    } else {
+      // Resize — scale all corners from opposite corner
+      const i = dc.cornerIndex;
+      const anchor = dc.startCorners[(i + 2) % 4];
+      const origin = dc.startCorners[i];
+      const ddx = origin.x - anchor.x;
+      const ddy = origin.y - anchor.y;
+      const sx = Math.abs(ddx) > 0.5 ? (pt.x - anchor.x) / ddx : 1;
+      const sy = Math.abs(ddy) > 0.5 ? (pt.y - anchor.y) / ddy : 1;
+      shape.corners = dc.startCorners.map(c => ({
+        x: anchor.x + (c.x - anchor.x) * sx,
+        y: anchor.y + (c.y - anchor.y) * sy,
+      }));
+    }
     updateShapeDOM(shape);
   } else if (dc.type === 'edge') {
     if (!dc.startPointer) {

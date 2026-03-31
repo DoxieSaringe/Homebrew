@@ -364,6 +364,24 @@ body.presentation-mode .spotify-panel {
   pointer-events: none;
 }
 
+/* Local video: use object-fit cover to fill without black bars */
+.shape-content video.media-el {
+  object-fit: cover;
+}
+
+/* YouTube cover wrapper — iframe is oversized inside, clipped by overflow:hidden */
+.yt-cover {
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.yt-cover iframe {
+  position: absolute;
+  border: none;
+  pointer-events: none;
+}
+
 .shape-content.is-circle .media-el {
   clip-path: ellipse(50% 50% at 50% 50%);
 }
@@ -380,7 +398,11 @@ body.presentation-mode .spotify-panel {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 212, 255, 0.04);
+  background-color: rgba(0, 212, 255, 0.04);
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.18) 1px, transparent 1px);
+  background-size: 24px 24px;
   pointer-events: none;
 }
 
@@ -447,6 +469,16 @@ body.presentation-mode .spotify-panel {
 
 .corner-handle { width: var(--handle-size); height: var(--handle-size); border-radius: 2px; }
 .edge-handle   { width: var(--edge-handle-sz); height: var(--edge-handle-sz); border-radius: 50%; opacity: 0; }
+
+/* Resize cursors by default (corner-based scaling) */
+.corner-handle[data-corner="0"] { cursor: nwse-resize; }
+.corner-handle[data-corner="1"] { cursor: nesw-resize; }
+.corner-handle[data-corner="2"] { cursor: nwse-resize; }
+.corner-handle[data-corner="3"] { cursor: nesw-resize; }
+
+/* Warp mode: corners become free-drag handles */
+.shape-wrapper.warp-mode .corner-handle { cursor: grab; border-radius: 50%; border-color: #ffaa00; background: #ffaa00; }
+.shape-wrapper.warp-mode .corner-handle:active { cursor: grabbing; }
 
 .shape-wrapper:hover .edge-handle,
 .shape-wrapper.selected .edge-handle { opacity: 0.75; }
