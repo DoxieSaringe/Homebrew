@@ -155,13 +155,17 @@ function isImageUrl(url) {
     url.startsWith('data:image/');
 }
 
+function isVideoUrl(url) {
+  return /\.(mp4|mov|webm|ogg|m4v)(\?.*)?$/i.test(url) ||
+    url.startsWith('data:video/') || url.startsWith('blob:');
+}
+
 function parseMediaUrl(raw) {
   const url = raw.trim();
   if (!url) return null;
   const ytId = parseYoutubeId(url);
-  if (ytId) {
-    return { type: 'youtube', url, embedId: ytId };
-  }
+  if (ytId) return { type: 'youtube', url, embedId: ytId };
+  if (isVideoUrl(url)) return { type: 'video', url };
   return { type: 'image', url, embedId: null };
 }
 
@@ -598,6 +602,15 @@ function applyMedia(shape) {
     el.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
     el.setAttribute('allowfullscreen', '');
     el.setAttribute('frameborder', '0');
+  } else if (shape.media.type === 'video') {
+    el = document.createElement('video');
+    el.src = shape.media.url;
+    el.autoplay = true;
+    el.loop = true;
+    el.muted = false;
+    el.setAttribute('playsinline', '');
+    el.setAttribute('preload', 'auto');
+    el.draggable = false;
   } else {
     el = document.createElement('img');
     el.src = shape.media.url;
@@ -793,13 +806,20 @@ window.addEventListener('keydown', e => {
    Drag-and-drop — local image files onto canvas or shapes
    ============================================================ */
 function applyLocalFile(shape, file) {
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    shape.media = { type: 'image', url: ev.target.result };
+  if (file.type.startsWith('video/')) {
+    const url = URL.createObjectURL(file);
+    shape.media = { type: 'video', url, blobUrl: true, mimeType: file.type };
     applyMedia(shape);
     saveState();
-  };
-  reader.readAsDataURL(file);
+  } else {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      shape.media = { type: 'image', url: ev.target.result };
+      applyMedia(shape);
+      saveState();
+    };
+    reader.readAsDataURL(file);
+  }
 }
 
 // Drop onto an existing shape wrapper
@@ -824,7 +844,9 @@ document.addEventListener('drop', e => {
   canvas.classList.remove('drag-over');
   document.querySelectorAll('[data-id].drag-over').forEach(el => el.classList.remove('drag-over'));
 
-  const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
+  const files = [...e.dataTransfer.files].filter(f =>
+    f.type.startsWith('image/') || f.type.startsWith('video/')
+  );
   if (!files.length) return;
 
   const wrapper = e.target.closest('[data-id]');
@@ -912,6 +934,15 @@ function updateMediaPreview() {
       </svg>
       YouTube video detected — ID: ${ytId}
     `;
+    mediaPreview.appendChild(div);
+    return;
+  }
+
+  if (isVideoUrl(url)) {
+    mediaPreview.hidden = false;
+    const div = document.createElement('div');
+    div.className = 'preview-yt';
+    div.innerHTML = `<span style="font-size:22px">🎬</span> Video detected`;
     mediaPreview.appendChild(div);
     return;
   }
@@ -1049,7 +1080,9 @@ document.getElementById('btn-fullscreen').addEventListener('click', () => {
    ============================================================ */
 function saveState() {
   const data = {
-    shapes: state.shapes,
+    shapes: state.shapes.map(s =>
+      s.media?.blobUrl ? { ...s, media: null } : s
+    ),
     nextZ: state.nextZ,
     spotifyUrl: state.spotifyUrl || null,
   };
