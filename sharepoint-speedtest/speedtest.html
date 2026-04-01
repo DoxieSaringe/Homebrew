@@ -353,17 +353,21 @@
   const LATENCY_URL =
     'https://res.cdn.office.net/assets/mail/pwa/n/me/robots.txt';
 
-  // A larger static asset for download measurement.
-  // We use a known, stable Fluent UI font bundle served by the O365 CDN.
-  const DOWNLOAD_URL =
-    'https://res.cdn.office.net/assets/mail/pwa/n/me/sw-background.js';
+  // Fluent UI font files served by SharePoint CDN (~300 KB each).
+  // These are CORS-enabled, stable public assets used by Teams/SharePoint.
+  const DOWNLOAD_URLS = [
+    'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-regular.woff2',
+    'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-semibold.woff2',
+    'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-bold.woff2',
+    'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-light.woff2',
+  ];
 
   // Fallback latency endpoint (img-based, no CORS restriction)
   const LATENCY_IMG_URL =
     'https://res.cdn.office.net/assets/mail/pwa/n/me/favicon.ico';
 
   const LATENCY_ROUNDS = 5;
-  const DOWNLOAD_PARALLEL = 3;
+  const DOWNLOAD_PARALLEL = 4;
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
   function median(arr) {
@@ -422,45 +426,38 @@
 
   // ─── Download speed measurement ───────────────────────────────────────────
   async function measureDownload() {
-    setProgress(60, 'Mäter nedladdningshastighet…');
+    setProgress(60, 'Measuring download speed…');
 
-    // Clear previous resource timing entries to get clean measurements
     performance.clearResourceTimings();
-
-    const bust = (n) => DOWNLOAD_URL + '?dl=' + Date.now() + '&n=' + n;
 
     let totalBytes = 0;
     const t0 = performance.now();
 
-    try {
-      const responses = await Promise.all(
-        Array.from({ length: DOWNLOAD_PARALLEL }, (_, i) =>
-          fetch(bust(i), { cache: 'no-store', mode: 'cors' })
-            .then(r => r.arrayBuffer())
-            .then(buf => { totalBytes += buf.byteLength; })
-        )
-      );
-    } catch (e) {
-      // CORS or network failure – try to read from Performance API as fallback
-      const entries = performance.getEntriesByType('resource')
-        .filter(e => e.name.includes('sw-background'));
-      totalBytes = entries.reduce((s, e) => s + (e.transferSize || e.encodedBodySize || 0), 0);
-      if (totalBytes === 0) throw new Error('DOWNLOAD_FAILED');
-    }
+    // Fetch all DOWNLOAD_URLS in parallel, each with a cache-bust param
+    await Promise.all(
+      DOWNLOAD_URLS.map((url, i) =>
+        fetch(url + '?cb=' + Date.now() + '_' + i, { cache: 'no-store', mode: 'cors' })
+          .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.arrayBuffer();
+          })
+          .then(buf => { totalBytes += buf.byteLength; })
+          .catch(() => {
+            // If one file fails, try Performance API for that entry
+            const entries = performance.getEntriesByType('resource')
+              .filter(e => e.name.includes(url.split('/').pop()));
+            totalBytes += entries.reduce((s, e) => s + (e.transferSize || e.encodedBodySize || 0), 0);
+          })
+      )
+    );
 
     const elapsed = (performance.now() - t0) / 1000; // seconds
 
-    // If we couldn't get bytes from arrayBuffer, use Performance API
-    if (totalBytes === 0) {
-      const entries = performance.getEntriesByType('resource')
-        .filter(e => e.name.includes('sw-background'));
-      totalBytes = entries.reduce((s, e) => s + (e.transferSize || e.encodedBodySize || 0), 0);
-    }
+    if (totalBytes === 0) throw new Error('DOWNLOAD_FAILED');
+    // Guard against unrealistically short elapsed time (< 100 ms)
+    if (elapsed < 0.1) throw new Error('ELAPSED_TOO_SHORT');
 
-    if (totalBytes === 0) throw new Error('NO_DATA');
-
-    const mbps = (totalBytes * 8) / elapsed / 1_000_000;
-    return mbps;
+    return (totalBytes * 8) / elapsed / 1_000_000; // Mbps
   }
 
   // ─── Main test flow ───────────────────────────────────────────────────────
@@ -497,7 +494,7 @@
       setPhase(2, 'done'); setPhase(3, 'active');
 
       // ── Phase 3: download ─────────────────────────────────────────────────
-      setProgress(60, 'Mäter nedladdningshastighet…');
+      setProgress(60, 'Measuring download speed…');
       let downloadMbps;
       try {
         downloadMbps = await measureDownload();
