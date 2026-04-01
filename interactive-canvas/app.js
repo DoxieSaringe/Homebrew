@@ -1,5 +1,5 @@
 /* ============================================================
-   Shape Canvas — app.js
+   Easy Projection — app.js
    Projection-mapping style canvas. Create rectangles and
    circles, resize them, skew them by dragging corners, and
    attach images or YouTube videos that warp to fit.

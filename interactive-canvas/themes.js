@@ -1,5 +1,5 @@
 /* ============================================================
-   themes.js — Curated YouTube VJ loop themes for Shape Canvas
+   themes.js — Curated YouTube VJ loop themes for Easy Projection
    ============================================================
    Easy to self-administer: just edit the video IDs and titles
    below. No need to touch any other file.
