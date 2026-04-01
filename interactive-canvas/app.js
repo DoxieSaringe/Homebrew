@@ -132,9 +132,10 @@ function parseYoutubeId(url) {
   return null;
 }
 
-function youtubeEmbedUrl(id, loop = true, audio = true) {
+function youtubeEmbedUrl(id, loop = true) {
   const params = {
     autoplay: '1',
+    mute: '1',       // always muted so autoplay works in all browsers
     controls: '1',
     rel: '0',
     modestbranding: '1',
@@ -144,10 +145,8 @@ function youtubeEmbedUrl(id, loop = true, audio = true) {
     params.loop = '1';
     params.playlist = id; // required for loop to work
   }
-  if (!audio) {
-    params.mute = '1';
-  }
-  return `https://www.youtube.com/embed/${id}?${new URLSearchParams(params)}`;
+  // youtube-nocookie.com = privacy-enhanced mode, significantly reduces ads
+  return `https://www.youtube-nocookie.com/embed/${id}?${new URLSearchParams(params)}`;
 }
 
 function isImageUrl(url) {
@@ -822,7 +821,7 @@ function applyMedia(shape) {
   } else if (shape.media.type === 'youtube') {
     // Wrap iframe in a cover div so it fills the shape without black bars
     const iframe = document.createElement('iframe');
-    iframe.src = youtubeEmbedUrl(shape.media.embedId, shape.media.loop !== false, shape.media.audio !== false);
+    iframe.src = youtubeEmbedUrl(shape.media.embedId, shape.media.loop !== false);
     iframe.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
     iframe.setAttribute('allowfullscreen', '');
     iframe.setAttribute('frameborder', '0');
