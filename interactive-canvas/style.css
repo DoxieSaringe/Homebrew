@@ -579,7 +579,10 @@ body.presentation-mode .spotify-panel {
 .btn-fx, .btn-flip-h, .btn-flip-v { font-size: 12px !important; }
 .btn-fx { font-weight: 600 !important; }
 
-/* Filter panel — absolute, appears below the shape toolbar */
+/* Shape toolbar must not clip the filter panel that pops out below */
+.shape-toolbar { overflow: visible; }
+
+/* Filter panel — child of .shape-toolbar, pops down below it */
 .filter-panel {
   position: absolute;
   top: calc(100% + 4px);
@@ -592,9 +595,19 @@ body.presentation-mode .spotify-panel {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-width: 200px;
+  min-width: 220px;
   pointer-events: all;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+  white-space: normal;
+}
+.blend-desc-row {
+  font-size: 11px;
+  color: var(--handle-color);
+  line-height: 1.4;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--toolbar-border);
+  margin-bottom: 2px;
+  min-height: 14px;
 }
 .filter-row {
   display: flex;
@@ -603,11 +616,11 @@ body.presentation-mode .spotify-panel {
   cursor: default;
 }
 .filter-icon {
-  font-size: 14px;
-  width: 18px;
-  text-align: center;
+  font-size: 11px;
+  width: 72px;
   flex-shrink: 0;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 .filter-row input[type="range"] {
   flex: 1;

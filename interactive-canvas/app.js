@@ -311,12 +311,6 @@ function renderShape(shape) {
   btnFx.textContent = 'FX';
   toolbar.appendChild(btnFx);
 
-  const btnFront = document.createElement('button');
-  btnFront.className = 'btn-front';
-  btnFront.title = 'Bring to front';
-  btnFront.innerHTML = '&#8679;';
-  toolbar.appendChild(btnFront);
-
   const btnDel = document.createElement('button');
   btnDel.className = 'btn-delete';
   btnDel.title = 'Delete shape';
@@ -358,28 +352,36 @@ function renderShape(shape) {
   nameLabel.addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
   wrapper.appendChild(nameLabel);
 
-  // ── Filter panel (hidden by default, toggled by FX button) ─
+  // ── Filter panel (inside toolbar so position:absolute is relative to toolbar) ─
   const filterPanel = document.createElement('div');
   filterPanel.className = 'filter-panel';
   filterPanel.hidden = true;
-  [['brightness','☀','0','200','100'],['contrast','◑','0','200','100'],
-   ['saturation','◈','0','200','100'],['hue','⊙','0','360','0']]
-    .forEach(([name, icon, min, max, def]) => {
+
+  // Blend mode description row (updates when blend mode changes)
+  const blendDescRow = document.createElement('div');
+  blendDescRow.className = 'blend-desc-row';
+  filterPanel.appendChild(blendDescRow);
+
+  [['brightness','☀ Brightness','0','200','100'],
+   ['contrast','◑ Contrast','0','200','100'],
+   ['saturation','◈ Saturation','0','200','100'],
+   ['hue','⊙ Hue','0','360','0']]
+    .forEach(([name, label, min, max, def]) => {
       const row = document.createElement('label');
       row.className = 'filter-row';
-      const val = shape.filters?.[name] ?? +def;
+      const val = shape.filters?.[name.split(' ')[0]] ?? +def;
       const span = document.createElement('span');
-      span.textContent = icon;
+      span.textContent = label;
       span.className = 'filter-icon';
       const sl = document.createElement('input');
       sl.type = 'range'; sl.min = min; sl.max = max; sl.value = val;
-      sl.dataset.filter = name;
-      sl.title = name;
+      sl.dataset.filter = name.split(' ')[0];
+      sl.title = label;
       row.appendChild(span);
       row.appendChild(sl);
       filterPanel.appendChild(row);
     });
-  wrapper.appendChild(filterPanel);
+  toolbar.appendChild(filterPanel);
 
   // Apply locked class from saved state
   if (shape.locked) wrapper.classList.add('locked');
@@ -472,13 +474,6 @@ function wireShapeEvents(shape, wrapper) {
     saveState();
   });
 
-  wrapper.querySelector('.btn-front').addEventListener('click', e => {
-    e.stopPropagation();
-    shape.zIndex = state.nextZ++;
-    wrapper.style.zIndex = shape.zIndex;
-    saveState();
-  });
-
   wrapper.querySelector('.btn-delete').addEventListener('click', e => {
     e.stopPropagation();
     deleteShape(shape.id);
@@ -505,6 +500,7 @@ function wireShapeEvents(shape, wrapper) {
     e.stopPropagation();
     shape.blendMode = e.target.value;
     applyContentEffects(shape);
+    updateBlendDesc(wrapper, shape.blendMode);
     saveState();
   });
 
@@ -531,6 +527,7 @@ function wireShapeEvents(shape, wrapper) {
     e.stopPropagation();
     const panel = wrapper.querySelector('.filter-panel');
     panel.hidden = !panel.hidden;
+    if (!panel.hidden) updateBlendDesc(wrapper, shape.blendMode);
     e.currentTarget.classList.toggle('active', !panel.hidden);
   });
 
@@ -680,13 +677,7 @@ function applyContentTransform(shape) {
   content.style.top       = bbox.minY + 'px';
   content.style.width     = w + 'px';
   content.style.height    = h + 'px';
-  const flipStr = [
-    shape.flipH ? 'scaleX(-1)' : '',
-    shape.flipV ? 'scaleY(-1)' : '',
-  ].filter(Boolean).join(' ');
-  content.style.transform = flipStr
-    ? `matrix3d(${cssMatrix}) ${flipStr}`
-    : `matrix3d(${cssMatrix})`;
+  content.style.transform = `matrix3d(${cssMatrix})`;
 
   applyContentEffects(shape);
 
@@ -718,8 +709,22 @@ function applyContentTransform(shape) {
   }
 }
 
+const BLEND_DESCRIPTIONS = {
+  normal:     'Normal — täcker utan interaktion med lager under',
+  screen:     'Screen — svart = transparent. VJ-klassikern för projection mapping',
+  multiply:   'Multiply — mörknar. Vitt = osynligt, svart = svart',
+  overlay:    'Overlay — ökar kontrast och mättnad beroende på underlaget',
+  lighten:    'Lighten — den ljusaste pixeln vinner (liknande Screen men hårdare)',
+  difference: 'Difference — inverterar pixlar där lagren överlappar',
+};
+
+function updateBlendDesc(wrapper, mode) {
+  const row = wrapper.querySelector('.blend-desc-row');
+  if (row) row.textContent = BLEND_DESCRIPTIONS[mode] || '';
+}
+
 /* ============================================================
-   applyContentEffects — blend mode + CSS filters on .shape-content
+   applyContentEffects — blend mode, CSS filters, flip on .shape-content / .media-el
    ============================================================ */
 function applyContentEffects(shape) {
   const wrapper = document.querySelector(`[data-id="${shape.id}"]`);
@@ -727,12 +732,24 @@ function applyContentEffects(shape) {
   const content = wrapper.querySelector('.shape-content');
   if (!content) return;
 
+  // Blend mode on the content layer
   content.style.mixBlendMode = shape.blendMode || 'normal';
 
+  // CSS filter on the content layer
   const f = shape.filters;
   content.style.filter = f
     ? `brightness(${f.brightness ?? 100}%) contrast(${f.contrast ?? 100}%) saturate(${f.saturation ?? 100}%) hue-rotate(${f.hue ?? 0}deg)`
     : '';
+
+  // Flip applied to the media element (not the content div — avoids offset outside the shape)
+  const mediaEl = content.querySelector('.media-el');
+  if (mediaEl) {
+    const flipStr = [
+      shape.flipH ? 'scaleX(-1)' : '',
+      shape.flipV ? 'scaleY(-1)' : '',
+    ].filter(Boolean).join(' ');
+    mediaEl.style.transform = flipStr || '';
+  }
 }
 
 /* ============================================================
