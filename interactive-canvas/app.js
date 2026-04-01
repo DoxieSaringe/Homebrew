@@ -278,7 +278,7 @@ function renderShape(shape) {
   // Blend mode
   const blendSelect = document.createElement('select');
   blendSelect.className = 'blend-select';
-  blendSelect.title = 'Blend mode (Screen = svart blir transparent)';
+  blendSelect.title = 'Blend mode (Screen = black becomes transparent)';
   [['normal','Normal'],['screen','Screen'],['multiply','Multiply'],
    ['overlay','Overlay'],['lighten','Lighten'],['difference','Difference']]
     .forEach(([v, l]) => {
@@ -307,7 +307,7 @@ function renderShape(shape) {
   // FX (colour correction filters)
   const btnFx = document.createElement('button');
   btnFx.className = 'btn-fx';
-  btnFx.title = 'Färgkorrigering (brightness, contrast, saturation, hue)';
+  btnFx.title = 'Color correction (brightness, contrast, saturation, hue)';
   btnFx.textContent = 'FX';
   toolbar.appendChild(btnFx);
 
@@ -710,12 +710,12 @@ function applyContentTransform(shape) {
 }
 
 const BLEND_DESCRIPTIONS = {
-  normal:     'Normal — täcker utan interaktion med lager under',
-  screen:     'Screen — svart = transparent. VJ-klassikern för projection mapping',
-  multiply:   'Multiply — mörknar. Vitt = osynligt, svart = svart',
-  overlay:    'Overlay — ökar kontrast och mättnad beroende på underlaget',
-  lighten:    'Lighten — den ljusaste pixeln vinner (liknande Screen men hårdare)',
-  difference: 'Difference — inverterar pixlar där lagren överlappar',
+  normal:     'Normal — standard compositing, no interaction with layers below',
+  screen:     'Screen — black = transparent. The classic VJ / projection mapping mode',
+  multiply:   'Multiply — darkens. White = invisible, black = black',
+  overlay:    'Overlay — boosts contrast and saturation based on the layer below',
+  lighten:    'Lighten — the brightest pixel wins (similar to Screen but harder)',
+  difference: 'Difference — inverts pixels where the layers overlap',
 };
 
 function updateBlendDesc(wrapper, mode) {
@@ -1613,7 +1613,7 @@ function renderLayersPanel() {
     });
 
     const btnVis = document.createElement('button');
-    btnVis.title = isHidden ? 'Visa shape' : 'Dölj shape';
+    btnVis.title = isHidden ? 'Show shape' : 'Hide shape';
     btnVis.textContent = isHidden ? '🙈' : '👁';
     btnVis.addEventListener('click', e => {
       e.stopPropagation();
@@ -1626,7 +1626,7 @@ function renderLayersPanel() {
 
     const isLocked = shape.locked === true;
     const btnLock = document.createElement('button');
-    btnLock.title = isLocked ? 'Lås upp' : 'Lås shape';
+    btnLock.title = isLocked ? 'Unlock shape' : 'Lock shape';
     btnLock.textContent = isLocked ? '🔒' : '🔓';
     btnLock.addEventListener('click', e => {
       e.stopPropagation();
@@ -1696,7 +1696,7 @@ function importScene(file) {
       if (state.spotifyUrl) applySpotifyEmbed(state.spotifyUrl);
       saveState();
     } catch (e) {
-      alert('Kunde inte läsa filen — är det en giltig canvas-scene.json?');
+      alert('Could not read file — is it a valid canvas-scene.json?');
     }
   };
   reader.readAsText(file);
@@ -1720,7 +1720,7 @@ let _castActive = false;
 function startCast() {
   _castActive = true;
   enterPresentationMode();
-  document.getElementById('btn-cast').textContent = '↩ Avsluta cast';
+  document.getElementById('btn-cast').textContent = '↩ Stop cast';
   document.getElementById('btn-cast').classList.add('active');
   const guide = document.getElementById('cast-guide');
   if (guide) { guide.hidden = false; }
