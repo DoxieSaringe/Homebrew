@@ -63,14 +63,23 @@ html, body {
 #main-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   height: var(--toolbar-h);
   padding: 0 12px;
+  gap: 12px;
   background: var(--toolbar-bg);
   border-bottom: 1px solid var(--toolbar-border);
   flex-shrink: 0;
   z-index: 100;
   user-select: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#main-toolbar::-webkit-scrollbar {
+  display: none;
 }
 
 .toolbar-left,
@@ -78,6 +87,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .app-title {
