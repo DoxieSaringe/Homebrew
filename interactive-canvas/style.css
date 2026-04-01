@@ -575,31 +575,37 @@ body.presentation-mode .spotify-panel {
 }
 .blend-select:focus { outline: 1px solid var(--handle-color); }
 
-/* FX / flip buttons */
-.btn-fx, .btn-flip-h, .btn-flip-v { font-size: 12px !important; }
+/* FX / flip / warp buttons — need auto width so text isn't clipped */
+.btn-fx, .btn-flip-h, .btn-flip-v,
+.btn-warp-toggle { font-size: 12px !important; width: auto !important; padding: 0 5px !important; }
 .btn-fx { font-weight: 600 !important; }
 
-/* Shape toolbar must not clip the filter panel that pops out below */
+/* Shape toolbar must not clip the filter panel that pops out */
 .shape-toolbar { overflow: visible; }
 
-/* Filter panel — child of .shape-toolbar, pops down below it */
+/* Filter panel — opens ABOVE the toolbar */
 .filter-panel {
   position: absolute;
-  top: calc(100% + 4px);
+  bottom: calc(100% + 4px);   /* above the toolbar */
+  top: auto;
   left: 0;
   z-index: 25;
   background: var(--toolbar-bg);
   border: 1px solid var(--toolbar-border);
   border-radius: 6px;
   padding: 8px 10px;
-  display: flex;
   flex-direction: column;
   gap: 6px;
   min-width: 220px;
   pointer-events: all;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.7);
   white-space: normal;
 }
+/* display:flex is only active when NOT hidden.
+   The [hidden] attribute alone is overridden by display:flex,
+   so we must explicitly honour it here. */
+.filter-panel[hidden] { display: none !important; }
+.filter-panel:not([hidden]) { display: flex; }
 .blend-desc-row {
   font-size: 11px;
   color: var(--handle-color);
