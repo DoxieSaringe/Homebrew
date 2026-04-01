@@ -27,6 +27,26 @@
       width: 100%;
     }
 
+    .language-switcher {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .lang-btn {
+      font-size: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .lang-btn:hover { background: #edebe9; }
+    .lang-btn.active { background: #464eb8; color: white; border-radius: 6px; }
+
     .header {
       display: flex;
       align-items: center;
@@ -92,7 +112,6 @@
       fill: white;
     }
 
-    /* Progress */
     .progress-section { margin-bottom: 28px; display: none; }
     .progress-section.visible { display: block; }
 
@@ -145,7 +164,6 @@
     .phase-item.active .phase-dot { background: #464eb8; }
     .phase-item.done .phase-dot { background: #107c10; }
 
-    /* Results */
     .results { display: none; }
     .results.visible { display: block; }
 
@@ -219,7 +237,6 @@
 
     .retry-btn:hover { background: #f3f2f1; }
 
-    /* Error */
     .error-box {
       display: none;
       background: #fde7e9;
@@ -264,44 +281,43 @@
 </head>
 <body>
 <div class="card">
+
+  <!-- Language Switcher -->
+  <div class="language-switcher">
+    <button class="lang-btn active" data-lang="sv" title="Svenska">🇸🇪</button>
+    <button class="lang-btn" data-lang="en" title="English">🇬🇧</button>
+    <button class="lang-btn" data-lang="nl" title="Nederlands">🇳🇱</button>
+    <button class="lang-btn" data-lang="pl" title="Polski">🇵🇱</button>
+  </div>
+
   <div class="header">
     <div class="header-icon">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M13 2C7.477 2 3 6.477 3 12s4.477 10 10 10 10-4.477 10-10S18.523 2 13 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8zm.5-13H12v6l5.25 3.15.75-1.23-4.5-2.67V7z"/>
       </svg>
     </div>
-    <h1>Nätverkshastighetstest<br>Microsoft Teams Town Hall</h1>
+    <h1 data-i18n="title">Nätverkshastighetstest<br>Microsoft Teams Town Hall</h1>
   </div>
-  <p class="subtitle">
-    Testa om din uppkoppling uppfyller kraven för att delta i eller arrangera
-    en Microsoft Teams Town Hall. Testet mäter anslutningskvalitet mot
-    Microsoft&nbsp;365-infrastrukturen.
+
+  <p class="subtitle" data-i18n="subtitle">
+    Testa om din uppkoppling uppfyller kraven för att delta i eller arrangera en Microsoft Teams Town Hall. Testet mäter anslutningskvalitet mot Microsoft 365-infrastrukturen.
   </p>
 
   <button class="btn" id="startBtn" onclick="startTest()">
     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-    Starta test
+    <span data-i18n="startBtn">Starta test</span>
   </button>
 
   <!-- Progress -->
   <div class="progress-section" id="progressSection">
-    <div class="progress-label" id="progressLabel">Förbereder test…</div>
+    <div class="progress-label" id="progressLabel" data-i18n="preparing">Förbereder test…</div>
     <div class="progress-bar-track">
       <div class="progress-bar-fill" id="progressFill"></div>
     </div>
     <div class="phase-list">
-      <div class="phase-item" id="phase1">
-        <div class="phase-dot"></div>
-        Fas 1 – Anslutningstest mot Microsoft 365
-      </div>
-      <div class="phase-item" id="phase2">
-        <div class="phase-dot"></div>
-        Fas 2 – Latensmätning (5 mätningar)
-      </div>
-      <div class="phase-item" id="phase3">
-        <div class="phase-dot"></div>
-        Fas 3 – Nedladdningshastighet
-      </div>
+      <div class="phase-item" id="phase1" data-i18n="phase1">Fas 1 – Anslutningstest mot Microsoft 365</div>
+      <div class="phase-item" id="phase2" data-i18n="phase2">Fas 2 – Latensmätning (5 mätningar)</div>
+      <div class="phase-item" id="phase3" data-i18n="phase3">Fas 3 – Nedladdningshastighet</div>
     </div>
   </div>
 
@@ -312,277 +328,470 @@
   <div class="results" id="results">
     <div class="result-grid">
       <div class="result-box">
-        <div class="result-label">Latens</div>
+        <div class="result-label" data-i18n="latencyLabel">Latens</div>
         <div class="result-value" id="latencyVal">–</div>
-        <div class="result-unit">ms (median)</div>
+        <div class="result-unit" data-i18n="latencyUnit">ms (median)</div>
+        <div class="result-unit" style="margin-top: 6px; font-size: 13px; color: #605e5c;">
+          <span data-i18n="jitterLabel">Jitter</span>: <span id="jitterVal">–</span> <span data-i18n="jitterUnit">ms</span>
+        </div>
       </div>
       <div class="result-box">
-        <div class="result-label">Nedladdning</div>
+        <div class="result-label" data-i18n="downloadLabel">Nedladdning</div>
         <div class="result-value" id="downloadVal">–</div>
-        <div class="result-unit">Mbps</div>
+        <div class="result-unit" data-i18n="downloadUnit">Mbps</div>
       </div>
     </div>
 
     <div class="quality-badge" id="qualityBadge"></div>
     <p class="quality-desc" id="qualityDesc"></p>
 
-    <button class="retry-btn" onclick="resetTest()">Testa igen</button>
+    <button class="retry-btn" onclick="resetTest()" data-i18n="retryBtn">Testa igen</button>
 
     <div class="threshold-info">
-      <div class="threshold-title">Krav för Town Hall</div>
+      <div class="threshold-title" data-i18n="thresholdTitle">Krav för Town Hall</div>
       <div class="threshold-row">
         <div class="dot-good"></div>
-        <span><strong>Bra:</strong> ≥ 3 Mbps &amp; latens ≤ 100 ms – optimalt för deltagare och presentatörer</span>
+        <span data-i18n="thresholdGood"><strong>Bra:</strong> ≥ 3 Mbps &amp; latens ≤ 100 ms – optimalt för deltagare och presentatörer</span>
       </div>
       <div class="threshold-row">
         <div class="dot-ok"></div>
-        <span><strong>OK:</strong> 1,5–3 Mbps eller latens 100–200 ms – acceptabelt för deltagare</span>
+        <span data-i18n="thresholdOk"><strong>OK:</strong> 1,5–3 Mbps eller latens 100–200 ms – acceptabelt för deltagare</span>
       </div>
       <div class="threshold-row">
         <div class="dot-bad"></div>
-        <span><strong>Dålig:</strong> &lt; 1,5 Mbps eller latens &gt; 200 ms – problem kan uppstå</span>
+        <span data-i18n="thresholdBad"><strong>Dålig:</strong> &lt; 1,5 Mbps eller latens &gt; 200 ms – problem kan uppstå</span>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-  // ─── Configuration ────────────────────────────────────────────────────────
-  // Known stable Microsoft CDN assets that serve Access-Control-Allow-Origin: *
-  // These are public static files on Office 365 / Teams CDN infrastructure.
-  const LATENCY_URL =
-    'https://res.cdn.office.net/assets/mail/pwa/n/me/robots.txt';
-
-  // Fluent UI font files served by SharePoint CDN (~300 KB each).
-  // These are CORS-enabled, stable public assets used by Teams/SharePoint.
-  const DOWNLOAD_URLS = [
-    'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-regular.woff2',
-    'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-semibold.woff2',
-    'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-bold.woff2',
-    'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-light.woff2',
-  ];
-
-  // Fallback latency endpoint (img-based, no CORS restriction)
-  const LATENCY_IMG_URL =
-    'https://res.cdn.office.net/assets/mail/pwa/n/me/favicon.ico';
-
-  const LATENCY_ROUNDS = 5;
-  const DOWNLOAD_PARALLEL = 4;
-
-  // ─── Helpers ──────────────────────────────────────────────────────────────
-  function median(arr) {
-    const s = [...arr].sort((a, b) => a - b);
-    const m = Math.floor(s.length / 2);
-    return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+// ==================== TRANSLATIONS ====================
+const translations = {
+  sv: {
+    title: "Nätverkshastighetstest<br>Microsoft Teams Town Hall",
+    subtitle: "Testa om din uppkoppling uppfyller kraven för att delta i eller arrangera en Microsoft Teams Town Hall. Testet mäter anslutningskvalitet mot Microsoft 365-infrastrukturen.",
+    startBtn: "Starta test",
+    preparing: "Förbereder test…",
+    phase1: "Fas 1 – Anslutningstest mot Microsoft 365",
+    phase2: "Fas 2 – Latensmätning (5 mätningar)",
+    phase3: "Fas 3 – Nedladdningshastighet",
+    latencyLabel: "Latens",
+    latencyUnit: "ms (median)",
+    downloadLabel: "Nedladdning",
+    downloadUnit: "Mbps",
+    retryBtn: "Testa igen",
+    thresholdTitle: "Krav för Town Hall",
+    thresholdGood: "<strong>Bra:</strong> ≥ 3 Mbps &amp; latens ≤ 100 ms – optimalt för deltagare och presentatörer",
+    thresholdOk: "<strong>OK:</strong> 1,5–3 Mbps eller latens 100–200 ms – acceptabelt för deltagare",
+    thresholdBad: "<strong>Dålig:</strong> &lt; 1,5 Mbps eller latens &gt; 200 ms – problem kan uppstå",
+    qualityGood: "✓ Bra anslutning",
+    qualityOk: "⚠ Acceptabel anslutning",
+    qualityBad: "✗ Svag anslutning",
+    qualityLowLatency: "✓ Låg latens",
+    qualityMediumLatency: "⚠ Medelhög latens",
+    qualityHighLatency: "✗ Hög latens",
+    descGood: "Din uppkoppling uppfyller kraven för att delta som åhörare och presentatör i Microsoft Teams Town Hall. Både video och ljud bör fungera utan problem.",
+    descOk: "Din uppkoppling är tillräcklig för att delta som åhörare i en Town Hall, men kan ibland ge buffring. För att presentera rekommenderas minst 3 Mbps och latens under 100 ms.",
+    descBad: "Din uppkoppling uppfyller inte minimikraven för Microsoft Teams Town Hall. Du kan uppleva störningar i video- och ljudströmmar. Kontakta IT-support eller försök från en annan nätverksanslutning.",
+    descLowLatency: "Latensmätningen visar bra resultat. Nedladdningstestet kunde inte slutföras – kontakta IT om du behöver fullständigt resultat.",
+    descMediumLatency: "Latensen är acceptabel men på gränsen. Nedladdningstestet kunde inte slutföras.",
+    descHighLatency: "Latensen är för hög för en bra Town Hall-upplevelse. Kontakta IT-support.",
+    jitterLabel: "Jitter",
+    jitterUnit: "ms"
+  },
+  en: {
+    title: "Network Speed Test<br>Microsoft Teams Town Hall",
+    subtitle: "Test if your connection meets the requirements to join or host a Microsoft Teams Town Hall. The test measures connection quality against Microsoft 365 infrastructure.",
+    startBtn: "Start test",
+    preparing: "Preparing test…",
+    phase1: "Phase 1 – Connection test to Microsoft 365",
+    phase2: "Phase 2 – Latency measurement (5 measurements)",
+    phase3: "Phase 3 – Download speed",
+    latencyLabel: "Latency",
+    latencyUnit: "ms (median)",
+    downloadLabel: "Download",
+    downloadUnit: "Mbps",
+    retryBtn: "Test again",
+    thresholdTitle: "Requirements for Town Hall",
+    thresholdGood: "<strong>Good:</strong> ≥ 3 Mbps &amp; latency ≤ 100 ms – optimal for attendees and presenters",
+    thresholdOk: "<strong>OK:</strong> 1.5–3 Mbps or latency 100–200 ms – acceptable for attendees",
+    thresholdBad: "<strong>Poor:</strong> &lt; 1.5 Mbps or latency &gt; 200 ms – issues may occur",
+    qualityGood: "✓ Good connection",
+    qualityOk: "⚠ Acceptable connection",
+    qualityBad: "✗ Weak connection",
+    qualityLowLatency: "✓ Low latency",
+    qualityMediumLatency: "⚠ Medium latency",
+    qualityHighLatency: "✗ High latency",
+    descGood: "Your connection meets the requirements to participate as attendee and presenter in Microsoft Teams Town Hall. Both video and audio should work without issues.",
+    descOk: "Your connection is sufficient to attend a Town Hall as a listener, but may occasionally buffer. For presenting, at least 3 Mbps and latency under 100 ms is recommended.",
+    descBad: "Your connection does not meet the minimum requirements for Microsoft Teams Town Hall. You may experience disruptions in video and audio streams. Contact IT support or try from another network.",
+    descLowLatency: "The latency measurement shows good results. The download test could not be completed – contact IT if you need a full result.",
+    descMediumLatency: "The latency is acceptable but borderline. The download test could not be completed.",
+    descHighLatency: "The latency is too high for a good Town Hall experience. Contact IT support.",
+    jitterLabel: "Jitter",
+    jitterUnit: "ms"
+  },
+  nl: {
+    title: "Netwerk Snelheidstest<br>Microsoft Teams Town Hall",
+    subtitle: "Test of uw verbinding voldoet aan de vereisten om deel te nemen aan of te hosten van een Microsoft Teams Town Hall. De test meet de aansluitingskwaliteit tegen de Microsoft 365-infrastructuur.",
+    startBtn: "Start test",
+    preparing: "Test voorbereiden…",
+    phase1: "Fase 1 – Verbindingstest met Microsoft 365",
+    phase2: "Fase 2 – Latentie meting (5 metingen)",
+    phase3: "Fase 3 – Downloadsnelheid",
+    latencyLabel: "Latency",
+    latencyUnit: "ms (mediaan)",
+    downloadLabel: "Download",
+    downloadUnit: "Mbps",
+    retryBtn: "Test opnieuw",
+    thresholdTitle: "Vereisten voor Town Hall",
+    thresholdGood: "<strong>Goed:</strong> ≥ 3 Mbps &amp; latency ≤ 100 ms – optimaal voor deelnemers en presentatoren",
+    thresholdOk: "<strong>OK:</strong> 1,5–3 Mbps of latency 100–200 ms – acceptabel voor deelnemers",
+    thresholdBad: "<strong>Slecht:</strong> &lt; 1,5 Mbps of latency &gt; 200 ms – problemen kunnen optreden",
+    qualityGood: "✓ Goede verbinding",
+    qualityOk: "⚠ Acceptabele verbinding",
+    qualityBad: "✗ Zwakke verbinding",
+    qualityLowLatency: "✓ Lage latency",
+    qualityMediumLatency: "⚠ Gemiddelde latency",
+    qualityHighLatency: "✗ Hoge latency",
+    descGood: "Uw verbinding voldoet aan de eisen om deel te nemen als toehoorder en presentator in Microsoft Teams Town Hall. Zowel video als audio zouden zonder problemen moeten werken.",
+    descOk: "Uw verbinding is voldoende om als toehoorder deel te nemen, maar kan soms bufferen. Voor presenteren wordt minimaal 3 Mbps en latency onder 100 ms aanbevolen.",
+    descBad: "Uw verbinding voldoet niet aan de minimumeisen voor Microsoft Teams Town Hall. U kunt storingen ervaren in video- en audiostreams. Neem contact op met IT-support of probeer vanaf een ander netwerk.",
+    descLowLatency: "De latencymeting toont goede resultaten. De downloadsnelheidstest kon niet worden voltooid – neem contact op met IT als u een volledig resultaat nodig heeft.",
+    descMediumLatency: "De latency is acceptabel maar op de grens. De downloadsnelheidstest kon niet worden voltooid.",
+    descHighLatency: "De latency is te hoog voor een goede Town Hall-ervaring. Neem contact op met IT-support.",
+    jitterLabel: "Jitter",
+    jitterUnit: "ms"
+  },
+  pl: {
+    title: "Test prędkości sieci<br>Microsoft Teams Town Hall",
+    subtitle: "Sprawdź, czy Twoje połączenie spełnia wymagania do udziału lub prowadzenia Microsoft Teams Town Hall. Test mierzy jakość połączenia z infrastrukturą Microsoft 365.",
+    startBtn: "Rozpocznij test",
+    preparing: "Przygotowywanie testu…",
+    phase1: "Faza 1 – Test połączenia z Microsoft 365",
+    phase2: "Faza 2 – Pomiar opóźnień (5 pomiarów)",
+    phase3: "Faza 3 – Prędkość pobierania",
+    latencyLabel: "Opóźnienie",
+    latencyUnit: "ms (mediana)",
+    downloadLabel: "Pobieranie",
+    downloadUnit: "Mbps",
+    retryBtn: "Testuj ponownie",
+    thresholdTitle: "Wymagania dla Town Hall",
+    thresholdGood: "<strong>Dobre:</strong> ≥ 3 Mbps &amp; opóźnienie ≤ 100 ms – optymalne dla uczestników i prezenterów",
+    thresholdOk: "<strong>OK:</strong> 1,5–3 Mbps lub opóźnienie 100–200 ms – akceptowalne dla uczestników",
+    thresholdBad: "<strong>Słabe:</strong> &lt; 1,5 Mbps lub opóźnienie &gt; 200 ms – mogą wystąpić problemy",
+    qualityGood: "✓ Dobre połączenie",
+    qualityOk: "⚠ Akceptowalne połączenie",
+    qualityBad: "✗ Słabe połączenie",
+    qualityLowLatency: "✓ Niskie opóźnienie",
+    qualityMediumLatency: "⚠ Średnie opóźnienie",
+    qualityHighLatency: "✗ Wysokie opóźnienie",
+    descGood: "Twoje połączenie spełnia wymagania do udziału jako słuchacz i prezenter w Microsoft Teams Town Hall. Zarówno wideo jak i audio powinny działać bez problemów.",
+    descOk: "Twoje połączenie jest wystarczające do udziału jako słuchacz, ale może czasem buforować. Do prezentowania zalecane jest minimum 3 Mbps i opóźnienie poniżej 100 ms.",
+    descBad: "Twoje połączenie nie spełnia minimalnych wymagań dla Microsoft Teams Town Hall. Możesz doświadczyć zakłóceń w strumieniach wideo i audio. Skontaktuj się z działem IT lub spróbuj z innej sieci.",
+    descLowLatency: "Pomiar opóźnień pokazuje dobre wyniki. Test prędkości pobierania nie mógł zostać ukończony – skontaktuj się z IT jeśli potrzebujesz pełnego wyniku.",
+    descMediumLatency: "Opóźnienie jest akceptowalne, ale na granicy. Test prędkości pobierania nie mógł zostać ukończony.",
+    descHighLatency: "Opóźnienie jest zbyt wysokie dla dobrej jakości Town Hall. Skontaktuj się z działem IT.",
+    jitterLabel: "Jitter",
+    jitterUnit: "ms"
   }
+};
 
-  function setProgress(pct, label) {
-    document.getElementById('progressFill').style.width = pct + '%';
-    document.getElementById('progressLabel').textContent = label;
-  }
+// Global variables to store latest test results for language refresh
+let lastLatencyMs = null;
+let lastDownloadMbps = null;
+let lastJitterMs = null;
 
-  function setPhase(n, state) { // state: 'active' | 'done' | ''
-    const el = document.getElementById('phase' + n);
-    el.className = 'phase-item' + (state ? ' ' + state : '');
-  }
+// ==================== LANGUAGE HANDLING ====================
+let currentLang = 'sv';
 
-  // ─── Latency measurement ──────────────────────────────────────────────────
-  async function measureLatencyFetch() {
-    const times = [];
-    for (let i = 0; i < LATENCY_ROUNDS; i++) {
-      const bust = '?v=' + Date.now() + '_' + i;
-      const t0 = performance.now();
-      try {
-        await fetch(LATENCY_URL + bust, {
-          cache: 'no-store',
-          mode: 'cors'
-        });
-      } catch (e) {
-        throw new Error('CORS_BLOCKED');
-      }
-      times.push(performance.now() - t0);
-      setProgress(10 + (i + 1) * 8, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
+function setLanguage(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (translations[lang] && translations[lang][key]) {
+      el.innerHTML = translations[lang][key];
     }
-    return median(times);
+  });
+
+  // Refresh results if visible (using stored values for full accuracy including jitter)
+  if (document.getElementById('results').classList.contains('visible') && lastLatencyMs !== null) {
+    showResults(lastLatencyMs, lastDownloadMbps, lastJitterMs);
   }
+}
 
-  async function measureLatencyImg() {
-    // Fallback: image-based timing (no CORS issue, but less precise)
-    const times = [];
-    for (let i = 0; i < LATENCY_ROUNDS; i++) {
-      await new Promise((resolve) => {
-        const t0 = performance.now();
-        const img = new Image();
-        img.onload = img.onerror = () => {
-          times.push(performance.now() - t0);
-          resolve();
-        };
-        img.src = LATENCY_IMG_URL + '?v=' + Date.now() + '_' + i;
-      });
-      setProgress(10 + (i + 1) * 8, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
-    }
-    return median(times);
+// ==================== TEST LOGIC ====================
+const LATENCY_URL = 'https://res.cdn.office.net/assets/mail/pwa/n/me/robots.txt';
+const DOWNLOAD_URLS = [
+  'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-regular.woff2',
+  'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-semibold.woff2',
+  'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-bold.woff2',
+  'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-light.woff2',
+];
+const LATENCY_IMG_URL = 'https://res.cdn.office.net/assets/mail/pwa/n/me/favicon.ico';
+const LATENCY_ROUNDS = 5;
+
+function median(arr) {
+  const s = [...arr].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+
+function calculateJitter(times) {
+  if (times.length < 2) {
+    return 0;
   }
+  const mean = times.reduce((a, b) => a + b, 0) / times.length;
+  const sqSum = times.reduce((a, b) => a + Math.pow(b - mean, 2), 0);
+  const variance = sqSum / (times.length - 1);
+  return Math.sqrt(variance);
+}
 
-  // ─── Download speed measurement ───────────────────────────────────────────
-  async function measureDownload() {
-    setProgress(60, 'Measuring download speed…');
+function computeLatencyStats(times) {
+  if (times.length === 0) {
+    throw new Error('NO_LATENCY_MEASUREMENTS');
+  }
+  return {
+    median: median(times),
+    jitter: calculateJitter(times)
+  };
+}
 
-    performance.clearResourceTimings();
-
-    let totalBytes = 0;
+async function measureLatencyFetch() {
+  const times = [];
+  for (let i = 0; i < LATENCY_ROUNDS; i++) {
+    const bust = '?v=' + Date.now() + '_' + i;
     const t0 = performance.now();
-
-    // Fetch all DOWNLOAD_URLS in parallel, each with a cache-bust param
-    await Promise.all(
-      DOWNLOAD_URLS.map((url, i) =>
-        fetch(url + '?cb=' + Date.now() + '_' + i, { cache: 'no-store', mode: 'cors' })
-          .then(r => {
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            return r.arrayBuffer();
-          })
-          .then(buf => { totalBytes += buf.byteLength; })
-          .catch(() => {
-            // If one file fails, try Performance API for that entry
-            const entries = performance.getEntriesByType('resource')
-              .filter(e => e.name.includes(url.split('/').pop()));
-            totalBytes += entries.reduce((s, e) => s + (e.transferSize || e.encodedBodySize || 0), 0);
-          })
-      )
-    );
-
-    const elapsed = (performance.now() - t0) / 1000; // seconds
-
-    if (totalBytes === 0) throw new Error('DOWNLOAD_FAILED');
-    // Guard against unrealistically short elapsed time (< 100 ms)
-    if (elapsed < 0.1) throw new Error('ELAPSED_TOO_SHORT');
-
-    return (totalBytes * 8) / elapsed / 1_000_000; // Mbps
-  }
-
-  // ─── Main test flow ───────────────────────────────────────────────────────
-  async function startTest() {
-    // Reset UI
-    document.getElementById('startBtn').disabled = true;
-    document.getElementById('results').className = 'results';
-    document.getElementById('errorBox').className = 'error-box';
-    document.getElementById('progressSection').className = 'progress-section visible';
-
-    setProgress(0, 'Ansluter till Microsoft 365…');
-    setPhase(1, 'active'); setPhase(2, ''); setPhase(3, '');
-
     try {
-      // ── Phase 1: connectivity check ──────────────────────────────────────
-      setProgress(5, 'Kontrollerar anslutning till Microsoft 365…');
-      await new Promise(r => setTimeout(r, 300));
-      setPhase(1, 'done'); setPhase(2, 'active');
-
-      // ── Phase 2: latency ─────────────────────────────────────────────────
-      setProgress(10, 'Startar latensmätning…');
-      let latencyMs;
-      try {
-        latencyMs = await measureLatencyFetch();
-      } catch (e) {
-        if (e.message === 'CORS_BLOCKED') {
-          // Try image-based fallback
-          latencyMs = await measureLatencyImg();
-        } else {
-          throw e;
-        }
-      }
-
-      setPhase(2, 'done'); setPhase(3, 'active');
-
-      // ── Phase 3: download ─────────────────────────────────────────────────
-      setProgress(60, 'Measuring download speed…');
-      let downloadMbps;
-      try {
-        downloadMbps = await measureDownload();
-      } catch (e) {
-        // If download test fails entirely, show partial result
-        downloadMbps = null;
-      }
-
-      setPhase(3, 'done');
-      setProgress(100, 'Testet är klart!');
-
-      await new Promise(r => setTimeout(r, 400));
-      showResults(latencyMs, downloadMbps);
-
-    } catch (err) {
-      showError(err);
+      await fetch(LATENCY_URL + bust, { cache: 'no-store', mode: 'cors' });
+    } catch (e) {
+      throw new Error('CORS_BLOCKED');
     }
+    times.push(performance.now() - t0);
+    setProgress(10 + (i + 1) * 8, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
+  }
+  return computeLatencyStats(times);
+}
+
+async function measureLatencyImg() {
+  const times = [];
+  for (let i = 0; i < LATENCY_ROUNDS; i++) {
+    await new Promise((resolve) => {
+      const t0 = performance.now();
+      const img = new Image();
+      img.onload = img.onerror = () => {
+        times.push(performance.now() - t0);
+        resolve();
+      };
+      img.src = LATENCY_IMG_URL + '?v=' + Date.now() + '_' + i;
+    });
+    setProgress(10 + (i + 1) * 8, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
+  }
+  return computeLatencyStats(times);
+}
+
+async function measureSingleDownload() {
+  performance.clearResourceTimings();
+  let totalBytes = 0;
+  const t0 = performance.now();
+
+  await Promise.all(
+    DOWNLOAD_URLS.map((url, i) =>
+      fetch(url + '?cb=' + Date.now() + '_' + i, { cache: 'no-store', mode: 'cors' })
+        .then(r => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.arrayBuffer();
+        })
+        .then(buf => { totalBytes += buf.byteLength; })
+        .catch(() => {
+          const entries = performance.getEntriesByType('resource')
+            .filter(e => e.name.includes(url.split('/').pop()));
+          totalBytes += entries.reduce((s, e) => s + (e.transferSize || e.encodedBodySize || 0), 0);
+        })
+    )
+  );
+
+  const elapsed = (performance.now() - t0) / 1000;
+  if (totalBytes === 0) throw new Error('DOWNLOAD_FAILED');
+  if (elapsed < 0.1) throw new Error('ELAPSED_TOO_SHORT');
+
+  return (totalBytes * 8) / elapsed / 1_000_000;
+}
+
+async function measureDownload() {
+  const speeds = [];
+  const baseLabel = translations[currentLang].phase3 || 'Fas 3 – Nedladdningshastighet';
+
+  for (let round = 0; round < 5; round++) {
+    let roundSuffix = ` (runda ${round + 1} av 5)…`;
+    if (currentLang === 'en') {
+      roundSuffix = ` (round ${round + 1} of 5)…`;
+    } else if (currentLang === 'nl') {
+      roundSuffix = ` (ronde ${round + 1} van 5)…`;
+    } else if (currentLang === 'pl') {
+      roundSuffix = ` (runda ${round + 1} z 5)…`;
+    }
+    setProgress(50 + round * 10, baseLabel + roundSuffix);
+
+    const speed = await measureSingleDownload();
+    speeds.push(speed);
   }
 
-  // ─── Display results ──────────────────────────────────────────────────────
-  function showResults(latencyMs, downloadMbps) {
-    document.getElementById('progressSection').className = 'progress-section';
-    document.getElementById('results').className = 'results visible';
+  return median(speeds);
+}
 
-    document.getElementById('latencyVal').textContent = Math.round(latencyMs);
+function setProgress(pct, label) {
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = label;
+}
 
-    let quality, badgeClass, desc;
+function setPhase(n, state) {
+  const el = document.getElementById('phase' + n);
+  el.className = 'phase-item' + (state ? ' ' + state : '');
+}
 
-    if (downloadMbps !== null) {
-      document.getElementById('downloadVal').textContent = downloadMbps.toFixed(1);
+async function startTest() {
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('results').className = 'results';
+  document.getElementById('errorBox').className = 'error-box';
+  document.getElementById('progressSection').className = 'progress-section visible';
 
-      if (downloadMbps >= 3 && latencyMs <= 100) {
-        quality = '✓ Bra anslutning';
-        badgeClass = 'good';
-        desc = 'Din uppkoppling uppfyller kraven för att delta som åhörare och presentatör i Microsoft Teams Town Hall. Både video och ljud bör fungera utan problem.';
-      } else if (downloadMbps >= 1.5 && latencyMs <= 200) {
-        quality = '⚠ Acceptabel anslutning';
-        badgeClass = 'ok';
-        desc = 'Din uppkoppling är tillräcklig för att delta som åhörare i en Town Hall, men kan ibland ge buffring. För att presentera rekommenderas minst 3 Mbps och latens under 100 ms.';
+  setProgress(0, translations[currentLang].preparing);
+  setPhase(1, 'active'); setPhase(2, ''); setPhase(3, '');
+
+  try {
+    setProgress(5, translations[currentLang].phase1 || 'Kontrollerar anslutning till Microsoft 365…');
+    await new Promise(r => setTimeout(r, 300));
+    setPhase(1, 'done'); setPhase(2, 'active');
+
+    setProgress(10, translations[currentLang].phase2 || 'Startar latensmätning…');
+    let latencyStats;
+    try {
+      latencyStats = await measureLatencyFetch();
+    } catch (e) {
+      if (e.message === 'CORS_BLOCKED') {
+        latencyStats = await measureLatencyImg();
       } else {
-        quality = '✗ Svag anslutning';
-        badgeClass = 'bad';
-        desc = 'Din uppkoppling uppfyller inte minimikraven för Microsoft Teams Town Hall. Du kan uppleva störningar i video- och ljudströmmar. Kontakta IT-support eller försök från en annan nätverksanslutning.';
+        throw e;
       }
+    }
+
+    const latencyMs = latencyStats.median;
+    const jitterMs = latencyStats.jitter;
+
+    setPhase(2, 'done'); setPhase(3, 'active');
+
+    let downloadMbps = null;
+    try {
+      downloadMbps = await measureDownload();
+    } catch (e) {
+      // Keep download as null on failure
+    }
+
+    setPhase(3, 'done');
+    setProgress(100, 'Testet är klart!');
+
+    await new Promise(r => setTimeout(r, 400));
+    showResults(latencyMs, downloadMbps, jitterMs);
+
+  } catch (err) {
+    showError(err);
+  }
+}
+
+function showResults(latencyMs, downloadMbps, jitterMs) {
+  lastLatencyMs = latencyMs;
+  lastDownloadMbps = downloadMbps;
+  lastJitterMs = jitterMs;
+
+  document.getElementById('progressSection').className = 'progress-section';
+  document.getElementById('results').className = 'results visible';
+
+  document.getElementById('latencyVal').textContent = Math.round(latencyMs);
+  document.getElementById('jitterVal').textContent = jitterMs.toFixed(1);
+
+  const t = translations[currentLang];
+  let quality, badgeClass, desc;
+
+  if (downloadMbps !== null) {
+    document.getElementById('downloadVal').textContent = downloadMbps.toFixed(1);
+
+    if (downloadMbps >= 3 && latencyMs <= 100) {
+      quality = t.qualityGood;
+      badgeClass = 'good';
+      desc = t.descGood;
+    } else if (downloadMbps >= 1.5 && latencyMs <= 200) {
+      quality = t.qualityOk;
+      badgeClass = 'ok';
+      desc = t.descOk;
     } else {
-      document.getElementById('downloadVal').textContent = '–';
-      if (latencyMs <= 100) {
-        quality = '✓ Låg latens';
-        badgeClass = 'good';
-        desc = 'Latensmätningen visar bra resultat. Nedladdningstestet kunde inte slutföras – kontakta IT om du behöver fullständigt resultat.';
-      } else if (latencyMs <= 200) {
-        quality = '⚠ Medelhög latens';
-        badgeClass = 'ok';
-        desc = 'Latensen är acceptabel men på gränsen. Nedladdningstestet kunde inte slutföras.';
-      } else {
-        quality = '✗ Hög latens';
-        badgeClass = 'bad';
-        desc = 'Latensen är för hög för en bra Town Hall-upplevelse. Kontakta IT-support.';
-      }
+      quality = t.qualityBad;
+      badgeClass = 'bad';
+      desc = t.descBad;
     }
-
-    const badge = document.getElementById('qualityBadge');
-    badge.textContent = quality;
-    badge.className = 'quality-badge ' + badgeClass;
-    document.getElementById('qualityDesc').textContent = desc;
+  } else {
+    document.getElementById('downloadVal').textContent = '–';
+    if (latencyMs <= 100) {
+      quality = t.qualityLowLatency;
+      badgeClass = 'good';
+      desc = t.descLowLatency;
+    } else if (latencyMs <= 200) {
+      quality = t.qualityMediumLatency;
+      badgeClass = 'ok';
+      desc = t.descMediumLatency;
+    } else {
+      quality = t.qualityHighLatency;
+      badgeClass = 'bad';
+      desc = t.descHighLatency;
+    }
   }
 
-  // ─── Error display ────────────────────────────────────────────────────────
-  function showError(err) {
-    document.getElementById('progressSection').className = 'progress-section';
-    document.getElementById('startBtn').disabled = false;
+  const badge = document.getElementById('qualityBadge');
+  badge.textContent = quality;
+  badge.className = 'quality-badge ' + badgeClass;
+  document.getElementById('qualityDesc').textContent = desc;
+}
 
-    const box = document.getElementById('errorBox');
-    box.className = 'error-box visible';
-    box.innerHTML =
-      '<strong>Testet kunde inte slutföras.</strong><br>' +
-      'Kontrollera att du är ansluten till internet och att sidan inte blockeras av en brandvägg. ' +
-      'Om problemet kvarstår, kontakta IT-support.<br><br>' +
-      '<small>Teknisk information: ' + (err.message || String(err)) + '</small>';
-  }
+function showError(err) {
+  document.getElementById('progressSection').className = 'progress-section';
+  document.getElementById('startBtn').disabled = false;
 
-  // ─── Reset ────────────────────────────────────────────────────────────────
-  function resetTest() {
-    document.getElementById('results').className = 'results';
-    document.getElementById('errorBox').className = 'error-box';
-    document.getElementById('startBtn').disabled = false;
-    setPhase(1, ''); setPhase(2, ''); setPhase(3, '');
-  }
+  const box = document.getElementById('errorBox');
+  box.className = 'error-box visible';
+  box.innerHTML = `
+    <strong>Testet kunde inte slutföras.</strong><br>
+    Kontrollera att du är ansluten till internet och att sidan inte blockeras av en brandvägg. 
+    Om problemet kvarstår, kontakta IT-support.<br><br>
+    <small>Teknisk information: ${err.message || String(err)}</small>
+  `;
+}
+
+function resetTest() {
+  document.getElementById('results').className = 'results';
+  document.getElementById('errorBox').className = 'error-box';
+  document.getElementById('startBtn').disabled = false;
+  setPhase(1, ''); setPhase(2, ''); setPhase(3, '');
+
+  // Clear stored results
+  lastLatencyMs = null;
+  lastDownloadMbps = null;
+  lastJitterMs = null;
+}
+
+// Language button listeners
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+});
+
+// Initialize
+setLanguage('sv');
 </script>
 </body>
 </html>
