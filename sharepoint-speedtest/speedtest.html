@@ -277,6 +277,14 @@
     .dot-good { width: 8px; height: 8px; border-radius: 50%; background: #107c10; flex-shrink:0; }
     .dot-ok   { width: 8px; height: 8px; border-radius: 50%; background: #797673; flex-shrink:0; }
     .dot-bad  { width: 8px; height: 8px; border-radius: 50%; background: #a80000; flex-shrink:0; }
+
+    .reference-latency {
+      font-size: 11px;
+      color: #8a8886;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #edebe9;
+    }
   </style>
 </head>
 <body>
@@ -334,6 +342,7 @@
         <div class="result-unit" style="margin-top: 6px; font-size: 13px; color: #605e5c;">
           <span data-i18n="jitterLabel">Jitter</span>: <span id="jitterVal">–</span> <span data-i18n="jitterUnit">ms</span>
         </div>
+        <div class="reference-latency" id="referenceLatencyBox"></div>
       </div>
       <div class="result-box">
         <div class="result-label" data-i18n="downloadLabel">Nedladdning</div>
@@ -374,7 +383,7 @@ const translations = {
     startBtn: "Starta test",
     preparing: "Förbereder test…",
     phase1: "Fas 1 – Anslutningstest mot Microsoft 365",
-    phase2: "Fas 2 – Latensmätning (5 mätningar)",
+    phase2: "Fas 2 – Latensmätning (6 mätningar)",
     phase3: "Fas 3 – Nedladdningshastighet",
     latencyLabel: "Latens",
     latencyUnit: "ms (median)",
@@ -406,7 +415,7 @@ const translations = {
     startBtn: "Start test",
     preparing: "Preparing test…",
     phase1: "Phase 1 – Connection test to Microsoft 365",
-    phase2: "Phase 2 – Latency measurement (5 measurements)",
+    phase2: "Phase 2 – Latency measurement (6 measurements)",
     phase3: "Phase 3 – Download speed",
     latencyLabel: "Latency",
     latencyUnit: "ms (median)",
@@ -438,7 +447,7 @@ const translations = {
     startBtn: "Start test",
     preparing: "Test voorbereiden…",
     phase1: "Fase 1 – Verbindingstest met Microsoft 365",
-    phase2: "Fase 2 – Latentie meting (5 metingen)",
+    phase2: "Fase 2 – Latentie meting (6 metingen)",
     phase3: "Fase 3 – Downloadsnelheid",
     latencyLabel: "Latency",
     latencyUnit: "ms (mediaan)",
@@ -470,7 +479,7 @@ const translations = {
     startBtn: "Rozpocznij test",
     preparing: "Przygotowywanie testu…",
     phase1: "Faza 1 – Test połączenia z Microsoft 365",
-    phase2: "Faza 2 – Pomiar opóźnień (5 pomiarów)",
+    phase2: "Faza 2 – Pomiar opóźnień (6 pomiarów)",
     phase3: "Faza 3 – Prędkość pobierania",
     latencyLabel: "Opóźnienie",
     latencyUnit: "ms (mediana)",
@@ -502,6 +511,7 @@ const translations = {
 let lastLatencyMs = null;
 let lastDownloadMbps = null;
 let lastJitterMs = null;
+let lastReferenceLatencyMs = null;
 
 // ==================== LANGUAGE HANDLING ====================
 let currentLang = 'sv';
@@ -522,7 +532,7 @@ function setLanguage(lang) {
   });
 
   if (document.getElementById('results').classList.contains('visible') && lastLatencyMs !== null) {
-    showResults(lastLatencyMs, lastDownloadMbps, lastJitterMs);
+    showResults(lastLatencyMs, lastDownloadMbps, lastJitterMs, lastReferenceLatencyMs);
   }
 }
 
@@ -538,7 +548,8 @@ const DOWNLOAD_URLS = [
 ];
 
 const LATENCY_IMG_URL = 'https://www.microsoft.com/favicon.ico';
-const LATENCY_ROUNDS = 5;
+const REFERENCE_LATENCY_URL = 'https://dns.google/dns-query';
+const LATENCY_ROUNDS = 6;
 
 function median(arr) {
   const s = [...arr].sort((a, b) => a - b);
@@ -556,10 +567,29 @@ function calculateJitter(times) {
 
 function computeLatencyStats(times) {
   if (times.length === 0) throw new Error('NO_LATENCY_MEASUREMENTS');
+  // Use measurements 2-6 (skip first warmup measurement)
+  const measuredTimes = times.slice(1);
   return {
-    median: median(times),
-    jitter: calculateJitter(times)
+    median: median(measuredTimes),
+    jitter: calculateJitter(measuredTimes)
   };
+}
+
+async function measureReferenceLatency() {
+  const times = [];
+  const rounds = 3;
+  for (let i = 0; i < rounds; i++) {
+    const bust = '?v=' + Date.now() + '_' + i;
+    const t0 = performance.now();
+    try {
+      await fetch(REFERENCE_LATENCY_URL + bust, { cache: 'no-store', mode: 'cors' });
+    } catch (e) {
+      // Silently fail for reference test, return null
+      return null;
+    }
+    times.push(performance.now() - t0);
+  }
+  return median(times);
 }
 
 async function measureLatencyFetch() {
@@ -573,7 +603,7 @@ async function measureLatencyFetch() {
       throw new Error('CORS_BLOCKED');
     }
     times.push(performance.now() - t0);
-    setProgress(10 + (i + 1) * 8, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
+    setProgress(10 + (i + 1) * 40 / LATENCY_ROUNDS, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
   }
   return computeLatencyStats(times);
 }
@@ -590,7 +620,7 @@ async function measureLatencyImg() {
       };
       img.src = LATENCY_IMG_URL + '?v=' + Date.now() + '_' + i;
     });
-    setProgress(10 + (i + 1) * 8, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
+    setProgress(10 + (i + 1) * 40 / LATENCY_ROUNDS, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
   }
   return computeLatencyStats(times);
 }
@@ -680,6 +710,9 @@ async function startTest() {
     const latencyMs = latencyStats.median;
     const jitterMs = latencyStats.jitter;
 
+    // Measure reference latency in parallel
+    const referenceLatencyPromise = measureReferenceLatency();
+
     setPhase(2, 'done'); setPhase(3, 'active');
 
     let downloadMbps = null;
@@ -689,27 +722,39 @@ async function startTest() {
       // Keep download as null on failure
     }
 
+    // Wait for reference latency result
+    const referenceLatencyMs = await referenceLatencyPromise;
+
     setPhase(3, 'done');
     setProgress(100, 'Testet är klart!');
 
     await new Promise(r => setTimeout(r, 400));
-    showResults(latencyMs, downloadMbps, jitterMs);
+    showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs);
 
   } catch (err) {
     showError(err);
   }
 }
 
-function showResults(latencyMs, downloadMbps, jitterMs) {
+function showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs) {
   lastLatencyMs = latencyMs;
   lastDownloadMbps = downloadMbps;
   lastJitterMs = jitterMs;
+  lastReferenceLatencyMs = referenceLatencyMs;
 
   document.getElementById('progressSection').className = 'progress-section';
   document.getElementById('results').className = 'results visible';
 
   document.getElementById('latencyVal').textContent = Math.round(latencyMs);
   document.getElementById('jitterVal').textContent = jitterMs.toFixed(1);
+
+  // Display reference latency if available
+  const refBox = document.getElementById('referenceLatencyBox');
+  if (referenceLatencyMs !== null) {
+    refBox.textContent = 'Reference latency Google: ' + Math.round(referenceLatencyMs) + ' ms';
+  } else {
+    refBox.textContent = '';
+  }
 
   const t = translations[currentLang];
   let quality, badgeClass, desc;
@@ -776,6 +821,7 @@ function resetTest() {
   lastLatencyMs = null;
   lastDownloadMbps = null;
   lastJitterMs = null;
+  lastReferenceLatencyMs = null;
 }
 
 // Language button listeners
