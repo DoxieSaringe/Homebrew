@@ -521,7 +521,6 @@ function setLanguage(lang) {
     }
   });
 
-  // Refresh results if visible (using stored values for full accuracy including jitter)
   if (document.getElementById('results').classList.contains('visible') && lastLatencyMs !== null) {
     showResults(lastLatencyMs, lastDownloadMbps, lastJitterMs);
   }
@@ -529,12 +528,15 @@ function setLanguage(lang) {
 
 // ==================== TEST LOGIC ====================
 const LATENCY_URL = 'https://res.cdn.office.net/assets/mail/pwa/n/me/robots.txt';
+
+// NYA, MER ROBUSTA DOWNLOAD-URL:ER (Microsoft Teams & Office 365 CDN)
 const DOWNLOAD_URLS = [
-  'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-regular.woff2',
-  'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-semibold.woff2',
-  'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-bold.woff2',
-  'https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean/segoeui-light.woff2',
+  'https://statics.teams.cdn.office.net/evergreen-assets/DesktopClient/MSTeamsSetup.exe',   // Stor Teams-installationsfil – hög relevans
+  'https://res.cdn.office.net/assets/mail/pwa/n/me/teams-logo-192.png',                   // Microsoft Office/Teams asset
+  'https://officecdn.microsoft.com/pr/492350f6-3a01-4f97-b9c0-c7c6d9a2e5e0/Office/Data/v64.cab', // Office deployment-fil
+  'https://az782000.vo.msecnd.net/public/Office/Data/v64_0.cab'                           // Azure CDN Office-fil
 ];
+
 const LATENCY_IMG_URL = 'https://res.cdn.office.net/assets/mail/pwa/n/me/favicon.ico';
 const LATENCY_ROUNDS = 5;
 
@@ -545,9 +547,7 @@ function median(arr) {
 }
 
 function calculateJitter(times) {
-  if (times.length < 2) {
-    return 0;
-  }
+  if (times.length < 2) return 0;
   const mean = times.reduce((a, b) => a + b, 0) / times.length;
   const sqSum = times.reduce((a, b) => a + Math.pow(b - mean, 2), 0);
   const variance = sqSum / (times.length - 1);
@@ -555,9 +555,7 @@ function calculateJitter(times) {
 }
 
 function computeLatencyStats(times) {
-  if (times.length === 0) {
-    throw new Error('NO_LATENCY_MEASUREMENTS');
-  }
+  if (times.length === 0) throw new Error('NO_LATENCY_MEASUREMENTS');
   return {
     median: median(times),
     jitter: calculateJitter(times)
@@ -631,13 +629,9 @@ async function measureDownload() {
 
   for (let round = 0; round < 5; round++) {
     let roundSuffix = ` (runda ${round + 1} av 5)…`;
-    if (currentLang === 'en') {
-      roundSuffix = ` (round ${round + 1} of 5)…`;
-    } else if (currentLang === 'nl') {
-      roundSuffix = ` (ronde ${round + 1} van 5)…`;
-    } else if (currentLang === 'pl') {
-      roundSuffix = ` (runda ${round + 1} z 5)…`;
-    }
+    if (currentLang === 'en') roundSuffix = ` (round ${round + 1} of 5)…`;
+    else if (currentLang === 'nl') roundSuffix = ` (ronde ${round + 1} van 5)…`;
+    else if (currentLang === 'pl') roundSuffix = ` (runda ${round + 1} z 5)…`;
     setProgress(50 + round * 10, baseLabel + roundSuffix);
 
     const speed = await measureSingleDownload();
@@ -779,7 +773,6 @@ function resetTest() {
   document.getElementById('startBtn').disabled = false;
   setPhase(1, ''); setPhase(2, ''); setPhase(3, '');
 
-  // Clear stored results
   lastLatencyMs = null;
   lastDownloadMbps = null;
   lastJitterMs = null;
