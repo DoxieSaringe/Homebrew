@@ -512,7 +512,6 @@ let lastLatencyMs = null;
 let lastDownloadMbps = null;
 let lastJitterMs = null;
 let lastReferenceLatencyMs = null;
-let lastInternalLatencyMs = null;
 
 // ==================== LANGUAGE HANDLING ====================
 let currentLang = 'sv';
@@ -533,7 +532,7 @@ function setLanguage(lang) {
   });
 
   if (document.getElementById('results').classList.contains('visible') && lastLatencyMs !== null) {
-    showResults(lastLatencyMs, lastDownloadMbps, lastJitterMs, lastReferenceLatencyMs, lastInternalLatencyMs);
+    showResults(lastLatencyMs, lastDownloadMbps, lastJitterMs, lastReferenceLatencyMs);
   }
 }
 
@@ -550,7 +549,6 @@ const DOWNLOAD_URLS = [
 
 const LATENCY_IMG_URL = 'https://www.microsoft.com/favicon.ico';
 const REFERENCE_LATENCY_URL = 'https://1.1.1.1/dns-query';
-const INTERNAL_LATENCY_URL = 'https://sdeurvf7140-r.eur.corp.vattenfall.com';
 const LATENCY_ROUNDS = 6;
 
 function median(arr) {
@@ -587,23 +585,6 @@ async function measureReferenceLatency() {
       await fetch(REFERENCE_LATENCY_URL + bust, { cache: 'no-store', mode: 'cors' });
     } catch (e) {
       // Silently fail for reference test, return null
-      return null;
-    }
-    times.push(performance.now() - t0);
-  }
-  return median(times);
-}
-
-async function measureInternalLatency() {
-  const times = [];
-  const rounds = 3;
-  for (let i = 0; i < rounds; i++) {
-    const bust = '?v=' + Date.now() + '_' + i;
-    const t0 = performance.now();
-    try {
-      await fetch(INTERNAL_LATENCY_URL + bust, { cache: 'no-store', mode: 'cors', timeout: 3000 });
-    } catch (e) {
-      // Silently fail for internal test, return null
       return null;
     }
     times.push(performance.now() - t0);
@@ -729,9 +710,8 @@ async function startTest() {
     const latencyMs = latencyStats.median;
     const jitterMs = latencyStats.jitter;
 
-    // Measure reference and internal latency in parallel
+    // Measure reference latency in parallel
     const referenceLatencyPromise = measureReferenceLatency();
-    const internalLatencyPromise = measureInternalLatency();
 
     setPhase(2, 'done'); setPhase(3, 'active');
 
@@ -742,27 +722,25 @@ async function startTest() {
       // Keep download as null on failure
     }
 
-    // Wait for reference and internal latency results
+    // Wait for reference latency result
     const referenceLatencyMs = await referenceLatencyPromise;
-    const internalLatencyMs = await internalLatencyPromise;
 
     setPhase(3, 'done');
     setProgress(100, 'Testet är klart!');
 
     await new Promise(r => setTimeout(r, 400));
-    showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs, internalLatencyMs);
+    showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs);
 
   } catch (err) {
     showError(err);
   }
 }
 
-function showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs, internalLatencyMs) {
+function showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs) {
   lastLatencyMs = latencyMs;
   lastDownloadMbps = downloadMbps;
   lastJitterMs = jitterMs;
   lastReferenceLatencyMs = referenceLatencyMs;
-  lastInternalLatencyMs = internalLatencyMs;
 
   document.getElementById('progressSection').className = 'progress-section';
   document.getElementById('results').className = 'results visible';
@@ -770,17 +748,13 @@ function showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs, inte
   document.getElementById('latencyVal').textContent = Math.round(latencyMs);
   document.getElementById('jitterVal').textContent = jitterMs.toFixed(1);
 
-  // Display reference and internal latency if available
+  // Display reference latency if available
   const refBox = document.getElementById('referenceLatencyBox');
-  let refText = '';
-  if (internalLatencyMs !== null) {
-    refText += 'Internal reference: ' + Math.round(internalLatencyMs) + ' ms';
-  }
   if (referenceLatencyMs !== null) {
-    if (refText) refText += ' | ';
-    refText += 'Cloudflare: ' + Math.round(referenceLatencyMs) + ' ms';
+    refBox.textContent = 'Reference latency Cloudflare: ' + Math.round(referenceLatencyMs) + ' ms';
+  } else {
+    refBox.textContent = '';
   }
-  refBox.textContent = refText;
 
   const t = translations[currentLang];
   let quality, badgeClass, desc;
@@ -848,7 +822,6 @@ function resetTest() {
   lastDownloadMbps = null;
   lastJitterMs = null;
   lastReferenceLatencyMs = null;
-  lastInternalLatencyMs = null;
 }
 
 // Language button listeners
