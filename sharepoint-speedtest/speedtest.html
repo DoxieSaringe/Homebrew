@@ -6,274 +6,51 @@
   <title>Nätverkshastighetstest – Microsoft Teams Town Hall</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f3f2f1;
-      color: #323130;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-
-    .card {
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      padding: 40px;
-      max-width: 560px;
-      width: 100%;
-    }
-
-    .language-switcher {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .lang-btn {
-      font-size: 24px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: background 0.2s;
-    }
-
+    body { font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif; background: #f3f2f1; color: #323130; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .card { background: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); padding: 40px; max-width: 560px; width: 100%; }
+    .language-switcher { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }
+    .lang-btn { font-size: 24px; background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s; }
     .lang-btn:hover { background: #edebe9; }
     .lang-btn.active { background: #464eb8; color: white; border-radius: 6px; }
-
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 8px;
-    }
-
-    .header-icon {
-      width: 40px;
-      height: 40px;
-      background: #464eb8;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .header-icon svg {
-      width: 22px;
-      height: 22px;
-      fill: white;
-    }
-
-    h1 {
-      font-size: 20px;
-      font-weight: 600;
-      color: #323130;
-      line-height: 1.3;
-    }
-
-    .subtitle {
-      font-size: 14px;
-      color: #605e5c;
-      margin-bottom: 32px;
-      margin-top: 4px;
-      line-height: 1.5;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #464eb8;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 10px 24px;
-      font-size: 15px;
-      font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: background 0.15s;
-      margin-bottom: 28px;
-    }
-
+    .header { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+    .header-icon { width: 40px; height: 40px; background: #464eb8; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .header-icon svg { width: 22px; height: 22px; fill: white; }
+    h1 { font-size: 20px; font-weight: 600; color: #323130; line-height: 1.3; }
+    .subtitle { font-size: 14px; color: #605e5c; margin-bottom: 32px; margin-top: 4px; line-height: 1.5; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; background: #464eb8; color: white; border: none; border-radius: 4px; padding: 10px 24px; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.15s; margin-bottom: 28px; }
     .btn:hover:not(:disabled) { background: #3b42a0; }
     .btn:disabled { background: #c8c6c4; cursor: not-allowed; }
-
-    .btn svg {
-      width: 16px;
-      height: 16px;
-      fill: white;
-    }
-
     .progress-section { margin-bottom: 28px; display: none; }
     .progress-section.visible { display: block; }
-
-    .progress-label {
-      font-size: 13px;
-      color: #605e5c;
-      margin-bottom: 8px;
-    }
-
-    .progress-bar-track {
-      height: 4px;
-      background: #edebe9;
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: #464eb8;
-      border-radius: 2px;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-
-    .phase-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 14px;
-    }
-
-    .phase-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      color: #a19f9d;
-    }
-
+    .progress-label { font-size: 13px; color: #605e5c; margin-bottom: 8px; }
+    .progress-bar-track { height: 4px; background: #edebe9; border-radius: 2px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: #464eb8; border-radius: 2px; width: 0%; transition: width 0.3s ease; }
+    .phase-list { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+    .phase-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #a19f9d; }
     .phase-item.active { color: #464eb8; font-weight: 600; }
     .phase-item.done { color: #107c10; }
-
-    .phase-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #c8c6c4;
-      flex-shrink: 0;
-    }
-
+    .phase-dot { width: 8px; height: 8px; border-radius: 50%; background: #c8c6c4; flex-shrink: 0; }
     .phase-item.active .phase-dot { background: #464eb8; }
     .phase-item.done .phase-dot { background: #107c10; }
-
     .results { display: none; }
     .results.visible { display: block; }
-
-    .result-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .result-box {
-      background: #f3f2f1;
-      border-radius: 6px;
-      padding: 16px;
-    }
-
-    .result-label {
-      font-size: 12px;
-      color: #605e5c;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 4px;
-    }
-
-    .result-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: #323130;
-      line-height: 1.1;
-    }
-
-    .result-unit {
-      font-size: 13px;
-      font-weight: 400;
-      color: #605e5c;
-    }
-
-    .quality-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 18px;
-      border-radius: 6px;
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .result-box { background: #f3f2f1; border-radius: 6px; padding: 16px; }
+    .result-label { font-size: 12px; color: #605e5c; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .result-value { font-size: 28px; font-weight: 700; color: #323130; line-height: 1.1; }
+    .result-unit { font-size: 13px; font-weight: 400; color: #605e5c; }
+    .quality-badge { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 6px; font-size: 15px; font-weight: 600; margin-bottom: 20px; }
     .quality-badge.good { background: #dff6dd; color: #107c10; }
     .quality-badge.ok   { background: #fff4ce; color: #797673; }
     .quality-badge.bad  { background: #fde7e9; color: #a80000; }
-
-    .quality-desc {
-      font-size: 13px;
-      color: #605e5c;
-      line-height: 1.6;
-      margin-bottom: 24px;
-    }
-
-    .retry-btn {
-      background: none;
-      border: 1px solid #8a8886;
-      color: #323130;
-      border-radius: 4px;
-      padding: 8px 20px;
-      font-size: 14px;
-      font-family: inherit;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-
+    .quality-desc { font-size: 13px; color: #605e5c; line-height: 1.6; margin-bottom: 24px; }
+    .retry-btn { background: none; border: 1px solid #8a8886; color: #323130; border-radius: 4px; padding: 8px 20px; font-size: 14px; font-family: inherit; cursor: pointer; transition: background 0.15s; }
     .retry-btn:hover { background: #f3f2f1; }
-
-    .error-box {
-      display: none;
-      background: #fde7e9;
-      border-radius: 6px;
-      padding: 16px;
-      font-size: 14px;
-      color: #a80000;
-      line-height: 1.5;
-      margin-bottom: 20px;
-    }
-
+    .error-box { display: none; background: #fde7e9; border-radius: 6px; padding: 16px; font-size: 14px; color: #a80000; line-height: 1.5; margin-bottom: 20px; }
     .error-box.visible { display: block; }
-
-    .threshold-info {
-      border-top: 1px solid #edebe9;
-      padding-top: 16px;
-      margin-top: 8px;
-    }
-
-    .threshold-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: #605e5c;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 8px;
-    }
-
-    .threshold-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: #605e5c;
-      margin-bottom: 4px;
-    }
-
+    .threshold-info { border-top: 1px solid #edebe9; padding-top: 16px; margin-top: 8px; }
+    .threshold-title { font-size: 12px; font-weight: 600; color: #605e5c; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .threshold-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #605e5c; margin-bottom: 4px; }
     .dot-good { width: 8px; height: 8px; border-radius: 50%; background: #107c10; flex-shrink:0; }
     .dot-ok   { width: 8px; height: 8px; border-radius: 50%; background: #797673; flex-shrink:0; }
     .dot-bad  { width: 8px; height: 8px; border-radius: 50%; background: #a80000; flex-shrink:0; }
@@ -281,8 +58,6 @@
 </head>
 <body>
 <div class="card">
-
-  <!-- Language Switcher -->
   <div class="language-switcher">
     <button class="lang-btn active" data-lang="sv" title="Svenska">🇸🇪</button>
     <button class="lang-btn" data-lang="en" title="English">🇬🇧</button>
@@ -292,28 +67,21 @@
 
   <div class="header">
     <div class="header-icon">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M13 2C7.477 2 3 6.477 3 12s4.477 10 10 10 10-4.477 10-10S18.523 2 13 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8zm.5-13H12v6l5.25 3.15.75-1.23-4.5-2.67V7z"/>
-      </svg>
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 2C7.477 2 3 6.477 3 12s4.477 10 10 10 10-4.477 10-10S18.523 2 13 2zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8zm.5-13H12v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
     </div>
     <h1 data-i18n="title">Nätverkshastighetstest<br>Microsoft Teams Town Hall</h1>
   </div>
 
-  <p class="subtitle" data-i18n="subtitle">
-    Testa om din uppkoppling uppfyller kraven för att delta i eller arrangera en Microsoft Teams Town Hall. Testet mäter anslutningskvalitet mot Microsoft 365-infrastrukturen.
-  </p>
+  <p class="subtitle" data-i18n="subtitle">Testa om din uppkoppling uppfyller kraven för att delta i eller arrangera en Microsoft Teams Town Hall. Testet mäter anslutningskvalitet mot Microsoft 365-infrastrukturen.</p>
 
   <button class="btn" id="startBtn" onclick="startTest()">
     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
     <span data-i18n="startBtn">Starta test</span>
   </button>
 
-  <!-- Progress -->
   <div class="progress-section" id="progressSection">
     <div class="progress-label" id="progressLabel" data-i18n="preparing">Förbereder test…</div>
-    <div class="progress-bar-track">
-      <div class="progress-bar-fill" id="progressFill"></div>
-    </div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progressFill"></div></div>
     <div class="phase-list">
       <div class="phase-item" id="phase1" data-i18n="phase1">Fas 1 – Anslutningstest mot Microsoft 365</div>
       <div class="phase-item" id="phase2" data-i18n="phase2">Fas 2 – Latensmätning (5 mätningar)</div>
@@ -321,17 +89,15 @@
     </div>
   </div>
 
-  <!-- Error -->
   <div class="error-box" id="errorBox"></div>
 
-  <!-- Results -->
   <div class="results" id="results">
     <div class="result-grid">
       <div class="result-box">
         <div class="result-label" data-i18n="latencyLabel">Latens</div>
         <div class="result-value" id="latencyVal">–</div>
         <div class="result-unit" data-i18n="latencyUnit">ms (median)</div>
-        <div class="result-unit" style="margin-top: 6px; font-size: 13px; color: #605e5c;">
+        <div class="result-unit" style="margin-top:6px;font-size:13px;color:#605e5c;">
           <span data-i18n="jitterLabel">Jitter</span>: <span id="jitterVal">–</span> <span data-i18n="jitterUnit">ms</span>
         </div>
       </div>
@@ -341,26 +107,14 @@
         <div class="result-unit" data-i18n="downloadUnit">Mbps</div>
       </div>
     </div>
-
     <div class="quality-badge" id="qualityBadge"></div>
     <p class="quality-desc" id="qualityDesc"></p>
-
     <button class="retry-btn" onclick="resetTest()" data-i18n="retryBtn">Testa igen</button>
-
     <div class="threshold-info">
       <div class="threshold-title" data-i18n="thresholdTitle">Krav för Town Hall</div>
-      <div class="threshold-row">
-        <div class="dot-good"></div>
-        <span data-i18n="thresholdGood"><strong>Bra:</strong> ≥ 3 Mbps &amp; latens ≤ 100 ms – optimalt för deltagare och presentatörer</span>
-      </div>
-      <div class="threshold-row">
-        <div class="dot-ok"></div>
-        <span data-i18n="thresholdOk"><strong>OK:</strong> 1,5–3 Mbps eller latens 100–200 ms – acceptabelt för deltagare</span>
-      </div>
-      <div class="threshold-row">
-        <div class="dot-bad"></div>
-        <span data-i18n="thresholdBad"><strong>Dålig:</strong> &lt; 1,5 Mbps eller latens &gt; 200 ms – problem kan uppstå</span>
-      </div>
+      <div class="threshold-row"><div class="dot-good"></div><span data-i18n="thresholdGood"><strong>Bra:</strong> ≥ 3 Mbps &amp; latens ≤ 100 ms – optimalt för deltagare och presentatörer</span></div>
+      <div class="threshold-row"><div class="dot-ok"></div><span data-i18n="thresholdOk"><strong>OK:</strong> 1,5–3 Mbps eller latens 100–200 ms – acceptabelt för deltagare</span></div>
+      <div class="threshold-row"><div class="dot-bad"></div><span data-i18n="thresholdBad"><strong>Dålig:</strong> &lt; 1,5 Mbps eller latens &gt; 200 ms – problem kan uppstå</span></div>
     </div>
   </div>
 </div>
@@ -399,145 +153,37 @@ const translations = {
     descHighLatency: "Latensen är för hög för en bra Town Hall-upplevelse. Kontakta IT-support.",
     jitterLabel: "Jitter",
     jitterUnit: "ms"
-  },
-  en: {
-    title: "Network Speed Test<br>Microsoft Teams Town Hall",
-    subtitle: "Test if your connection meets the requirements to join or host a Microsoft Teams Town Hall. The test measures connection quality against Microsoft 365 infrastructure.",
-    startBtn: "Start test",
-    preparing: "Preparing test…",
-    phase1: "Phase 1 – Connection test to Microsoft 365",
-    phase2: "Phase 2 – Latency measurement (5 measurements)",
-    phase3: "Phase 3 – Download speed",
-    latencyLabel: "Latency",
-    latencyUnit: "ms (median)",
-    downloadLabel: "Download",
-    downloadUnit: "Mbps",
-    retryBtn: "Test again",
-    thresholdTitle: "Requirements for Town Hall",
-    thresholdGood: "<strong>Good:</strong> ≥ 3 Mbps &amp; latency ≤ 100 ms – optimal for attendees and presenters",
-    thresholdOk: "<strong>OK:</strong> 1.5–3 Mbps or latency 100–200 ms – acceptable for attendees",
-    thresholdBad: "<strong>Poor:</strong> &lt; 1.5 Mbps or latency &gt; 200 ms – issues may occur",
-    qualityGood: "✓ Good connection",
-    qualityOk: "⚠ Acceptable connection",
-    qualityBad: "✗ Weak connection",
-    qualityLowLatency: "✓ Low latency",
-    qualityMediumLatency: "⚠ Medium latency",
-    qualityHighLatency: "✗ High latency",
-    descGood: "Your connection meets the requirements to participate as attendee and presenter in Microsoft Teams Town Hall. Both video and audio should work without issues.",
-    descOk: "Your connection is sufficient to attend a Town Hall as a listener, but may occasionally buffer. For presenting, at least 3 Mbps and latency under 100 ms is recommended.",
-    descBad: "Your connection does not meet the minimum requirements for Microsoft Teams Town Hall. You may experience disruptions in video and audio streams. Contact IT support or try from another network.",
-    descLowLatency: "The latency measurement shows good results. The download test could not be completed – contact IT if you need a full result.",
-    descMediumLatency: "The latency is acceptable but borderline. The download test could not be completed.",
-    descHighLatency: "The latency is too high for a good Town Hall experience. Contact IT support.",
-    jitterLabel: "Jitter",
-    jitterUnit: "ms"
-  },
-  nl: {
-    title: "Netwerk Snelheidstest<br>Microsoft Teams Town Hall",
-    subtitle: "Test of uw verbinding voldoet aan de vereisten om deel te nemen aan of te hosten van een Microsoft Teams Town Hall. De test meet de aansluitingskwaliteit tegen de Microsoft 365-infrastructuur.",
-    startBtn: "Start test",
-    preparing: "Test voorbereiden…",
-    phase1: "Fase 1 – Verbindingstest met Microsoft 365",
-    phase2: "Fase 2 – Latentie meting (5 metingen)",
-    phase3: "Fase 3 – Downloadsnelheid",
-    latencyLabel: "Latency",
-    latencyUnit: "ms (mediaan)",
-    downloadLabel: "Download",
-    downloadUnit: "Mbps",
-    retryBtn: "Test opnieuw",
-    thresholdTitle: "Vereisten voor Town Hall",
-    thresholdGood: "<strong>Goed:</strong> ≥ 3 Mbps &amp; latency ≤ 100 ms – optimaal voor deelnemers en presentatoren",
-    thresholdOk: "<strong>OK:</strong> 1,5–3 Mbps of latency 100–200 ms – acceptabel voor deelnemers",
-    thresholdBad: "<strong>Slecht:</strong> &lt; 1,5 Mbps of latency &gt; 200 ms – problemen kunnen optreden",
-    qualityGood: "✓ Goede verbinding",
-    qualityOk: "⚠ Acceptabele verbinding",
-    qualityBad: "✗ Zwakke verbinding",
-    qualityLowLatency: "✓ Lage latency",
-    qualityMediumLatency: "⚠ Gemiddelde latency",
-    qualityHighLatency: "✗ Hoge latency",
-    descGood: "Uw verbinding voldoet aan de eisen om deel te nemen als toehoorder en presentator in Microsoft Teams Town Hall. Zowel video als audio zouden zonder problemen moeten werken.",
-    descOk: "Uw verbinding is voldoende om als toehoorder deel te nemen, maar kan soms bufferen. Voor presenteren wordt minimaal 3 Mbps en latency onder 100 ms aanbevolen.",
-    descBad: "Uw verbinding voldoet niet aan de minimumeisen voor Microsoft Teams Town Hall. U kunt storingen ervaren in video- en audiostreams. Neem contact op met IT-support of probeer vanaf een ander netwerk.",
-    descLowLatency: "De latencymeting toont goede resultaten. De downloadsnelheidstest kon niet worden voltooid – neem contact op met IT als u een volledig resultaat nodig heeft.",
-    descMediumLatency: "De latency is acceptabel maar op de grens. De downloadsnelheidstest kon niet worden voltooid.",
-    descHighLatency: "De latency is te hoog voor een goede Town Hall-ervaring. Neem contact op met IT-support.",
-    jitterLabel: "Jitter",
-    jitterUnit: "ms"
-  },
-  pl: {
-    title: "Test prędkości sieci<br>Microsoft Teams Town Hall",
-    subtitle: "Sprawdź, czy Twoje połączenie spełnia wymagania do udziału lub prowadzenia Microsoft Teams Town Hall. Test mierzy jakość połączenia z infrastrukturą Microsoft 365.",
-    startBtn: "Rozpocznij test",
-    preparing: "Przygotowywanie testu…",
-    phase1: "Faza 1 – Test połączenia z Microsoft 365",
-    phase2: "Faza 2 – Pomiar opóźnień (5 pomiarów)",
-    phase3: "Faza 3 – Prędkość pobierania",
-    latencyLabel: "Opóźnienie",
-    latencyUnit: "ms (mediana)",
-    downloadLabel: "Pobieranie",
-    downloadUnit: "Mbps",
-    retryBtn: "Testuj ponownie",
-    thresholdTitle: "Wymagania dla Town Hall",
-    thresholdGood: "<strong>Dobre:</strong> ≥ 3 Mbps &amp; opóźnienie ≤ 100 ms – optymalne dla uczestników i prezenterów",
-    thresholdOk: "<strong>OK:</strong> 1,5–3 Mbps lub opóźnienie 100–200 ms – akceptowalne dla uczestników",
-    thresholdBad: "<strong>Słabe:</strong> &lt; 1,5 Mbps lub opóźnienie &gt; 200 ms – mogą wystąpić problemy",
-    qualityGood: "✓ Dobre połączenie",
-    qualityOk: "⚠ Akceptowalne połączenie",
-    qualityBad: "✗ Słabe połączenie",
-    qualityLowLatency: "✓ Niskie opóźnienie",
-    qualityMediumLatency: "⚠ Średnie opóźnienie",
-    qualityHighLatency: "✗ Wysokie opóźnienie",
-    descGood: "Twoje połączenie spełnia wymagania do udziału jako słuchacz i prezenter w Microsoft Teams Town Hall. Zarówno wideo jak i audio powinny działać bez problemów.",
-    descOk: "Twoje połączenie jest wystarczające do udziału jako słuchacz, ale może czasem buforować. Do prezentowania zalecane jest minimum 3 Mbps i opóźnienie poniżej 100 ms.",
-    descBad: "Twoje połączenie nie spełnia minimalnych wymagań dla Microsoft Teams Town Hall. Możesz doświadczyć zakłóceń w strumieniach wideo i audio. Skontaktuj się z działem IT lub spróbuj z innej sieci.",
-    descLowLatency: "Pomiar opóźnień pokazuje dobre wyniki. Test prędkości pobierania nie mógł zostać ukończony – skontaktuj się z IT jeśli potrzebujesz pełnego wyniku.",
-    descMediumLatency: "Opóźnienie jest akceptowalne, ale na granicy. Test prędkości pobierania nie mógł zostać ukończony.",
-    descHighLatency: "Opóźnienie jest zbyt wysokie dla dobrej jakości Town Hall. Skontaktuj się z działem IT.",
-    jitterLabel: "Jitter",
-    jitterUnit: "ms"
   }
 };
 
-// Global variables to store latest test results for language refresh
 let lastLatencyMs = null;
 let lastDownloadMbps = null;
 let lastJitterMs = null;
-
-// ==================== LANGUAGE HANDLING ====================
 let currentLang = 'sv';
 
 function setLanguage(lang) {
   currentLang = lang;
   document.documentElement.lang = lang;
-
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.lang === lang);
-  });
-
+  document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (translations[lang] && translations[lang][key]) {
-      el.innerHTML = translations[lang][key];
-    }
+    if (translations[lang] && translations[lang][key]) el.innerHTML = translations[lang][key];
   });
-
   if (document.getElementById('results').classList.contains('visible') && lastLatencyMs !== null) {
     showResults(lastLatencyMs, lastDownloadMbps, lastJitterMs);
   }
 }
 
 // ==================== TEST LOGIC ====================
-const LATENCY_URL = 'https://res.cdn.office.net/assets/mail/pwa/n/me/robots.txt';
+const LATENCY_URL = 'https://www.microsoft.com/favicon.ico';
 
-// NYA, MER ROBUSTA DOWNLOAD-URL:ER (Microsoft Teams & Office 365 CDN)
+// Stabila URL:er som fungerar bättre (uppdaterade)
 const DOWNLOAD_URLS = [
-  'https://statics.teams.cdn.office.net/evergreen-assets/DesktopClient/MSTeamsSetup.exe',   // Stor Teams-installationsfil – hög relevans
-  'https://res.cdn.office.net/assets/mail/pwa/n/me/teams-logo-192.png',                   // Microsoft Office/Teams asset
-  'https://officecdn.microsoft.com/pr/492350f6-3a01-4f97-b9c0-c7c6d9a2e5e0/Office/Data/v64.cab', // Office deployment-fil
-  'https://az782000.vo.msecnd.net/public/Office/Data/v64_0.cab'                           // Azure CDN Office-fil
+  'https://www.microsoft.com/favicon.ico',
+  'https://statics.teams.cdn.office.net/evergreen-assets/teams/1.0.0.0/teams-192.png',
+  'https://res.cdn.office.net/owamail/1.0.0.0/favicon.ico'
 ];
 
-const LATENCY_IMG_URL = 'https://res.cdn.office.net/assets/mail/pwa/n/me/favicon.ico';
 const LATENCY_ROUNDS = 5;
 
 function median(arr) {
@@ -556,10 +202,7 @@ function calculateJitter(times) {
 
 function computeLatencyStats(times) {
   if (times.length === 0) throw new Error('NO_LATENCY_MEASUREMENTS');
-  return {
-    median: median(times),
-    jitter: calculateJitter(times)
-  };
+  return { median: median(times), jitter: calculateJitter(times) };
 }
 
 async function measureLatencyFetch() {
@@ -569,26 +212,22 @@ async function measureLatencyFetch() {
     const t0 = performance.now();
     try {
       await fetch(LATENCY_URL + bust, { cache: 'no-store', mode: 'cors' });
-    } catch (e) {
-      throw new Error('CORS_BLOCKED');
-    }
-    times.push(performance.now() - t0);
+      times.push(performance.now() - t0);
+    } catch (e) {}
     setProgress(10 + (i + 1) * 8, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
   }
+  if (times.length < 2) return await measureLatencyImg();
   return computeLatencyStats(times);
 }
 
 async function measureLatencyImg() {
   const times = [];
   for (let i = 0; i < LATENCY_ROUNDS; i++) {
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       const t0 = performance.now();
       const img = new Image();
-      img.onload = img.onerror = () => {
-        times.push(performance.now() - t0);
-        resolve();
-      };
-      img.src = LATENCY_IMG_URL + '?v=' + Date.now() + '_' + i;
+      img.onload = img.onerror = () => { times.push(performance.now() - t0); resolve(); };
+      img.src = LATENCY_URL + '?v=' + Date.now() + '_' + i;
     });
     setProgress(10 + (i + 1) * 8, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
   }
@@ -600,26 +239,22 @@ async function measureSingleDownload() {
   let totalBytes = 0;
   const t0 = performance.now();
 
-  await Promise.all(
-    DOWNLOAD_URLS.map((url, i) =>
-      fetch(url + '?cb=' + Date.now() + '_' + i, { cache: 'no-store', mode: 'cors' })
-        .then(r => {
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          return r.arrayBuffer();
-        })
-        .then(buf => { totalBytes += buf.byteLength; })
-        .catch(() => {
-          const entries = performance.getEntriesByType('resource')
-            .filter(e => e.name.includes(url.split('/').pop()));
-          totalBytes += entries.reduce((s, e) => s + (e.transferSize || e.encodedBodySize || 0), 0);
-        })
-    )
-  );
+  await Promise.all(DOWNLOAD_URLS.map(async (url, i) => {
+    try {
+      const resp = await fetch(url + '?cb=' + Date.now() + '_' + i, { cache: 'no-store', mode: 'cors' });
+      if (resp.ok) {
+        const buf = await resp.arrayBuffer();
+        totalBytes += buf.byteLength;
+      }
+    } catch (e) {}
+    const entries = performance.getEntriesByType('resource')
+      .filter(e => e.name.includes(url.split('/').pop().split('?')[0]));
+    totalBytes += entries.reduce((s, e) => s + (e.transferSize || e.encodedBodySize || 0), 0);
+  }));
 
   const elapsed = (performance.now() - t0) / 1000;
   if (totalBytes === 0) throw new Error('DOWNLOAD_FAILED');
-  if (elapsed < 0.1) throw new Error('ELAPSED_TOO_SHORT');
-
+  if (elapsed < 0.05) throw new Error('ELAPSED_TOO_SHORT');
   return (totalBytes * 8) / elapsed / 1_000_000;
 }
 
@@ -629,15 +264,17 @@ async function measureDownload() {
 
   for (let round = 0; round < 5; round++) {
     let roundSuffix = ` (runda ${round + 1} av 5)…`;
-    if (currentLang === 'en') roundSuffix = ` (round ${round + 1} of 5)…`;
-    else if (currentLang === 'nl') roundSuffix = ` (ronde ${round + 1} van 5)…`;
-    else if (currentLang === 'pl') roundSuffix = ` (runda ${round + 1} z 5)…`;
     setProgress(50 + round * 10, baseLabel + roundSuffix);
 
-    const speed = await measureSingleDownload();
-    speeds.push(speed);
+    try {
+      const speed = await measureSingleDownload();
+      speeds.push(speed);
+    } catch (e) {
+      console.warn(`Download round ${round + 1} misslyckades:`, e.message);
+    }
   }
 
+  if (speeds.length === 0) throw new Error('ALL_DOWNLOADS_FAILED');
   return median(speeds);
 }
 
@@ -652,6 +289,10 @@ function setPhase(n, state) {
 }
 
 async function startTest() {
+  if (window.location.protocol === 'file:') {
+    console.warn('Varning: Sidan körs från fil:// – CORS kan vara begränsat. Använd Live Server för bästa resultat.');
+  }
+
   document.getElementById('startBtn').disabled = true;
   document.getElementById('results').className = 'results';
   document.getElementById('errorBox').className = 'error-box';
@@ -666,17 +307,7 @@ async function startTest() {
     setPhase(1, 'done'); setPhase(2, 'active');
 
     setProgress(10, translations[currentLang].phase2 || 'Startar latensmätning…');
-    let latencyStats;
-    try {
-      latencyStats = await measureLatencyFetch();
-    } catch (e) {
-      if (e.message === 'CORS_BLOCKED') {
-        latencyStats = await measureLatencyImg();
-      } else {
-        throw e;
-      }
-    }
-
+    let latencyStats = await measureLatencyFetch();
     const latencyMs = latencyStats.median;
     const jitterMs = latencyStats.jitter;
 
@@ -686,7 +317,7 @@ async function startTest() {
     try {
       downloadMbps = await measureDownload();
     } catch (e) {
-      // Keep download as null on failure
+      console.warn('Nedladdning misslyckades:', e.message);
     }
 
     setPhase(3, 'done');
@@ -694,7 +325,6 @@ async function startTest() {
 
     await new Promise(r => setTimeout(r, 400));
     showResults(latencyMs, downloadMbps, jitterMs);
-
   } catch (err) {
     showError(err);
   }
@@ -716,35 +346,14 @@ function showResults(latencyMs, downloadMbps, jitterMs) {
 
   if (downloadMbps !== null) {
     document.getElementById('downloadVal').textContent = downloadMbps.toFixed(1);
-
-    if (downloadMbps >= 3 && latencyMs <= 100) {
-      quality = t.qualityGood;
-      badgeClass = 'good';
-      desc = t.descGood;
-    } else if (downloadMbps >= 1.5 && latencyMs <= 200) {
-      quality = t.qualityOk;
-      badgeClass = 'ok';
-      desc = t.descOk;
-    } else {
-      quality = t.qualityBad;
-      badgeClass = 'bad';
-      desc = t.descBad;
-    }
+    if (downloadMbps >= 3 && latencyMs <= 100) { quality = t.qualityGood; badgeClass = 'good'; desc = t.descGood; }
+    else if (downloadMbps >= 1.5 && latencyMs <= 200) { quality = t.qualityOk; badgeClass = 'ok'; desc = t.descOk; }
+    else { quality = t.qualityBad; badgeClass = 'bad'; desc = t.descBad; }
   } else {
     document.getElementById('downloadVal').textContent = '–';
-    if (latencyMs <= 100) {
-      quality = t.qualityLowLatency;
-      badgeClass = 'good';
-      desc = t.descLowLatency;
-    } else if (latencyMs <= 200) {
-      quality = t.qualityMediumLatency;
-      badgeClass = 'ok';
-      desc = t.descMediumLatency;
-    } else {
-      quality = t.qualityHighLatency;
-      badgeClass = 'bad';
-      desc = t.descHighLatency;
-    }
+    if (latencyMs <= 100) { quality = t.qualityLowLatency; badgeClass = 'good'; desc = t.descLowLatency; }
+    else if (latencyMs <= 200) { quality = t.qualityMediumLatency; badgeClass = 'ok'; desc = t.descMediumLatency; }
+    else { quality = t.qualityHighLatency; badgeClass = 'bad'; desc = t.descHighLatency; }
   }
 
   const badge = document.getElementById('qualityBadge');
@@ -756,15 +365,9 @@ function showResults(latencyMs, downloadMbps, jitterMs) {
 function showError(err) {
   document.getElementById('progressSection').className = 'progress-section';
   document.getElementById('startBtn').disabled = false;
-
   const box = document.getElementById('errorBox');
   box.className = 'error-box visible';
-  box.innerHTML = `
-    <strong>Testet kunde inte slutföras.</strong><br>
-    Kontrollera att du är ansluten till internet och att sidan inte blockeras av en brandvägg. 
-    Om problemet kvarstår, kontakta IT-support.<br><br>
-    <small>Teknisk information: ${err.message || String(err)}</small>
-  `;
+  box.innerHTML = `<strong>Testet kunde inte slutföras.</strong><br>Kontrollera internetanslutning och brandvägg. Om problemet kvarstår, kontakta IT-support.<br><br><small>Teknisk information: ${err.message || String(err)}</small>`;
 }
 
 function resetTest() {
@@ -772,18 +375,14 @@ function resetTest() {
   document.getElementById('errorBox').className = 'error-box';
   document.getElementById('startBtn').disabled = false;
   setPhase(1, ''); setPhase(2, ''); setPhase(3, '');
-
-  lastLatencyMs = null;
-  lastDownloadMbps = null;
-  lastJitterMs = null;
+  lastLatencyMs = lastDownloadMbps = lastJitterMs = null;
 }
 
-// Language button listeners
+// Language listeners
 document.querySelectorAll('.lang-btn').forEach(btn => {
   btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
 });
 
-// Initialize
 setLanguage('sv');
 </script>
 </body>
