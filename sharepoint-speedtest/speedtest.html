@@ -548,7 +548,7 @@ const DOWNLOAD_URLS = [
 ];
 
 const LATENCY_IMG_URL = 'https://www.microsoft.com/favicon.ico';
-const REFERENCE_LATENCY_URL = 'https://dns.google/dns-query';
+const REFERENCE_LATENCY_URL = 'https://1.1.1.1/dns-query';
 const LATENCY_ROUNDS = 6;
 
 function median(arr) {
@@ -751,7 +751,7 @@ function showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs) {
   // Display reference latency if available
   const refBox = document.getElementById('referenceLatencyBox');
   if (referenceLatencyMs !== null) {
-    refBox.textContent = 'Reference latency Google: ' + Math.round(referenceLatencyMs) + ' ms';
+    refBox.textContent = 'Reference latency Cloudflare: ' + Math.round(referenceLatencyMs) + ' ms';
   } else {
     refBox.textContent = '';
   }
