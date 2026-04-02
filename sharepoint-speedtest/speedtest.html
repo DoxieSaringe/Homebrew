@@ -527,17 +527,17 @@ function setLanguage(lang) {
 }
 
 // ==================== TEST LOGIC ====================
-const LATENCY_URL = 'https://res.cdn.office.net/assets/mail/pwa/n/me/robots.txt';
+const LATENCY_URL = 'https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.7.1.min.js';
 
-// NYA, MER ROBUSTA DOWNLOAD-URL:ER (Microsoft Teams & Office 365 CDN)
+// Microsoft AJAX CDN (ajax.aspnetcdn.com) – CORS-aktiverat, stabilt
 const DOWNLOAD_URLS = [
-  'https://statics.teams.cdn.office.net/evergreen-assets/DesktopClient/MSTeamsSetup.exe',   // Stor Teams-installationsfil – hög relevans
-  'https://res.cdn.office.net/assets/mail/pwa/n/me/teams-logo-192.png',                   // Microsoft Office/Teams asset
-  'https://officecdn.microsoft.com/pr/492350f6-3a01-4f97-b9c0-c7c6d9a2e5e0/Office/Data/v64.cab', // Office deployment-fil
-  'https://az782000.vo.msecnd.net/public/Office/Data/v64_0.cab'                           // Azure CDN Office-fil
+  'https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.7.1.js',                // ~280 KB – jQuery ohoptimerad
+  'https://ajax.aspnetcdn.com/ajax/jquery-ui/1.13.2/jquery-ui.js',         // ~490 KB – jQuery UI ohoptimerad
+  'https://ajax.aspnetcdn.com/ajax/bootstrap/5.3.2/js/bootstrap.bundle.js', // ~230 KB – Bootstrap bundle
+  'https://ajax.aspnetcdn.com/ajax/modernizr/2.8.3/modernizr.js'           // ~47 KB – Modernizr
 ];
 
-const LATENCY_IMG_URL = 'https://res.cdn.office.net/assets/mail/pwa/n/me/favicon.ico';
+const LATENCY_IMG_URL = 'https://www.microsoft.com/favicon.ico';
 const LATENCY_ROUNDS = 5;
 
 function median(arr) {
