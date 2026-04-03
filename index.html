@@ -461,10 +461,6 @@
         padding: 28px 20px;
       }
 
-      .top-logo {
-        margin-top: 4px;
-      }
-
       .top-logo img {
         width: 200px;
       }
@@ -530,7 +526,7 @@
     </div>
     <div class="phase-list">
       <div class="phase-item" id="phase1" data-i18n="phase1">Fas 1 – Anslutningstest mot Microsoft 365</div>
-      <div class="phase-item" id="phase2" data-i18n="phase2">Fas 2 – Latensmätning (6 mätningar)</div>
+      <div class="phase-item" id="phase2" data-i18n="phase2">Fas 2 – Latensmätning (8 mätningar)</div>
       <div class="phase-item" id="phase3" data-i18n="phase3">Fas 3 – Nedladdningshastighet</div>
     </div>
   </div>
@@ -618,7 +614,7 @@ const translations = {
     connectionTypeOther: "Annan",
     preparing: "Förbereder test…",
     phase1: "Fas 1 – Kontroll av Microsoft-anslutning",
-    phase2: "Fas 2 – Svarstidsmätning (6 mätningar)",
+    phase2: "Fas 2 – Svarstidsmätning (8 mätningar)",
     phase3: "Fas 3 – Ihållande nedladdning",
     latencyLabel: "Latens",
     latencyUnit: "ms (median)",
@@ -642,6 +638,7 @@ const translations = {
     descMediumLatency: "Svarstiden är acceptabel men nedladdningstestet kunde inte slutföras. Resultatet är därför osäkert för faktisk Town Hall-visning.",
     descHighLatency: "Svarstiden är hög och nedladdningstestet kunde inte slutföras. Town Hall-visning kan därför bli instabil.",
     jitterLabel: "Jitter",
+    p95Label: "P95",
     jitterUnit: "ms",
     latencyProgress: "Latensmätning {current} av {total}…",
     testDone: "Testet är klart!",
@@ -655,11 +652,15 @@ const translations = {
     compareBalanced: "Referensmätningarna ligger nära huvudresultatet. Det finns ingen tydlig avvikelse i jämförelsen.",
     testTimeLabel: "Test kört",
     resultConnectionLabel: "Nätverkskontext",
+    resultStabilityLabel: "Stabilitet",
     resultSummaryLabel: "Bedömning",
+    stabilityStable: "Stabil",
+    stabilityVariable: "Varierande",
+    stabilityUnstable: "Instabil",
     advancedTitle: "Avancerade detaljer",
     advancedBtnShow: "Visa avancerat",
     advancedBtnHide: "Dolj avancerat",
-    advancedLatencySummary: "Latensprofiler (median / jitter)",
+    advancedLatencySummary: "Latensprofiler (median / p95 / jitter)",
     advancedReferenceSummary: "Referenser och jämförelse",
     endpointProfileGeneric: "Generic (Microsoft baseline)",
     endpointProfileTownhallMedia: "TownHall-Media (stream CDN)",
@@ -705,7 +706,7 @@ const translations = {
     connectionTypeOther: "Other",
     preparing: "Preparing test…",
     phase1: "Phase 1 – Microsoft connectivity check",
-    phase2: "Phase 2 – Response time measurement (6 measurements)",
+    phase2: "Phase 2 – Response time measurement (8 measurements)",
     phase3: "Phase 3 – Sustained download",
     latencyLabel: "Latency",
     latencyUnit: "ms (median)",
@@ -729,6 +730,7 @@ const translations = {
     descMediumLatency: "Response time is acceptable, but the download test could not be completed. The result is therefore uncertain for actual Town Hall viewing.",
     descHighLatency: "Response time is high and the download test could not be completed. Town Hall viewing may therefore be unstable.",
     jitterLabel: "Jitter",
+    p95Label: "P95",
     jitterUnit: "ms",
     latencyProgress: "Latency measurement {current} of {total}…",
     testDone: "The test is complete!",
@@ -742,11 +744,15 @@ const translations = {
     compareBalanced: "The reference checks are close to the main result. There is no clear deviation in the comparison.",
     testTimeLabel: "Test run",
     resultConnectionLabel: "Network context",
+    resultStabilityLabel: "Stability",
     resultSummaryLabel: "Assessment",
+    stabilityStable: "Stable",
+    stabilityVariable: "Variable",
+    stabilityUnstable: "Unstable",
     advancedTitle: "Advanced details",
     advancedBtnShow: "Show advanced",
     advancedBtnHide: "Hide advanced",
-    advancedLatencySummary: "Latency profiles (median / jitter)",
+    advancedLatencySummary: "Latency profiles (median / p95 / jitter)",
     advancedReferenceSummary: "References and comparison",
     endpointProfileGeneric: "Generic (Microsoft baseline)",
     endpointProfileTownhallMedia: "TownHall-Media (stream CDN)",
@@ -792,7 +798,7 @@ const translations = {
     connectionTypeOther: "Anders",
     preparing: "Test voorbereiden…",
     phase1: "Fase 1 – Microsoft-connectiviteitscontrole",
-    phase2: "Fase 2 – Reactietijdmeting (6 metingen)",
+    phase2: "Fase 2 – Reactietijdmeting (8 metingen)",
     phase3: "Fase 3 – Aanhoudende download",
     latencyLabel: "Latency",
     latencyUnit: "ms (mediaan)",
@@ -816,6 +822,7 @@ const translations = {
     descMediumLatency: "De reactietijd is acceptabel, maar de downloadtest kon niet worden voltooid. Het resultaat blijft daarom onzeker voor echte Town Hall-weergave.",
     descHighLatency: "De reactietijd is hoog en de downloadtest kon niet worden voltooid. Town Hall-weergave kan daardoor instabiel zijn.",
     jitterLabel: "Jitter",
+    p95Label: "P95",
     jitterUnit: "ms",
     latencyProgress: "Latentiemeting {current} van {total}…",
     testDone: "De test is voltooid!",
@@ -829,11 +836,15 @@ const translations = {
     compareBalanced: "De referentiemetingen liggen dicht bij het hoofdresultaat. Er is geen duidelijke afwijking in de vergelijking.",
     testTimeLabel: "Test uitgevoerd",
     resultConnectionLabel: "Netwerkcontext",
+    resultStabilityLabel: "Stabiliteit",
     resultSummaryLabel: "Beoordeling",
+    stabilityStable: "Stabiel",
+    stabilityVariable: "Variabel",
+    stabilityUnstable: "Instabiel",
     advancedTitle: "Geavanceerde details",
     advancedBtnShow: "Toon geavanceerd",
     advancedBtnHide: "Verberg geavanceerd",
-    advancedLatencySummary: "Latency-profielen (mediaan / jitter)",
+    advancedLatencySummary: "Latency-profielen (mediaan / p95 / jitter)",
     advancedReferenceSummary: "Referenties en vergelijking",
     endpointProfileGeneric: "Generic (Microsoft-baseline)",
     endpointProfileTownhallMedia: "TownHall-Media (stream-CDN)",
@@ -879,7 +890,7 @@ const translations = {
     connectionTypeOther: "Inne",
     preparing: "Przygotowywanie testu…",
     phase1: "Faza 1 – Sprawdzenie łączności z Microsoft",
-    phase2: "Faza 2 – Pomiar czasu odpowiedzi (6 pomiarów)",
+    phase2: "Faza 2 – Pomiar czasu odpowiedzi (8 pomiarów)",
     phase3: "Faza 3 – Utrzymane pobieranie",
     latencyLabel: "Opóźnienie",
     latencyUnit: "ms (mediana)",
@@ -903,6 +914,7 @@ const translations = {
     descMediumLatency: "Czas odpowiedzi jest akceptowalny, ale test pobierania nie został ukończony. Wynik pozostaje więc niepewny dla rzeczywistego oglądania Town Hall.",
     descHighLatency: "Czas odpowiedzi jest wysoki, a test pobierania nie został ukończony. Oglądanie Town Hall może być niestabilne.",
     jitterLabel: "Jitter",
+    p95Label: "P95",
     jitterUnit: "ms",
     latencyProgress: "Pomiar opóźnienia {current} z {total}…",
     testDone: "Test zakończony!",
@@ -916,11 +928,15 @@ const translations = {
     compareBalanced: "Pomiary referencyjne są zbliżone do głównego wyniku. Brak wyraźnego odchylenia w porównaniu.",
     testTimeLabel: "Czas testu",
     resultConnectionLabel: "Kontekst sieci",
+    resultStabilityLabel: "Stabilnosc",
     resultSummaryLabel: "Ocena",
+    stabilityStable: "Stabilne",
+    stabilityVariable: "Zmienne",
+    stabilityUnstable: "Niestabilne",
     advancedTitle: "Szczegoly zaawansowane",
     advancedBtnShow: "Pokaz zaawansowane",
     advancedBtnHide: "Ukryj zaawansowane",
-    advancedLatencySummary: "Profile opoznienia (mediana / jitter)",
+    advancedLatencySummary: "Profile opoznienia (mediana / p95 / jitter)",
     advancedReferenceSummary: "Referencje i porownanie",
     endpointProfileGeneric: "Generic (Microsoft baseline)",
     endpointProfileTownhallMedia: "TownHall-Media (CDN strumienia)",
@@ -954,6 +970,8 @@ const translations = {
 let lastLatencyMs = null;
 let lastDownloadMbps = null;
 let lastJitterMs = null;
+let lastP95Ms = null;
+let lastStabilityLevel = null;
 let lastReferenceResults = null;
 let lastLatencyProfileResults = null;
 let lastLocationType = 'unknown';
@@ -980,7 +998,15 @@ function setLanguage(lang) {
   });
 
   if (document.getElementById('results').classList.contains('visible') && lastLatencyMs !== null) {
-    showResults(lastLatencyMs, lastDownloadMbps, lastJitterMs, lastReferenceResults);
+    showResults(
+      lastLatencyMs,
+      lastDownloadMbps,
+      lastJitterMs,
+      lastReferenceResults,
+      lastLatencyProfileResults,
+      lastP95Ms,
+      lastStabilityLevel
+    );
   }
 
   updateAdvancedButtonLabel();
@@ -1011,7 +1037,7 @@ const LATENCY_PROFILES = {
 };
 const EXTERNAL_REFERENCE_IMG_URL = 'https://www.cloudflare.com/favicon.ico';
 const INTERNAL_REFERENCE_IMG_URL = 'https://marvin.corp.vattenfall.com/favicon.ico';
-const LATENCY_ROUNDS = 6;
+const LATENCY_ROUNDS = 8;
 const GOOD_DOWNLOAD_MBPS = 3;
 const OK_DOWNLOAD_MBPS = 2;
 const GOOD_LATENCY_MS = 150;
@@ -1024,6 +1050,13 @@ function median(arr) {
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 }
 
+function percentile(arr, p) {
+  if (!arr.length) return null;
+  const s = [...arr].sort((a, b) => a - b);
+  const idx = Math.ceil((p / 100) * s.length) - 1;
+  return s[Math.max(0, Math.min(idx, s.length - 1))];
+}
+
 function calculateJitter(times) {
   if (times.length < 2) return 0;
   const mean = times.reduce((a, b) => a + b, 0) / times.length;
@@ -1034,12 +1067,30 @@ function calculateJitter(times) {
 
 function computeLatencyStats(times) {
   if (times.length === 0) throw new Error('NO_LATENCY_MEASUREMENTS');
-  // Use measurements 2-6 (skip first warmup measurement)
-  const measuredTimes = times.length > 1 ? times.slice(1) : [...times];
+  // Use measurements 3+ to reduce first-run cold-start effects.
+  const measuredTimes = times.length > 2 ? times.slice(2) : [...times];
   return {
     median: median(measuredTimes),
+    p95: percentile(measuredTimes, 95),
     jitter: calculateJitter(measuredTimes)
   };
+}
+
+function getStabilityLevel(latencyStats) {
+  if (!latencyStats || !Number.isFinite(latencyStats.median) || !Number.isFinite(latencyStats.jitter) || !Number.isFinite(latencyStats.p95)) {
+    return 'variable';
+  }
+
+  const p95Spread = latencyStats.p95 - latencyStats.median;
+  if (latencyStats.jitter <= 20 && p95Spread <= 60) return 'stable';
+  if (latencyStats.jitter <= 40 && p95Spread <= 120) return 'variable';
+  return 'unstable';
+}
+
+function getStabilityLabel(level, t) {
+  if (level === 'stable') return t.stabilityStable;
+  if (level === 'unstable') return t.stabilityUnstable;
+  return t.stabilityVariable;
 }
 
 function formatI18n(template, values) {
@@ -1243,8 +1294,8 @@ function buildCopyResultText() {
     profileRows.push(t.advancedLatencySummary + ':');
     Object.keys(LATENCY_PROFILES).forEach((profileKey) => {
       const profileStats = lastLatencyProfileResults[profileKey];
-      if (profileStats && Number.isFinite(profileStats.median) && Number.isFinite(profileStats.jitter)) {
-        profileRows.push(`- ${getEndpointProfileLabel(profileKey)}: ${Math.round(profileStats.median)} ${t.jitterUnit} / ${profileStats.jitter.toFixed(1)} ${t.jitterUnit}`);
+      if (profileStats && Number.isFinite(profileStats.median) && Number.isFinite(profileStats.p95) && Number.isFinite(profileStats.jitter)) {
+        profileRows.push(`- ${getEndpointProfileLabel(profileKey)}: ${Math.round(profileStats.median)} / ${Math.round(profileStats.p95)} / ${profileStats.jitter.toFixed(1)} ${t.jitterUnit}`);
       }
     });
   }
@@ -1256,6 +1307,8 @@ function buildCopyResultText() {
     `${t.resultConnectionLabel}: ${getNetworkContextLabel(lastLocationType, lastConnectionType)}`,
     `${t.latencyLabel}: ${Math.round(lastLatencyMs)} ${t.jitterUnit}`,
     `${t.jitterLabel}: ${lastJitterMs.toFixed(1)} ${t.jitterUnit}`,
+    `${t.p95Label}: ${Number.isFinite(lastP95Ms) ? Math.round(lastP95Ms) : '–'} ${t.jitterUnit}`,
+    `${t.resultStabilityLabel}: ${getStabilityLabel(lastStabilityLevel, t)}`,
     `${t.downloadLabel}: ${lastDownloadMbps !== null ? lastDownloadMbps.toFixed(1) + ' ' + t.downloadUnit : '–'}`,
     `${t.externalReferenceLabel}: ${externalMs !== null ? Math.round(externalMs) + ' ' + t.jitterUnit : t.referenceUnavailable}`,
     `${t.internalReferenceLabel}: ${internalMs !== null ? Math.round(internalMs) + ' ' + t.jitterUnit : t.referenceUnavailable}`,
@@ -1354,8 +1407,19 @@ function renderAdvancedLatencyDetails() {
   latencySummary.textContent = t.advancedLatencySummary;
   latencyDetails.appendChild(latencySummary);
 
+  const stabilityRow = document.createElement('div');
+  stabilityRow.className = 'advanced-row';
+  const stabilityLabel = document.createElement('span');
+  stabilityLabel.textContent = t.resultStabilityLabel;
+  const stabilityValue = document.createElement('span');
+  stabilityValue.textContent = getStabilityLabel(lastStabilityLevel, t);
+  stabilityRow.appendChild(stabilityLabel);
+  stabilityRow.appendChild(stabilityValue);
+  latencyDetails.appendChild(stabilityRow);
+
   const referenceSummary = document.createElement('div');
   referenceSummary.style.marginBottom = '8px';
+  referenceSummary.style.fontWeight = '600';
   referenceSummary.textContent = t.advancedReferenceSummary;
   referenceDetails.appendChild(referenceSummary);
 
@@ -1373,8 +1437,8 @@ function renderAdvancedLatencyDetails() {
     label.textContent = getEndpointProfileLabel(profileKey);
 
     const value = document.createElement('span');
-    if (stats && Number.isFinite(stats.median) && Number.isFinite(stats.jitter)) {
-      value.textContent = `${Math.round(stats.median)} ${t.jitterUnit} / ${stats.jitter.toFixed(1)} ${t.jitterUnit}`;
+    if (stats && Number.isFinite(stats.median) && Number.isFinite(stats.p95) && Number.isFinite(stats.jitter)) {
+      value.textContent = `${Math.round(stats.median)} / ${Math.round(stats.p95)} / ${stats.jitter.toFixed(1)} ${t.jitterUnit}`;
     } else {
       value.textContent = t.referenceUnavailable;
     }
@@ -1510,6 +1574,8 @@ async function startTest() {
 
     const latencyMs = latencyStats.median;
     const jitterMs = latencyStats.jitter;
+    const p95Ms = latencyStats.p95;
+    const stabilityLevel = getStabilityLevel(latencyStats);
 
     const referencePromise = measureReferenceLatencies();
 
@@ -1528,19 +1594,29 @@ async function startTest() {
     setProgress(100, translations[currentLang].testDone || 'The test is complete!');
 
     await new Promise(r => setTimeout(r, 400));
-    showResults(latencyMs, downloadMbps, jitterMs, referenceResults, latencyProfileResults);
+    showResults(latencyMs, downloadMbps, jitterMs, referenceResults, latencyProfileResults, p95Ms, stabilityLevel);
 
   } catch (err) {
     showError(err);
   }
 }
 
-function showResults(latencyMs, downloadMbps, jitterMs, referenceResults, latencyProfileResults = lastLatencyProfileResults) {
+function showResults(
+  latencyMs,
+  downloadMbps,
+  jitterMs,
+  referenceResults,
+  latencyProfileResults = lastLatencyProfileResults,
+  p95Ms = lastP95Ms,
+  stabilityLevel = lastStabilityLevel
+) {
   const t = translations[currentLang];
 
   lastLatencyMs = latencyMs;
   lastDownloadMbps = downloadMbps;
   lastJitterMs = jitterMs;
+  lastP95Ms = p95Ms;
+  lastStabilityLevel = stabilityLevel;
   lastReferenceResults = referenceResults;
   lastLatencyProfileResults = latencyProfileResults;
 
@@ -1659,6 +1735,8 @@ function resetTest() {
   lastLatencyMs = null;
   lastDownloadMbps = null;
   lastJitterMs = null;
+  lastP95Ms = null;
+  lastStabilityLevel = null;
   lastReferenceResults = null;
   lastLatencyProfileResults = null;
   lastLocationType = 'unknown';
