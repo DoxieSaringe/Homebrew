@@ -619,6 +619,7 @@
     <div class="action-row">
       <button class="retry-btn" onclick="resetTest()" data-i18n="retryBtn">Testa igen</button>
       <button class="copy-btn" id="copyBtn" onclick="copyResults()" data-i18n="copyResultsBtn" style="display: none;">Kopiera resultat</button>
+      <button class="copy-btn" id="sendBtn" onclick="sendResults()" data-i18n="sendResultsBtn">Send</button>
       <button class="retry-btn" id="advancedBtn" onclick="toggleAdvanced()">Advanced details</button>
       <span class="copy-status" id="copyStatus"></span>
     </div>
@@ -770,6 +771,12 @@ const translations = {
     adviceHome1: "Hemma: kontrollera att ingen annan belastar linan med streaming, backup eller större nedladdningar.",
     adviceField1: "I fält: mobilnät kan variera snabbt. Testa gärna från en annan plats om resultatet är svagt.",
     copyResultsBtn: "Kopiera resultat",
+    sendResultsBtn: "Skicka",
+    sendPending: "Skickar resultat...",
+    sendSuccess: "Resultatet skickades.",
+    sendFailed: "Det gick inte att skicka resultatet.",
+    sendCrossOrigin: "Skicka fungerar bara nar sidan kor pa vattenfall.sharepoint.com.",
+    sendNoResults: "Kör testet innan du skickar.",
     copySuccess: "Resultatet kopierades.",
     copyFailed: "Det gick inte att kopiera resultatet.",
     errorTitle: "Testet kunde inte slutföras.",
@@ -873,6 +880,12 @@ const translations = {
     adviceHome1: "At home: confirm no one else is saturating the line with streaming, backups, or large downloads.",
     adviceField1: "In the field: mobile network conditions can change quickly. If results are weak, retest from another nearby spot.",
     copyResultsBtn: "Copy results",
+    sendResultsBtn: "Send",
+    sendPending: "Sending results...",
+    sendSuccess: "Results sent.",
+    sendFailed: "Unable to send results.",
+    sendCrossOrigin: "Send works only when the page runs on vattenfall.sharepoint.com.",
+    sendNoResults: "Run the test before sending.",
     copySuccess: "Results copied.",
     copyFailed: "Unable to copy results.",
     errorTitle: "The test could not be completed.",
@@ -976,6 +989,12 @@ const translations = {
     adviceHome1: "Thuis: controleer of niemand anders de lijn verzadigt met streaming, back-ups of grote downloads.",
     adviceField1: "In het veld: omstandigheden op het mobiele netwerk kunnen snel veranderen. Test opnieuw op een nabijgelegen locatie als het resultaat zwak is.",
     copyResultsBtn: "Resultaten kopieren",
+    sendResultsBtn: "Verstuur",
+    sendPending: "Resultaten worden verstuurd...",
+    sendSuccess: "Resultaten verstuurd.",
+    sendFailed: "Resultaten konden niet worden verstuurd.",
+    sendCrossOrigin: "Versturen werkt alleen wanneer de pagina draait op vattenfall.sharepoint.com.",
+    sendNoResults: "Voer eerst de test uit.",
     copySuccess: "Resultaten gekopieerd.",
     copyFailed: "Resultaten konden niet worden gekopieerd.",
     errorTitle: "De test kon niet worden voltooid.",
@@ -1079,6 +1098,12 @@ const translations = {
     adviceHome1: "W domu: upewnij się, że nikt inny nie obciąża łącza streamingiem, backupem lub dużymi pobraniami.",
     adviceField1: "W terenie: warunki sieci mobilnej mogą szybko się zmieniać. Przy słabym wyniku przetestuj ponownie z innego pobliskiego miejsca.",
     copyResultsBtn: "Kopiuj wyniki",
+    sendResultsBtn: "Wyslij",
+    sendPending: "Wysylanie wynikow...",
+    sendSuccess: "Wyniki wyslano.",
+    sendFailed: "Nie udalo sie wyslac wynikow.",
+    sendCrossOrigin: "Wysylanie dziala tylko, gdy strona dziala w domenie vattenfall.sharepoint.com.",
+    sendNoResults: "Najpierw uruchom test.",
     copySuccess: "Wyniki skopiowano.",
     copyFailed: "Nie udało się skopiować wyników.",
     errorTitle: "Nie udało się ukończyć testu.",
@@ -1094,6 +1119,7 @@ let lastDownloadMbps = null;
 let lastJitterMs = null;
 let lastP95Ms = null;
 let lastStabilityLevel = null;
+let lastQualityLevel = null;
 let lastReferenceResults = null;
 let lastLatencyProfileResults = null;
 let lastLocationType = 'unknown';
@@ -1101,6 +1127,12 @@ let lastConnectionType = 'unknown';
 let lastTestTimestamp = null;
 let isAdvancedVisible = false;
 let isTechnicalNotesVisible = false;
+
+const SHAREPOINT_SITE_URL = 'https://vattenfall.sharepoint.com/sites/SITS-SpecialITService';
+const SHAREPOINT_LIST_TITLE = 'Townhall';
+let sharePointDigest = null;
+let sharePointDigestExpiresAt = 0;
+let sharePointListItemType = null;
 
 // ==================== LANGUAGE HANDLING ====================
 let currentLang = 'en';
@@ -1166,12 +1198,12 @@ const LATENCY_PROFILES = {
     urls: ['https://www.microsoft.com/favicon.ico']
   },
   townhallMedia: {
-    urls: ['https://b.public-teams.prod.ml.cdn.office.net/favicon.ico']
+    urls: ['https://b.public-teams.prod.ml.cdn.office.net/']
   },
   townhallMediaKey: {
     urls: [
-      'https://b.public-teams.prod.ml.cdn.office.net/favicon.ico',
-      'https://kd.public-teams.keys.ml.teams.microsoft.com/favicon.ico'
+      'https://b.public-teams.prod.ml.cdn.office.net/',
+      'https://kd.public-teams.keys.ml.teams.microsoft.com/'
     ]
   }
 };
@@ -1183,6 +1215,11 @@ const OK_DOWNLOAD_MBPS = 2;
 const GOOD_LATENCY_MS = 150;
 const OK_LATENCY_MS = 250;
 const REFERENCE_ROUNDS = 3;
+const QUALITY_LABELS_EN = {
+  good: 'Good for attendees',
+  ok: 'Limited headroom',
+  bad: 'Weak for attendees'
+};
 
 function median(arr) {
   const s = [...arr].sort((a, b) => a - b);
@@ -1405,6 +1442,140 @@ function formatTimestamp(timestamp, language = currentLang) {
 
 function setCopyStatus(message) {
   document.getElementById('copyStatus').textContent = message;
+}
+
+function toNumberOrNull(value, digits = null) {
+  if (!Number.isFinite(value)) return null;
+  return digits === null ? Number(value) : Number(value.toFixed(digits));
+}
+
+function buildSharePointPayload() {
+  const externalMs = lastReferenceResults ? lastReferenceResults.externalMs : null;
+  const internalMs = lastReferenceResults ? lastReferenceResults.internalMs : null;
+
+  return {
+    TestTimestamp: lastTestTimestamp ? new Date(lastTestTimestamp).toISOString() : null,
+    LocationType: lastLocationType,
+    ConnectionType: lastConnectionType,
+    QualityLevel: lastQualityLevel,
+    QualityLabel: QUALITY_LABELS_EN[lastQualityLevel] || 'Weak for attendees',
+    LatencyMs: toNumberOrNull(lastLatencyMs),
+    JitterMs: toNumberOrNull(lastJitterMs, 1),
+    P95Ms: toNumberOrNull(lastP95Ms),
+    DownloadMbps: toNumberOrNull(lastDownloadMbps, 1),
+    StabilityLevel: lastStabilityLevel,
+    ExternalReferenceMs: toNumberOrNull(externalMs),
+    InternalReferenceMs: toNumberOrNull(internalMs)
+  };
+}
+
+async function getSharePointDigest() {
+  const now = Date.now();
+  if (sharePointDigest && now < sharePointDigestExpiresAt) {
+    return sharePointDigest;
+  }
+
+  const response = await fetch(`${SHAREPOINT_SITE_URL}/_api/contextinfo`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json;odata=verbose'
+    },
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    throw new Error(`CONTEXTINFO_HTTP_${response.status}`);
+  }
+
+  const json = await response.json();
+  const info = json && json.d && json.d.GetContextWebInformation;
+  if (!info || !info.FormDigestValue) {
+    throw new Error('MISSING_FORM_DIGEST');
+  }
+
+  sharePointDigest = info.FormDigestValue;
+  const timeoutSeconds = Number(info.FormDigestTimeoutSeconds) || 1200;
+  sharePointDigestExpiresAt = Date.now() + Math.max(60, timeoutSeconds - 60) * 1000;
+  return sharePointDigest;
+}
+
+async function getSharePointListItemType() {
+  if (sharePointListItemType) {
+    return sharePointListItemType;
+  }
+
+  const response = await fetch(`${SHAREPOINT_SITE_URL}/_api/web/lists/getbytitle('${SHAREPOINT_LIST_TITLE}')?$select=ListItemEntityTypeFullName`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json;odata=verbose'
+    },
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    throw new Error(`LIST_META_HTTP_${response.status}`);
+  }
+
+  const json = await response.json();
+  const itemType = json && json.d && json.d.ListItemEntityTypeFullName;
+  if (!itemType) {
+    throw new Error('MISSING_LIST_ITEM_TYPE');
+  }
+
+  sharePointListItemType = itemType;
+  return sharePointListItemType;
+}
+
+async function sendResults() {
+  const t = translations[currentLang] || translations.sv;
+  const button = document.getElementById('sendBtn');
+  const expectedOrigin = new URL(SHAREPOINT_SITE_URL).origin;
+
+  if (window.location.origin !== expectedOrigin) {
+    setCopyStatus(t.sendCrossOrigin || t.sendFailed);
+    return;
+  }
+
+  if (lastLatencyMs === null || !lastQualityLevel) {
+    setCopyStatus(t.sendNoResults || t.sendFailed);
+    return;
+  }
+
+  try {
+    button.disabled = true;
+    setCopyStatus(t.sendPending || 'Sending results...');
+
+    const [digest, itemType] = await Promise.all([
+      getSharePointDigest(),
+      getSharePointListItemType()
+    ]);
+
+    const payload = buildSharePointPayload();
+    const response = await fetch(`${SHAREPOINT_SITE_URL}/_api/web/lists/getbytitle('${SHAREPOINT_LIST_TITLE}')/items`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json;odata=verbose',
+        'Content-Type': 'application/json;odata=verbose',
+        'X-RequestDigest': digest
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        __metadata: { type: itemType },
+        ...payload
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`LIST_POST_HTTP_${response.status}`);
+    }
+
+    setCopyStatus(t.sendSuccess || 'Results sent.');
+  } catch (e) {
+    console.error('SharePoint send failed:', e);
+    setCopyStatus(t.sendFailed || 'Unable to send results.');
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function copyText(text) {
@@ -1811,6 +1982,8 @@ function showResults(
     }
   }
 
+  lastQualityLevel = qualityLevel;
+
   const badge = document.getElementById('qualityBadge');
   badge.textContent = quality;
   badge.className = 'quality-badge ' + badgeClass;
@@ -1881,9 +2054,11 @@ function resetTest() {
   lastJitterMs = null;
   lastP95Ms = null;
   lastStabilityLevel = null;
+  lastQualityLevel = null;
   lastReferenceResults = null;
   lastLatencyProfileResults = null;
   lastLocationType = 'unknown';
+  lastConnectionType = 'unknown';
 }
 
 // Language button listeners
