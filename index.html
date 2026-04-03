@@ -619,7 +619,7 @@
     <div class="action-row">
       <button class="retry-btn" onclick="resetTest()" data-i18n="retryBtn">Testa igen</button>
       <button class="copy-btn" id="copyBtn" onclick="copyResults()" data-i18n="copyResultsBtn" style="display: none;">Kopiera resultat</button>
-      <button class="copy-btn" id="sendBtn" onclick="sendResults()" data-i18n="sendResultsBtn">Send</button>
+      <button class="copy-btn" id="sendBtn" onclick="sendResultsEmail()" data-i18n="sendResultsBtn">Skicka till IT</button>
       <button class="retry-btn" id="advancedBtn" onclick="toggleAdvanced()">Advanced details</button>
       <span class="copy-status" id="copyStatus"></span>
     </div>
@@ -771,12 +771,10 @@ const translations = {
     adviceHome1: "Hemma: kontrollera att ingen annan belastar linan med streaming, backup eller större nedladdningar.",
     adviceField1: "I fält: mobilnät kan variera snabbt. Testa gärna från en annan plats om resultatet är svagt.",
     copyResultsBtn: "Kopiera resultat",
-    sendResultsBtn: "Skicka",
-    sendPending: "Skickar resultat...",
-    sendSuccess: "Resultatet skickades.",
-    sendFailed: "Det gick inte att skicka resultatet.",
-    sendCrossOrigin: "Skicka fungerar bara nar sidan kor pa vattenfall.sharepoint.com.",
+    sendResultsBtn: "Skicka till IT",
     sendNoResults: "Kör testet innan du skickar.",
+    sendOpenedMail: "E-postutkast öppnat.",
+    sendFailed: "Det gick inte att öppna e-postutkastet.",
     copySuccess: "Resultatet kopierades.",
     copyFailed: "Det gick inte att kopiera resultatet.",
     errorTitle: "Testet kunde inte slutföras.",
@@ -880,12 +878,10 @@ const translations = {
     adviceHome1: "At home: confirm no one else is saturating the line with streaming, backups, or large downloads.",
     adviceField1: "In the field: mobile network conditions can change quickly. If results are weak, retest from another nearby spot.",
     copyResultsBtn: "Copy results",
-    sendResultsBtn: "Send",
-    sendPending: "Sending results...",
-    sendSuccess: "Results sent.",
-    sendFailed: "Unable to send results.",
-    sendCrossOrigin: "Send works only when the page runs on vattenfall.sharepoint.com.",
+    sendResultsBtn: "Send to IT",
     sendNoResults: "Run the test before sending.",
+    sendOpenedMail: "Draft email opened.",
+    sendFailed: "Unable to open the draft email.",
     copySuccess: "Results copied.",
     copyFailed: "Unable to copy results.",
     errorTitle: "The test could not be completed.",
@@ -989,12 +985,10 @@ const translations = {
     adviceHome1: "Thuis: controleer of niemand anders de lijn verzadigt met streaming, back-ups of grote downloads.",
     adviceField1: "In het veld: omstandigheden op het mobiele netwerk kunnen snel veranderen. Test opnieuw op een nabijgelegen locatie als het resultaat zwak is.",
     copyResultsBtn: "Resultaten kopieren",
-    sendResultsBtn: "Verstuur",
-    sendPending: "Resultaten worden verstuurd...",
-    sendSuccess: "Resultaten verstuurd.",
-    sendFailed: "Resultaten konden niet worden verstuurd.",
-    sendCrossOrigin: "Versturen werkt alleen wanneer de pagina draait op vattenfall.sharepoint.com.",
+    sendResultsBtn: "Verstuur naar IT",
     sendNoResults: "Voer eerst de test uit.",
+    sendOpenedMail: "Conceptmail geopend.",
+    sendFailed: "Kon conceptmail niet openen.",
     copySuccess: "Resultaten gekopieerd.",
     copyFailed: "Resultaten konden niet worden gekopieerd.",
     errorTitle: "De test kon niet worden voltooid.",
@@ -1098,12 +1092,10 @@ const translations = {
     adviceHome1: "W domu: upewnij się, że nikt inny nie obciąża łącza streamingiem, backupem lub dużymi pobraniami.",
     adviceField1: "W terenie: warunki sieci mobilnej mogą szybko się zmieniać. Przy słabym wyniku przetestuj ponownie z innego pobliskiego miejsca.",
     copyResultsBtn: "Kopiuj wyniki",
-    sendResultsBtn: "Wyslij",
-    sendPending: "Wysylanie wynikow...",
-    sendSuccess: "Wyniki wyslano.",
-    sendFailed: "Nie udalo sie wyslac wynikow.",
-    sendCrossOrigin: "Wysylanie dziala tylko, gdy strona dziala w domenie vattenfall.sharepoint.com.",
+    sendResultsBtn: "Wyslij do IT",
     sendNoResults: "Najpierw uruchom test.",
+    sendOpenedMail: "Otwarto szkic wiadomosci e-mail.",
+    sendFailed: "Nie udalo sie otworzyc szkicu wiadomosci e-mail.",
     copySuccess: "Wyniki skopiowano.",
     copyFailed: "Nie udało się skopiować wyników.",
     errorTitle: "Nie udało się ukończyć testu.",
@@ -1127,12 +1119,6 @@ let lastConnectionType = 'unknown';
 let lastTestTimestamp = null;
 let isAdvancedVisible = false;
 let isTechnicalNotesVisible = false;
-
-const SHAREPOINT_SITE_URL = 'https://vattenfall.sharepoint.com/sites/SITS-SpecialITService';
-const SHAREPOINT_LIST_TITLE = 'Townhall';
-let sharePointDigest = null;
-let sharePointDigestExpiresAt = 0;
-let sharePointListItemType = null;
 
 // ==================== LANGUAGE HANDLING ====================
 let currentLang = 'en';
@@ -1198,12 +1184,12 @@ const LATENCY_PROFILES = {
     urls: ['https://www.microsoft.com/favicon.ico']
   },
   townhallMedia: {
-    urls: ['https://b.public-teams.prod.ml.cdn.office.net/']
+    urls: ['https://b.public-teams.prod.ml.cdn.office.net/favicon.ico']
   },
   townhallMediaKey: {
     urls: [
-      'https://b.public-teams.prod.ml.cdn.office.net/',
-      'https://kd.public-teams.keys.ml.teams.microsoft.com/'
+      'https://b.public-teams.prod.ml.cdn.office.net/favicon.ico',
+      'https://kd.public-teams.keys.ml.teams.microsoft.com/favicon.ico'
     ]
   }
 };
@@ -1215,11 +1201,6 @@ const OK_DOWNLOAD_MBPS = 2;
 const GOOD_LATENCY_MS = 150;
 const OK_LATENCY_MS = 250;
 const REFERENCE_ROUNDS = 3;
-const QUALITY_LABELS_EN = {
-  good: 'Good for attendees',
-  ok: 'Limited headroom',
-  bad: 'Weak for attendees'
-};
 
 function median(arr) {
   const s = [...arr].sort((a, b) => a - b);
@@ -1449,7 +1430,12 @@ function toNumberOrNull(value, digits = null) {
   return digits === null ? Number(value) : Number(value.toFixed(digits));
 }
 
-function buildSharePointPayload() {
+function buildEmailExportPayload() {
+  const qualityLabelMap = {
+    good: 'Good for attendees',
+    ok: 'Limited headroom',
+    bad: 'Weak for attendees'
+  };
   const externalMs = lastReferenceResults ? lastReferenceResults.externalMs : null;
   const internalMs = lastReferenceResults ? lastReferenceResults.internalMs : null;
 
@@ -1458,7 +1444,7 @@ function buildSharePointPayload() {
     LocationType: lastLocationType,
     ConnectionType: lastConnectionType,
     QualityLevel: lastQualityLevel,
-    QualityLabel: QUALITY_LABELS_EN[lastQualityLevel] || 'Weak for attendees',
+    QualityLabel: qualityLabelMap[lastQualityLevel] || 'Weak for attendees',
     LatencyMs: toNumberOrNull(lastLatencyMs),
     JitterMs: toNumberOrNull(lastJitterMs, 1),
     P95Ms: toNumberOrNull(lastP95Ms),
@@ -1469,112 +1455,29 @@ function buildSharePointPayload() {
   };
 }
 
-async function getSharePointDigest() {
-  const now = Date.now();
-  if (sharePointDigest && now < sharePointDigestExpiresAt) {
-    return sharePointDigest;
-  }
-
-  const response = await fetch(`${SHAREPOINT_SITE_URL}/_api/contextinfo`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json;odata=verbose'
-    },
-    credentials: 'include'
-  });
-
-  if (!response.ok) {
-    throw new Error(`CONTEXTINFO_HTTP_${response.status}`);
-  }
-
-  const json = await response.json();
-  const info = json && json.d && json.d.GetContextWebInformation;
-  if (!info || !info.FormDigestValue) {
-    throw new Error('MISSING_FORM_DIGEST');
-  }
-
-  sharePointDigest = info.FormDigestValue;
-  const timeoutSeconds = Number(info.FormDigestTimeoutSeconds) || 1200;
-  sharePointDigestExpiresAt = Date.now() + Math.max(60, timeoutSeconds - 60) * 1000;
-  return sharePointDigest;
-}
-
-async function getSharePointListItemType() {
-  if (sharePointListItemType) {
-    return sharePointListItemType;
-  }
-
-  const response = await fetch(`${SHAREPOINT_SITE_URL}/_api/web/lists/getbytitle('${SHAREPOINT_LIST_TITLE}')?$select=ListItemEntityTypeFullName`, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json;odata=verbose'
-    },
-    credentials: 'include'
-  });
-
-  if (!response.ok) {
-    throw new Error(`LIST_META_HTTP_${response.status}`);
-  }
-
-  const json = await response.json();
-  const itemType = json && json.d && json.d.ListItemEntityTypeFullName;
-  if (!itemType) {
-    throw new Error('MISSING_LIST_ITEM_TYPE');
-  }
-
-  sharePointListItemType = itemType;
-  return sharePointListItemType;
-}
-
-async function sendResults() {
+function sendResultsEmail() {
   const t = translations[currentLang] || translations.sv;
-  const button = document.getElementById('sendBtn');
-  const expectedOrigin = new URL(SHAREPOINT_SITE_URL).origin;
-
-  if (window.location.origin !== expectedOrigin) {
-    setCopyStatus(t.sendCrossOrigin || t.sendFailed);
-    return;
-  }
-
   if (lastLatencyMs === null || !lastQualityLevel) {
-    setCopyStatus(t.sendNoResults || t.sendFailed);
+    setCopyStatus(t.sendNoResults || t.copyFailed);
     return;
   }
 
   try {
-    button.disabled = true;
-    setCopyStatus(t.sendPending || 'Sending results...');
+    const payload = buildEmailExportPayload();
+    const subject = '[TownhallTest] Result';
+    const body = [
+      'Townhall readiness result payload',
+      '',
+      '[TOWNHALL_JSON_START]',
+      JSON.stringify(payload),
+      '[TOWNHALL_JSON_END]'
+    ].join('\n');
 
-    const [digest, itemType] = await Promise.all([
-      getSharePointDigest(),
-      getSharePointListItemType()
-    ]);
-
-    const payload = buildSharePointPayload();
-    const response = await fetch(`${SHAREPOINT_SITE_URL}/_api/web/lists/getbytitle('${SHAREPOINT_LIST_TITLE}')/items`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json;odata=verbose',
-        'Content-Type': 'application/json;odata=verbose',
-        'X-RequestDigest': digest
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        __metadata: { type: itemType },
-        ...payload
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`LIST_POST_HTTP_${response.status}`);
-    }
-
-    setCopyStatus(t.sendSuccess || 'Results sent.');
+    const mailto = `mailto:sits@vattenfall.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+    setCopyStatus(t.sendOpenedMail || t.copySuccess);
   } catch (e) {
-    console.error('SharePoint send failed:', e);
-    setCopyStatus(t.sendFailed || 'Unable to send results.');
-  } finally {
-    button.disabled = false;
+    setCopyStatus(t.sendFailed || t.copyFailed);
   }
 }
 
