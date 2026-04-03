@@ -103,6 +103,34 @@
       line-height: 1.5;
     }
 
+      .support-link {
+      margin-top: 18px;
+        font-size: 12px;
+        color: #605e5c;
+      text-align: center;
+      }
+
+    .support-link button {
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .support-link button,
+    .support-link a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+    .support-link button:hover,
+    .support-link a:hover {
+        color: #464eb8;
+      }
+
     .btn {
       display: inline-flex;
       align-items: center;
@@ -362,6 +390,32 @@
       display: block;
     }
 
+    .technical-notes-panel {
+      display: none;
+      background: #f8f8f8;
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #605e5c;
+      line-height: 1.6;
+    }
+
+    .technical-notes-panel.visible {
+      display: block;
+    }
+
+    .technical-notes-block + .technical-notes-block {
+      margin-top: 12px;
+    }
+
+    .technical-notes-block strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #323130;
+      font-weight: 600;
+    }
+
     .advanced-title {
       font-size: 12px;
       font-weight: 600;
@@ -475,8 +529,8 @@
 
   <!-- Language Switcher -->
   <div class="language-switcher">
-    <button class="lang-btn active" data-lang="sv" title="Svenska">🇸🇪</button>
-    <button class="lang-btn" data-lang="en" title="English">🇬🇧</button>
+    <button class="lang-btn active" data-lang="en" title="English">🇬🇧</button>
+    <button class="lang-btn" data-lang="sv" title="Svenska">🇸🇪</button>
     <button class="lang-btn" data-lang="nl" title="Nederlands">🇳🇱</button>
     <button class="lang-btn" data-lang="pl" title="Polski">🇵🇱</button>
   </div>
@@ -494,7 +548,7 @@
     Bedom om din uppkoppling ar lamplig for att delta som ahorare i en Microsoft Teams Town Hall.
   </p>
 
-  <div class="test-settings">
+  <div class="test-settings" id="testSettings">
     <label class="field-label" for="locationType" data-i18n="locationTypeLabel">Plats</label>
     <select class="field-select" id="locationType" style="margin-bottom: 12px;">
       <option value="unknown" data-i18n="locationTypeUnknown">Välj plats</option>
@@ -564,7 +618,7 @@
 
     <div class="action-row">
       <button class="retry-btn" onclick="resetTest()" data-i18n="retryBtn">Testa igen</button>
-      <button class="copy-btn" id="copyBtn" onclick="copyResults()" data-i18n="copyResultsBtn">Kopiera resultat</button>
+      <button class="copy-btn" id="copyBtn" onclick="copyResults()" data-i18n="copyResultsBtn" style="display: none;">Kopiera resultat</button>
       <button class="retry-btn" id="advancedBtn" onclick="toggleAdvanced()">Advanced details</button>
       <span class="copy-status" id="copyStatus"></span>
     </div>
@@ -591,6 +645,30 @@
       </div>
     </div>
   </div>
+
+  <p class="support-link">
+    <button type="button" id="technicalNotesBtn" onclick="toggleTechnicalNotes()">Technical notes (for IT/support)</button>
+  </p>
+
+  <div class="technical-notes-panel" id="technicalNotesPanel">
+    <div class="advanced-title" data-i18n="technicalNotesTitle">Technical notes</div>
+    <div class="technical-notes-block">
+      <strong data-i18n="technicalNotesMeasureTitle">What the test measures</strong>
+      <div data-i18n="technicalNotesMeasureBody">The test combines a Microsoft connectivity check, latency profiling against Microsoft-related endpoints, and a sustained download test.</div>
+    </div>
+    <div class="technical-notes-block">
+      <strong data-i18n="technicalNotesDownloadTitle">Download method</strong>
+      <div data-i18n="technicalNotesDownloadBody">Download speed is measured by fetching four smaller Microsoft CDN files in parallel for five rounds, then using the median result.</div>
+    </div>
+    <div class="technical-notes-block">
+      <strong data-i18n="technicalNotesWhyTitle">Why not one large file?</strong>
+      <div data-i18n="technicalNotesWhyBody">Parallel smaller files better reflect browser traffic during a Town Hall, avoid single-connection bottlenecks, and allow exact byte counting through stable CORS-enabled Microsoft endpoints.</div>
+    </div>
+    <div class="technical-notes-block">
+      <strong data-i18n="technicalNotesCaveatsTitle">Important caveats</strong>
+      <div data-i18n="technicalNotesCaveatsBody">This is a readiness estimate, not official Teams media telemetry. VPN, proxies, Wi-Fi conditions, browser policy, and endpoint reachability can all affect results.</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -599,6 +677,17 @@ const translations = {
   sv: {
     title: "Town Hall Readiness Test<br>Microsoft Teams",
     subtitle: "Bedöm om din uppkoppling är lämplig för att delta som åhörare i en Microsoft Teams Town Hall.",
+    technicalNotesShow: "Tekniska anteckningar (för IT/support)",
+    technicalNotesHide: "Dölj tekniska anteckningar",
+    technicalNotesTitle: "Tekniska anteckningar",
+    technicalNotesMeasureTitle: "Vad testet mäter",
+    technicalNotesMeasureBody: "Testet kombinerar en Microsoft-kontroll, latensprofilering mot Microsoft-relaterade slutpunkter och ett test av ihållande nedladdning.",
+    technicalNotesDownloadTitle: "Nedladdningsmetod",
+    technicalNotesDownloadBody: "Nedladdningshastigheten mäts genom att fyra mindre Microsoft CDN-filer hämtas parallellt i fem omgångar, och därefter används medianvärdet.",
+    technicalNotesWhyTitle: "Varför inte en enda stor fil?",
+    technicalNotesWhyBody: "Flera mindre filer i parallell hämtning liknar webbläsartrafiken under en Town Hall bättre, undviker flaskhalsar i en enda anslutning och gör exakt byte-räkning möjlig via stabila Microsoft-slutpunkter med CORS.",
+    technicalNotesCaveatsTitle: "Viktiga begränsningar",
+    technicalNotesCaveatsBody: "Det här är en uppskattning av beredskap, inte officiell Teams-media-telemetri. VPN, proxy, Wi-Fi-förhållanden, webbläsarpolicy och endpoint-tillgänglighet kan påverka resultaten.",
     startBtn: "Starta test",
     locationTypeLabel: "Plats",
     locationTypeUnknown: "Välj plats",
@@ -691,6 +780,17 @@ const translations = {
   en: {
     title: "Town Hall Readiness Test<br>Microsoft Teams",
     subtitle: "Assess whether your connection is suitable for attending a Microsoft Teams Town Hall.",
+    technicalNotesShow: "Technical notes (for IT/support)",
+    technicalNotesHide: "Hide technical notes",
+    technicalNotesTitle: "Technical notes",
+    technicalNotesMeasureTitle: "What the test measures",
+    technicalNotesMeasureBody: "The test combines a Microsoft connectivity check, latency profiling against Microsoft-related endpoints, and a sustained download test.",
+    technicalNotesDownloadTitle: "Download method",
+    technicalNotesDownloadBody: "Download speed is measured by fetching four smaller Microsoft CDN files in parallel for five rounds, then using the median result.",
+    technicalNotesWhyTitle: "Why not one large file?",
+    technicalNotesWhyBody: "Parallel smaller files better reflect browser traffic during a Town Hall, avoid single-connection bottlenecks, and allow exact byte counting through stable CORS-enabled Microsoft endpoints.",
+    technicalNotesCaveatsTitle: "Important caveats",
+    technicalNotesCaveatsBody: "This is a readiness estimate, not official Teams media telemetry. VPN, proxies, Wi-Fi conditions, browser policy, and endpoint reachability can all affect results.",
     startBtn: "Start test",
     locationTypeLabel: "Location",
     locationTypeUnknown: "Select location",
@@ -783,6 +883,17 @@ const translations = {
   nl: {
     title: "Town Hall Readiness Test<br>Microsoft Teams",
     subtitle: "Beoordeel of uw verbinding geschikt is om als deelnemer een Microsoft Teams Town Hall te volgen.",
+    technicalNotesShow: "Technische notities (voor IT/support)",
+    technicalNotesHide: "Verberg technische notities",
+    technicalNotesTitle: "Technische notities",
+    technicalNotesMeasureTitle: "Wat de test meet",
+    technicalNotesMeasureBody: "De test combineert een Microsoft-connectiviteitscontrole, latency-profielen naar Microsoft-gerelateerde eindpunten en een test van aanhoudende download.",
+    technicalNotesDownloadTitle: "Downloadmethode",
+    technicalNotesDownloadBody: "De downloadsnelheid wordt gemeten door vier kleinere Microsoft CDN-bestanden parallel op te halen in vijf rondes, waarna de mediaan wordt gebruikt.",
+    technicalNotesWhyTitle: "Waarom niet één groot bestand?",
+    technicalNotesWhyBody: "Meerdere kleinere bestanden die parallel worden opgehaald lijken beter op browserverkeer tijdens een Town Hall, vermijden bottlenecks van één verbinding en maken nauwkeurige byte-telling mogelijk via stabiele Microsoft-eindpunten met CORS.",
+    technicalNotesCaveatsTitle: "Belangrijke aandachtspunten",
+    technicalNotesCaveatsBody: "Dit is een gereedheidsschatting, geen officiële Teams-media-telemetrie. VPN, proxies, Wi-Fi-omstandigheden, browserbeleid en endpoint-beschikbaarheid kunnen allemaal invloed hebben op de resultaten.",
     startBtn: "Start test",
     locationTypeLabel: "Locatie",
     locationTypeUnknown: "Selecteer locatie",
@@ -875,6 +986,17 @@ const translations = {
   pl: {
     title: "Town Hall Readiness Test<br>Microsoft Teams",
     subtitle: "Oceń, czy Twoje połączenie nadaje się do uczestnictwa jako widz w Microsoft Teams Town Hall.",
+    technicalNotesShow: "Informacje techniczne (dla IT/support)",
+    technicalNotesHide: "Ukryj informacje techniczne",
+    technicalNotesTitle: "Informacje techniczne",
+    technicalNotesMeasureTitle: "Co mierzy test",
+    technicalNotesMeasureBody: "Test łączy kontrolę łączności z Microsoft, profilowanie opóźnień względem punktów końcowych powiązanych z Microsoft oraz test utrzymanego pobierania.",
+    technicalNotesDownloadTitle: "Metoda pobierania",
+    technicalNotesDownloadBody: "Prędkość pobierania jest mierzona przez równoległe pobranie czterech mniejszych plików z Microsoft CDN w pięciu rundach, a następnie użycie wyniku mediany.",
+    technicalNotesWhyTitle: "Dlaczego nie jeden duży plik?",
+    technicalNotesWhyBody: "Kilka mniejszych plików pobieranych równolegle lepiej odzwierciedla ruch przeglądarki podczas Town Hall, unika wąskich gardeł pojedynczego połączenia i pozwala dokładnie liczyć bajty dzięki stabilnym punktom końcowym Microsoft z obsługą CORS.",
+    technicalNotesCaveatsTitle: "Ważne zastrzeżenia",
+    technicalNotesCaveatsBody: "To przybliżona ocena gotowości, a nie oficjalna telemetria multimediów Teams. VPN, proxy, warunki Wi-Fi, polityka przeglądarki i dostępność punktów końcowych mogą wpływać na wyniki.",
     startBtn: "Rozpocznij test",
     locationTypeLabel: "Lokalizacja",
     locationTypeUnknown: "Wybierz lokalizację",
@@ -978,9 +1100,26 @@ let lastLocationType = 'unknown';
 let lastConnectionType = 'unknown';
 let lastTestTimestamp = null;
 let isAdvancedVisible = false;
+let isTechnicalNotesVisible = false;
 
 // ==================== LANGUAGE HANDLING ====================
 let currentLang = 'en';
+
+function updateTechnicalNotesButtonLabel() {
+  const t = translations[currentLang] || translations.en;
+  const button = document.getElementById('technicalNotesBtn');
+  const panel = document.getElementById('technicalNotesPanel');
+  if (!button || !panel) return;
+
+  button.textContent = isTechnicalNotesVisible ? t.technicalNotesHide : t.technicalNotesShow;
+  button.setAttribute('aria-expanded', String(isTechnicalNotesVisible));
+  panel.classList.toggle('visible', isTechnicalNotesVisible);
+}
+
+function toggleTechnicalNotes() {
+  isTechnicalNotesVisible = !isTechnicalNotesVisible;
+  updateTechnicalNotesButtonLabel();
+}
 
 function setLanguage(lang) {
   currentLang = lang;
@@ -1010,6 +1149,7 @@ function setLanguage(lang) {
   }
 
   updateAdvancedButtonLabel();
+  updateTechnicalNotesButtonLabel();
 }
 
 // ==================== TEST LOGIC ====================
@@ -1556,6 +1696,7 @@ async function startTest() {
   setCopyStatus('');
 
   document.getElementById('startBtn').disabled = true;
+  document.getElementById('testSettings').style.display = '';
   document.getElementById('results').className = 'results';
   document.getElementById('errorBox').className = 'error-box';
   document.getElementById('progressSection').className = 'progress-section visible';
@@ -1677,9 +1818,11 @@ function showResults(
 
   meta.innerHTML = `
     <strong>${t.testTimeLabel}:</strong> ${formatTimestamp(lastTestTimestamp)}<br>
-    <strong>${t.resultConnectionLabel}:</strong> ${getNetworkContextLabel(lastLocationType, lastConnectionType)}<br>
-    <strong>${t.resultSummaryLabel}:</strong> ${quality}
+    <strong>${t.resultSummaryLabel}:</strong> ${quality}<br>
+    <strong>${t.resultConnectionLabel}:</strong> ${getNetworkContextLabel(lastLocationType, lastConnectionType)}
   `;
+
+  document.getElementById('testSettings').style.display = 'none';
 
   renderAdvancedLatencyDetails();
   updateAdvancedButtonLabel();
@@ -1722,6 +1865,7 @@ function resetTest() {
   document.getElementById('results').className = 'results';
   document.getElementById('errorBox').className = 'error-box';
   document.getElementById('startBtn').disabled = false;
+  document.getElementById('testSettings').style.display = '';
   document.getElementById('resultMeta').textContent = '';
   document.getElementById('adviceList').textContent = '';
   document.getElementById('advancedLatencyDetails').textContent = '';

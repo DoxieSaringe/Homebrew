@@ -43,10 +43,26 @@ Used for comparison context, not for the core quality badge.
 
 The sustained download phase fetches these resources (cache-busted):
 
-- `https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.7.1.js`
-- `https://ajax.aspnetcdn.com/ajax/jquery.ui/1.13.2/jquery-ui.js`
-- `https://ajax.aspnetcdn.com/ajax/bootstrap/5.2.3/bootstrap.bundle.js`
-- `https://ajax.aspnetcdn.com/ajax/modernizr/modernizr-2.8.3.js`
+- `https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.7.1.js` (~285 KB)
+- `https://ajax.aspnetcdn.com/ajax/jquery.ui/1.13.2/jquery-ui.js` (~529 KB)
+- `https://ajax.aspnetcdn.com/ajax/bootstrap/5.2.3/bootstrap.bundle.js` (~208 KB)
+- `https://ajax.aspnetcdn.com/ajax/modernizr/modernizr-2.8.3.js` (~47 KB)
+
+**Why multiple smaller files instead of one large file?**
+
+A single large file would be the simplest approach, but it produces less accurate results in real-world network conditions. Here's why multiple files were chosen:
+
+1. **Parallel downloading reflects real usage.** When attending a Town Hall, the browser fetches numerous small assets simultaneously — video chunks, thumbnails, signalling payloads, key delivery requests. Downloading one giant sequential file does not replicate this pattern.
+
+2. **Avoids browser connection throttling.** Browsers cap a single connection to one host at a time. Fetching multiple files in parallel (`Promise.all`) opens several connections, which better saturates the available bandwidth and gives a more realistic throughput reading.
+
+3. **Cache-busting is reliable.** Each URL is appended with a unique `?cb=` query string per round so browsers never serve a cached response. With a large dedicated test file this would waste significant bandwidth on retries; with smaller known-stable files the overhead is minimal.
+
+4. **CORS support guaranteed.** The Microsoft AJAX CDN (`ajax.aspnetcdn.com`) is a Microsoft-owned CDN with permanent CORS headers, enabling `arrayBuffer()` reads that give exact byte counts. Picking a single large arbitrary file risks CORS being absent or removed in future.
+
+5. **Total payload (~1.07 MB) is intentional.** This is large enough to produce a stable throughput measurement even on slower connections (≥ 2 Mbps takes under 5 seconds), but small enough not to be disruptive on metered or mobile connections.
+
+The test runs 5 rounds of this parallel fetch, then reports the **median** speed across rounds to filter out single-round outliers.
 
 ## Core Constants And Thresholds
 
