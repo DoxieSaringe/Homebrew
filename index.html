@@ -14,9 +14,25 @@
       color: #323130;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px;
+    }
+
+    .top-logo {
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      margin: 8px 0 20px;
+      user-select: none;
+    }
+
+    .top-logo img {
+      width: 230px;
+      max-width: 72vw;
+      height: auto;
+      display: block;
     }
 
     .card {
@@ -331,6 +347,41 @@
       color: #605e5c;
     }
 
+    .advanced-panel {
+      display: none;
+      background: #f8f8f8;
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: #605e5c;
+      line-height: 1.5;
+    }
+
+    .advanced-panel.visible {
+      display: block;
+    }
+
+    .advanced-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #323130;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .advanced-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .advanced-row:last-child {
+      margin-bottom: 0;
+    }
+
     .error-box {
       display: none;
       background: #fde7e9;
@@ -400,9 +451,30 @@
       color: #605e5c;
       line-height: 1.4;
     }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 16px;
+      }
+
+      .card {
+        padding: 28px 20px;
+      }
+
+      .top-logo {
+        margin-top: 4px;
+      }
+
+      .top-logo img {
+        width: 200px;
+      }
+    }
   </style>
 </head>
 <body>
+<div class="top-logo" aria-label="Vattenfall">
+  <img src="https://www.vattenfall.se/Static/img/logo/VF_logo.svg" alt="Vattenfall" loading="eager" decoding="async">
+</div>
 <div class="card">
 
   <!-- Language Switcher -->
@@ -423,7 +495,7 @@
   </div>
 
   <p class="subtitle" data-i18n="subtitle">
-    Testa om din uppkoppling uppfyller kraven för att delta i eller arrangera en Microsoft Teams Town Hall. Testet mäter anslutningskvalitet mot Microsoft 365-infrastrukturen.
+    Bedom om din uppkoppling ar lamplig for att delta som ahorare i en Microsoft Teams Town Hall.
   </p>
 
   <div class="test-settings">
@@ -442,6 +514,7 @@
       <option value="ethernet" data-i18n="connectionTypeEthernet">Kabel/Ethernet</option>
       <option value="hotspot" data-i18n="connectionTypeHotspot">Mobil hotspot</option>
     </select>
+
   </div>
 
   <button class="btn" id="startBtn" onclick="startTest()">
@@ -475,7 +548,6 @@
         <div class="result-unit" style="margin-top: 6px; font-size: 13px; color: #605e5c;">
           <span data-i18n="jitterLabel">Jitter</span>: <span id="jitterVal">–</span> <span data-i18n="jitterUnit">ms</span>
         </div>
-        <div class="reference-latency" id="referenceLatencyBox"></div>
       </div>
       <div class="result-box">
         <div class="result-label" data-i18n="downloadLabel">Nedladdning</div>
@@ -497,7 +569,14 @@
     <div class="action-row">
       <button class="retry-btn" onclick="resetTest()" data-i18n="retryBtn">Testa igen</button>
       <button class="copy-btn" id="copyBtn" onclick="copyResults()" data-i18n="copyResultsBtn">Kopiera resultat</button>
+      <button class="retry-btn" id="advancedBtn" onclick="toggleAdvanced()">Advanced details</button>
       <span class="copy-status" id="copyStatus"></span>
+    </div>
+
+    <div class="advanced-panel" id="advancedPanel">
+      <div class="advanced-title" data-i18n="advancedTitle">Advanced details</div>
+      <div id="advancedLatencyDetails"></div>
+      <div id="advancedReferenceDetails" style="margin-top: 10px;"></div>
     </div>
 
     <div class="threshold-info">
@@ -523,7 +602,7 @@
 const translations = {
   sv: {
     title: "Town Hall Readiness Test<br>Microsoft Teams",
-    subtitle: "Bedöm om din uppkoppling är lämplig för att delta som åhörare i en Microsoft Teams Town Hall. Testet efterliknar en TCP/HTTPS-baserad visningsupplevelse mot Microsoft-hostat innehåll.",
+    subtitle: "Bedöm om din uppkoppling är lämplig för att delta som åhörare i en Microsoft Teams Town Hall.",
     startBtn: "Starta test",
     locationTypeLabel: "Plats",
     locationTypeUnknown: "Välj plats",
@@ -577,6 +656,14 @@ const translations = {
     testTimeLabel: "Test kört",
     resultConnectionLabel: "Nätverkskontext",
     resultSummaryLabel: "Bedömning",
+    advancedTitle: "Avancerade detaljer",
+    advancedBtnShow: "Visa avancerat",
+    advancedBtnHide: "Dolj avancerat",
+    advancedLatencySummary: "Latensprofiler (median / jitter)",
+    advancedReferenceSummary: "Referenser och jämförelse",
+    endpointProfileGeneric: "Generic (Microsoft baseline)",
+    endpointProfileTownhallMedia: "TownHall-Media (stream CDN)",
+    endpointProfileTownhallMediaKey: "TownHall-Media+Key (stream + key delivery)",
     adviceTitle: "Rekommenderade åtgärder",
     adviceGeneralGood1: "Anslutningen ser tillräckligt stabil ut för Town Hall som deltagare.",
     adviceGeneralGood2: "Anslut gärna några minuter innan sändningen startar så att videoströmmen hinner stabiliseras.",
@@ -602,7 +689,7 @@ const translations = {
   },
   en: {
     title: "Town Hall Readiness Test<br>Microsoft Teams",
-    subtitle: "Assess whether your connection is suitable for attending a Microsoft Teams Town Hall. The test approximates a TCP/HTTPS-based viewing experience against Microsoft-hosted content.",
+    subtitle: "Assess whether your connection is suitable for attending a Microsoft Teams Town Hall.",
     startBtn: "Start test",
     locationTypeLabel: "Location",
     locationTypeUnknown: "Select location",
@@ -656,6 +743,14 @@ const translations = {
     testTimeLabel: "Test run",
     resultConnectionLabel: "Network context",
     resultSummaryLabel: "Assessment",
+    advancedTitle: "Advanced details",
+    advancedBtnShow: "Show advanced",
+    advancedBtnHide: "Hide advanced",
+    advancedLatencySummary: "Latency profiles (median / jitter)",
+    advancedReferenceSummary: "References and comparison",
+    endpointProfileGeneric: "Generic (Microsoft baseline)",
+    endpointProfileTownhallMedia: "TownHall-Media (stream CDN)",
+    endpointProfileTownhallMediaKey: "TownHall-Media+Key (stream + key delivery)",
     adviceTitle: "Recommended actions",
     adviceGeneralGood1: "The connection looks stable enough for attending a Town Hall.",
     adviceGeneralGood2: "Join a few minutes before the event starts so the stream has time to stabilize.",
@@ -681,7 +776,7 @@ const translations = {
   },
   nl: {
     title: "Town Hall Readiness Test<br>Microsoft Teams",
-    subtitle: "Beoordeel of uw verbinding geschikt is om als deelnemer een Microsoft Teams Town Hall te volgen. De test benadert een TCP/HTTPS-weergave-ervaring tegen door Microsoft gehoste inhoud.",
+    subtitle: "Beoordeel of uw verbinding geschikt is om als deelnemer een Microsoft Teams Town Hall te volgen.",
     startBtn: "Start test",
     locationTypeLabel: "Locatie",
     locationTypeUnknown: "Selecteer locatie",
@@ -735,6 +830,14 @@ const translations = {
     testTimeLabel: "Test uitgevoerd",
     resultConnectionLabel: "Netwerkcontext",
     resultSummaryLabel: "Beoordeling",
+    advancedTitle: "Geavanceerde details",
+    advancedBtnShow: "Toon geavanceerd",
+    advancedBtnHide: "Verberg geavanceerd",
+    advancedLatencySummary: "Latency-profielen (mediaan / jitter)",
+    advancedReferenceSummary: "Referenties en vergelijking",
+    endpointProfileGeneric: "Generic (Microsoft-baseline)",
+    endpointProfileTownhallMedia: "TownHall-Media (stream-CDN)",
+    endpointProfileTownhallMediaKey: "TownHall-Media+Key (stream + key delivery)",
     adviceTitle: "Aanbevolen acties",
     adviceGeneralGood1: "De verbinding lijkt stabiel genoeg om een Town Hall als deelnemer te volgen.",
     adviceGeneralGood2: "Sluit een paar minuten voor de start aan zodat de stream tijd heeft om te stabiliseren.",
@@ -760,7 +863,7 @@ const translations = {
   },
   pl: {
     title: "Town Hall Readiness Test<br>Microsoft Teams",
-    subtitle: "Oceń, czy Twoje połączenie nadaje się do uczestnictwa jako widz w Microsoft Teams Town Hall. Test przybliża odbiór oparty na TCP/HTTPS względem treści hostowanych przez Microsoft.",
+    subtitle: "Oceń, czy Twoje połączenie nadaje się do uczestnictwa jako widz w Microsoft Teams Town Hall.",
     startBtn: "Rozpocznij test",
     locationTypeLabel: "Lokalizacja",
     locationTypeUnknown: "Wybierz lokalizację",
@@ -814,6 +917,14 @@ const translations = {
     testTimeLabel: "Czas testu",
     resultConnectionLabel: "Kontekst sieci",
     resultSummaryLabel: "Ocena",
+    advancedTitle: "Szczegoly zaawansowane",
+    advancedBtnShow: "Pokaz zaawansowane",
+    advancedBtnHide: "Ukryj zaawansowane",
+    advancedLatencySummary: "Profile opoznienia (mediana / jitter)",
+    advancedReferenceSummary: "Referencje i porownanie",
+    endpointProfileGeneric: "Generic (Microsoft baseline)",
+    endpointProfileTownhallMedia: "TownHall-Media (CDN strumienia)",
+    endpointProfileTownhallMediaKey: "TownHall-Media+Key (strumien + dostarczanie kluczy)",
     adviceTitle: "Zalecane działania",
     adviceGeneralGood1: "Połączenie wygląda na wystarczająco stabilne do udziału w Town Hall jako uczestnik.",
     adviceGeneralGood2: "Dołącz kilka minut przed rozpoczęciem wydarzenia, aby strumień zdążył się ustabilizować.",
@@ -844,9 +955,11 @@ let lastLatencyMs = null;
 let lastDownloadMbps = null;
 let lastJitterMs = null;
 let lastReferenceResults = null;
+let lastLatencyProfileResults = null;
 let lastLocationType = 'unknown';
 let lastConnectionType = 'unknown';
 let lastTestTimestamp = null;
+let isAdvancedVisible = false;
 
 // ==================== LANGUAGE HANDLING ====================
 let currentLang = 'en';
@@ -869,6 +982,8 @@ function setLanguage(lang) {
   if (document.getElementById('results').classList.contains('visible') && lastLatencyMs !== null) {
     showResults(lastLatencyMs, lastDownloadMbps, lastJitterMs, lastReferenceResults);
   }
+
+  updateAdvancedButtonLabel();
 }
 
 // ==================== TEST LOGIC ====================
@@ -880,7 +995,20 @@ const DOWNLOAD_URLS = [
   'https://ajax.aspnetcdn.com/ajax/modernizr/modernizr-2.8.3.js'           // ~47 KB – Modernizr
 ];
 
-const LATENCY_IMG_URL = 'https://www.microsoft.com/favicon.ico';
+const LATENCY_PROFILES = {
+  generic: {
+    urls: ['https://www.microsoft.com/favicon.ico']
+  },
+  townhallMedia: {
+    urls: ['https://b.public-teams.prod.ml.cdn.office.net/favicon.ico']
+  },
+  townhallMediaKey: {
+    urls: [
+      'https://b.public-teams.prod.ml.cdn.office.net/favicon.ico',
+      'https://kd.public-teams.keys.ml.teams.microsoft.com/favicon.ico'
+    ]
+  }
+};
 const EXTERNAL_REFERENCE_IMG_URL = 'https://www.cloudflare.com/favicon.ico';
 const INTERNAL_REFERENCE_IMG_URL = 'https://marvin.corp.vattenfall.com/favicon.ico';
 const LATENCY_ROUNDS = 6;
@@ -907,7 +1035,7 @@ function calculateJitter(times) {
 function computeLatencyStats(times) {
   if (times.length === 0) throw new Error('NO_LATENCY_MEASUREMENTS');
   // Use measurements 2-6 (skip first warmup measurement)
-  const measuredTimes = times.slice(1);
+  const measuredTimes = times.length > 1 ? times.slice(1) : [...times];
   return {
     median: median(measuredTimes),
     jitter: calculateJitter(measuredTimes)
@@ -1027,6 +1155,16 @@ function getNetworkContextLabel(locationType, connectionType, language = current
   return `${getLocationTypeLabel(locationType, language)} - ${getConnectionTypeLabel(connectionType, language)}`;
 }
 
+function getEndpointProfileLabel(value, language = currentLang) {
+  const t = translations[language] || translations.sv;
+  const map = {
+    generic: t.endpointProfileGeneric,
+    townhallMedia: t.endpointProfileTownhallMedia,
+    townhallMediaKey: t.endpointProfileTownhallMediaKey
+  };
+  return map[value] || map.generic;
+}
+
 function getAdviceItems(qualityLevel, locationType, connectionType, t) {
   const items = [];
 
@@ -1099,6 +1237,17 @@ function buildCopyResultText() {
   const t = translations[currentLang] || translations.sv;
   const externalMs = lastReferenceResults ? lastReferenceResults.externalMs : null;
   const internalMs = lastReferenceResults ? lastReferenceResults.internalMs : null;
+  const profileRows = [];
+
+  if (lastLatencyProfileResults) {
+    profileRows.push(t.advancedLatencySummary + ':');
+    Object.keys(LATENCY_PROFILES).forEach((profileKey) => {
+      const profileStats = lastLatencyProfileResults[profileKey];
+      if (profileStats && Number.isFinite(profileStats.median) && Number.isFinite(profileStats.jitter)) {
+        profileRows.push(`- ${getEndpointProfileLabel(profileKey)}: ${Math.round(profileStats.median)} ${t.jitterUnit} / ${profileStats.jitter.toFixed(1)} ${t.jitterUnit}`);
+      }
+    });
+  }
 
   return [
     'Microsoft Teams Town Hall',
@@ -1110,6 +1259,7 @@ function buildCopyResultText() {
     `${t.downloadLabel}: ${lastDownloadMbps !== null ? lastDownloadMbps.toFixed(1) + ' ' + t.downloadUnit : '–'}`,
     `${t.externalReferenceLabel}: ${externalMs !== null ? Math.round(externalMs) + ' ' + t.jitterUnit : t.referenceUnavailable}`,
     `${t.internalReferenceLabel}: ${internalMs !== null ? Math.round(internalMs) + ' ' + t.jitterUnit : t.referenceUnavailable}`,
+    ...profileRows,
     `${t.resultSummaryLabel}: ${document.getElementById('qualityDesc').textContent}`
   ].join('\n');
 }
@@ -1130,25 +1280,153 @@ async function copyResults() {
   }
 }
 
-async function measureLatencyImg() {
-  const times = [];
+async function measureAllLatencyProfiles() {
+  const profileKeys = Object.keys(LATENCY_PROFILES);
+  const totalRounds = LATENCY_ROUNDS * profileKeys.length;
+  let completedRounds = 0;
+  const profileResults = {};
   const progressTemplate = translations[currentLang].latencyProgress || 'Latency measurement {current} of {total}...';
-  for (let i = 0; i < LATENCY_ROUNDS; i++) {
-    await new Promise((resolve) => {
-      const t0 = performance.now();
-      const img = new Image();
-      img.onload = img.onerror = () => {
-        times.push(performance.now() - t0);
-        resolve();
-      };
-      img.src = withCacheBust(LATENCY_IMG_URL, Date.now() + '_' + i);
-    });
-    setProgress(
-      10 + (i + 1) * 40 / LATENCY_ROUNDS,
-      formatI18n(progressTemplate, { current: i + 1, total: LATENCY_ROUNDS })
-    );
+
+  for (const profileKey of profileKeys) {
+    const profile = LATENCY_PROFILES[profileKey];
+    const urls = profile.urls;
+    const times = [];
+
+    for (let i = 0; i < LATENCY_ROUNDS; i++) {
+      const url = urls[i % urls.length];
+      await new Promise((resolve) => {
+        const t0 = performance.now();
+        fetch(withCacheBust(url, Date.now() + '_' + profileKey + '_' + i), {
+          method: 'GET',
+          mode: 'no-cors',
+          credentials: 'omit',
+          cache: 'no-store'
+        }).then(() => {
+          times.push(performance.now() - t0);
+          resolve();
+        }).catch(() => {
+          resolve();
+        });
+      });
+
+      completedRounds += 1;
+      setProgress(
+        10 + completedRounds * 40 / totalRounds,
+        formatI18n(progressTemplate, { current: completedRounds, total: totalRounds })
+      );
+    }
+
+    if (times.length > 0) {
+      profileResults[profileKey] = computeLatencyStats(times);
+    }
   }
-  return computeLatencyStats(times);
+
+  if (!profileResults.townhallMediaKey && !profileResults.townhallMedia && !profileResults.generic) {
+    throw new Error('NO_LATENCY_MEASUREMENTS');
+  }
+
+  return profileResults;
+}
+
+function getPrimaryLatencyStats(profileResults) {
+  if (!profileResults) throw new Error('NO_LATENCY_MEASUREMENTS');
+  return profileResults.townhallMediaKey || profileResults.townhallMedia || profileResults.generic;
+}
+
+function updateAdvancedButtonLabel() {
+  const t = translations[currentLang] || translations.sv;
+  const btn = document.getElementById('advancedBtn');
+  if (!btn) return;
+  btn.textContent = isAdvancedVisible ? t.advancedBtnHide : t.advancedBtnShow;
+}
+
+function renderAdvancedLatencyDetails() {
+  const t = translations[currentLang] || translations.sv;
+  const panel = document.getElementById('advancedPanel');
+  const latencyDetails = document.getElementById('advancedLatencyDetails');
+  const referenceDetails = document.getElementById('advancedReferenceDetails');
+
+  latencyDetails.textContent = '';
+  referenceDetails.textContent = '';
+
+  const latencySummary = document.createElement('div');
+  latencySummary.style.marginBottom = '8px';
+  latencySummary.textContent = t.advancedLatencySummary;
+  latencyDetails.appendChild(latencySummary);
+
+  const referenceSummary = document.createElement('div');
+  referenceSummary.style.marginBottom = '8px';
+  referenceSummary.textContent = t.advancedReferenceSummary;
+  referenceDetails.appendChild(referenceSummary);
+
+  if (!lastLatencyProfileResults) {
+    panel.classList.remove('visible');
+    return;
+  }
+
+  Object.keys(LATENCY_PROFILES).forEach((profileKey) => {
+    const stats = lastLatencyProfileResults[profileKey];
+    const row = document.createElement('div');
+    row.className = 'advanced-row';
+
+    const label = document.createElement('span');
+    label.textContent = getEndpointProfileLabel(profileKey);
+
+    const value = document.createElement('span');
+    if (stats && Number.isFinite(stats.median) && Number.isFinite(stats.jitter)) {
+      value.textContent = `${Math.round(stats.median)} ${t.jitterUnit} / ${stats.jitter.toFixed(1)} ${t.jitterUnit}`;
+    } else {
+      value.textContent = t.referenceUnavailable;
+    }
+
+    row.appendChild(label);
+    row.appendChild(value);
+    latencyDetails.appendChild(row);
+  });
+
+  const externalMs = lastReferenceResults ? lastReferenceResults.externalMs : null;
+  const internalMs = lastReferenceResults ? lastReferenceResults.internalMs : null;
+
+  const buildReferenceRow = (label, value) => {
+    const row = document.createElement('div');
+    row.className = 'advanced-row';
+
+    const labelEl = document.createElement('span');
+    labelEl.textContent = label;
+
+    const valueEl = document.createElement('span');
+    valueEl.textContent = value !== null ? Math.round(value) + ' ' + t.jitterUnit : t.referenceUnavailable;
+
+    row.appendChild(labelEl);
+    row.appendChild(valueEl);
+    return row;
+  };
+
+  referenceDetails.appendChild(buildReferenceRow(t.externalReferenceLabel, externalMs));
+  referenceDetails.appendChild(buildReferenceRow(t.internalReferenceLabel, internalMs));
+
+  const comparison = getComparisonMessage(lastLatencyMs, lastReferenceResults, t);
+  if (comparison) {
+    const note = document.createElement('div');
+    note.className = 'reference-note';
+    note.style.marginTop = '8px';
+    note.textContent = comparison;
+    referenceDetails.appendChild(note);
+  }
+
+  const disclaimer = document.createElement('div');
+  disclaimer.className = 'reference-note';
+  disclaimer.style.marginTop = '8px';
+  disclaimer.textContent = t.referenceNote;
+  referenceDetails.appendChild(disclaimer);
+
+  panel.classList.toggle('visible', isAdvancedVisible);
+}
+
+function toggleAdvanced() {
+  isAdvancedVisible = !isAdvancedVisible;
+  updateAdvancedButtonLabel();
+  renderAdvancedLatencyDetails();
 }
 
 async function measureSingleDownload() {
@@ -1227,7 +1505,8 @@ async function startTest() {
     setPhase(1, 'done'); setPhase(2, 'active');
 
     setProgress(10, translations[currentLang].phase2 || 'Startar latensmätning…');
-    const latencyStats = await measureLatencyImg();
+    const latencyProfileResults = await measureAllLatencyProfiles();
+    const latencyStats = getPrimaryLatencyStats(latencyProfileResults);
 
     const latencyMs = latencyStats.median;
     const jitterMs = latencyStats.jitter;
@@ -1249,65 +1528,27 @@ async function startTest() {
     setProgress(100, translations[currentLang].testDone || 'The test is complete!');
 
     await new Promise(r => setTimeout(r, 400));
-    showResults(latencyMs, downloadMbps, jitterMs, referenceResults);
+    showResults(latencyMs, downloadMbps, jitterMs, referenceResults, latencyProfileResults);
 
   } catch (err) {
     showError(err);
   }
 }
 
-function showResults(latencyMs, downloadMbps, jitterMs, referenceResults) {
+function showResults(latencyMs, downloadMbps, jitterMs, referenceResults, latencyProfileResults = lastLatencyProfileResults) {
   const t = translations[currentLang];
 
   lastLatencyMs = latencyMs;
   lastDownloadMbps = downloadMbps;
   lastJitterMs = jitterMs;
   lastReferenceResults = referenceResults;
+  lastLatencyProfileResults = latencyProfileResults;
 
   document.getElementById('progressSection').className = 'progress-section';
   document.getElementById('results').className = 'results visible';
 
   document.getElementById('latencyVal').textContent = Math.round(latencyMs);
   document.getElementById('jitterVal').textContent = jitterMs.toFixed(1);
-
-  const refBox = document.getElementById('referenceLatencyBox');
-  refBox.textContent = '';
-
-  const externalMs = referenceResults ? referenceResults.externalMs : null;
-  const internalMs = referenceResults ? referenceResults.internalMs : null;
-
-  const buildReferenceRow = (label, value) => {
-    const row = document.createElement('div');
-    row.className = 'reference-row';
-
-    const labelEl = document.createElement('span');
-    labelEl.className = 'reference-label';
-    labelEl.textContent = label;
-
-    const valueEl = document.createElement('span');
-    valueEl.className = 'reference-value';
-    valueEl.textContent = value !== null ? Math.round(value) + ' ms' : t.referenceUnavailable;
-
-    row.appendChild(labelEl);
-    row.appendChild(valueEl);
-    return row;
-  };
-
-  refBox.appendChild(buildReferenceRow(t.externalReferenceLabel, externalMs));
-  refBox.appendChild(buildReferenceRow(t.internalReferenceLabel, internalMs));
-
-  const comparison = getComparisonMessage(latencyMs, referenceResults, t);
-  if (comparison) {
-    const note = document.createElement('div');
-    note.className = 'reference-note';
-    note.textContent = comparison;
-    refBox.appendChild(note);
-  }
-
-  const disclaimer = document.createElement('div');
-  disclaimer.className = 'reference-note';
-  disclaimer.textContent = t.referenceNote;
-  refBox.appendChild(disclaimer);
 
   const meta = document.getElementById('resultMeta');
   const adviceList = document.getElementById('adviceList');
@@ -1364,6 +1605,9 @@ function showResults(latencyMs, downloadMbps, jitterMs, referenceResults) {
     <strong>${t.resultSummaryLabel}:</strong> ${quality}
   `;
 
+  renderAdvancedLatencyDetails();
+  updateAdvancedButtonLabel();
+
   adviceList.textContent = '';
   getAdviceItems(qualityLevel, lastLocationType, lastConnectionType, t).forEach((item) => {
     const listItem = document.createElement('li');
@@ -1404,6 +1648,11 @@ function resetTest() {
   document.getElementById('startBtn').disabled = false;
   document.getElementById('resultMeta').textContent = '';
   document.getElementById('adviceList').textContent = '';
+  document.getElementById('advancedLatencyDetails').textContent = '';
+  document.getElementById('advancedReferenceDetails').textContent = '';
+  document.getElementById('advancedPanel').className = 'advanced-panel';
+  isAdvancedVisible = false;
+  updateAdvancedButtonLabel();
   setCopyStatus('');
   setPhase(1, ''); setPhase(2, ''); setPhase(3, '');
 
@@ -1411,6 +1660,7 @@ function resetTest() {
   lastDownloadMbps = null;
   lastJitterMs = null;
   lastReferenceResults = null;
+  lastLatencyProfileResults = null;
   lastLocationType = 'unknown';
 }
 
