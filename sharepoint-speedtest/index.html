@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nätverkshastighetstest – Microsoft Teams Town Hall</title>
+  <link rel="icon" href="data:,">
+  <title>Town Hall Readiness Test – Microsoft Teams</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -13,9 +14,25 @@
       color: #323130;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 24px;
+    }
+
+    .top-logo {
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      margin: 8px 0 20px;
+      user-select: none;
+    }
+
+    .top-logo img {
+      width: 230px;
+      max-width: 72vw;
+      height: auto;
+      display: block;
     }
 
     .card {
@@ -86,6 +103,34 @@
       line-height: 1.5;
     }
 
+      .support-link {
+      margin-top: 18px;
+        font-size: 12px;
+        color: #605e5c;
+      text-align: center;
+      }
+
+    .support-link button {
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .support-link button,
+    .support-link a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+    .support-link button:hover,
+    .support-link a:hover {
+        color: #464eb8;
+      }
+
     .btn {
       display: inline-flex;
       align-items: center;
@@ -110,6 +155,31 @@
       width: 16px;
       height: 16px;
       fill: white;
+    }
+
+    .test-settings {
+      margin-bottom: 20px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #605e5c;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .field-select {
+      width: 100%;
+      border: 1px solid #c8c6c4;
+      border-radius: 4px;
+      background: #ffffff;
+      color: #323130;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
     }
 
     .progress-section { margin-bottom: 28px; display: none; }
@@ -220,7 +290,56 @@
       font-size: 13px;
       color: #605e5c;
       line-height: 1.6;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
+    }
+
+    .result-meta {
+      background: #f8f8f8;
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: #605e5c;
+      line-height: 1.5;
+    }
+
+    .result-meta strong {
+      color: #323130;
+    }
+
+    .advice-box {
+      background: #f8f8f8;
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+
+    .advice-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #605e5c;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .advice-list {
+      margin-left: 18px;
+      color: #605e5c;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .advice-list li + li {
+      margin-top: 6px;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
     }
 
     .retry-btn {
@@ -236,6 +355,86 @@
     }
 
     .retry-btn:hover { background: #f3f2f1; }
+
+    .copy-btn {
+      background: #464eb8;
+      border: 1px solid #464eb8;
+      color: #ffffff;
+      border-radius: 4px;
+      padding: 8px 20px;
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .copy-btn:hover { background: #3b42a0; border-color: #3b42a0; }
+
+    .copy-status {
+      font-size: 12px;
+      color: #605e5c;
+    }
+
+    .advanced-panel {
+      display: none;
+      background: #f8f8f8;
+      border-radius: 6px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: #605e5c;
+      line-height: 1.5;
+    }
+
+    .advanced-panel.visible {
+      display: block;
+    }
+
+    .technical-notes-panel {
+      display: none;
+      background: #f8f8f8;
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #605e5c;
+      line-height: 1.6;
+    }
+
+    .technical-notes-panel.visible {
+      display: block;
+    }
+
+    .technical-notes-block + .technical-notes-block {
+      margin-top: 12px;
+    }
+
+    .technical-notes-block strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #323130;
+      font-weight: 600;
+    }
+
+    .advanced-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #323130;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .advanced-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .advanced-row:last-child {
+      margin-bottom: 0;
+    }
 
     .error-box {
       display: none;
@@ -285,15 +484,53 @@
       padding-top: 12px;
       border-top: 1px solid #edebe9;
     }
+
+    .reference-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .reference-label {
+      color: #605e5c;
+    }
+
+    .reference-value {
+      white-space: nowrap;
+    }
+
+    .reference-note {
+      margin-top: 8px;
+      color: #605e5c;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 16px;
+      }
+
+      .card {
+        padding: 28px 20px;
+      }
+
+      .top-logo img {
+        width: 200px;
+      }
+    }
   </style>
 </head>
 <body>
+<div class="top-logo" aria-label="Vattenfall">
+  <img src="https://www.vattenfall.se/Static/img/logo/VF_logo.svg" alt="Vattenfall" loading="eager" decoding="async">
+</div>
 <div class="card">
 
   <!-- Language Switcher -->
   <div class="language-switcher">
-    <button class="lang-btn active" data-lang="sv" title="Svenska">🇸🇪</button>
-    <button class="lang-btn" data-lang="en" title="English">🇬🇧</button>
+    <button class="lang-btn active" data-lang="en" title="English">🇬🇧</button>
+    <button class="lang-btn" data-lang="sv" title="Svenska">🇸🇪</button>
     <button class="lang-btn" data-lang="nl" title="Nederlands">🇳🇱</button>
     <button class="lang-btn" data-lang="pl" title="Polski">🇵🇱</button>
   </div>
@@ -308,8 +545,27 @@
   </div>
 
   <p class="subtitle" data-i18n="subtitle">
-    Testa om din uppkoppling uppfyller kraven för att delta i eller arrangera en Microsoft Teams Town Hall. Testet mäter anslutningskvalitet mot Microsoft 365-infrastrukturen.
+    Bedom om din uppkoppling ar lamplig for att delta som ahorare i en Microsoft Teams Town Hall.
   </p>
+
+  <div class="test-settings" id="testSettings">
+    <label class="field-label" for="locationType" data-i18n="locationTypeLabel">Plats</label>
+    <select class="field-select" id="locationType" style="margin-bottom: 12px;">
+      <option value="unknown" data-i18n="locationTypeUnknown">Välj plats</option>
+      <option value="office" data-i18n="locationTypeOffice">Office</option>
+      <option value="home" data-i18n="locationTypeHome">Home</option>
+      <option value="field" data-i18n="locationTypeField">Field</option>
+    </select>
+
+    <label class="field-label" for="connectionType" data-i18n="connectionTypeLabel">Anslutningstyp</label>
+    <select class="field-select" id="connectionType">
+      <option value="unknown" data-i18n="connectionTypeUnknown">Välj anslutningstyp</option>
+      <option value="wifi" data-i18n="connectionTypeWifi">Wi-Fi</option>
+      <option value="ethernet" data-i18n="connectionTypeEthernet">Kabel/Ethernet</option>
+      <option value="hotspot" data-i18n="connectionTypeHotspot">Mobil hotspot</option>
+    </select>
+
+  </div>
 
   <button class="btn" id="startBtn" onclick="startTest()">
     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -324,7 +580,7 @@
     </div>
     <div class="phase-list">
       <div class="phase-item" id="phase1" data-i18n="phase1">Fas 1 – Anslutningstest mot Microsoft 365</div>
-      <div class="phase-item" id="phase2" data-i18n="phase2">Fas 2 – Latensmätning (5 mätningar)</div>
+      <div class="phase-item" id="phase2" data-i18n="phase2">Fas 2 – Latensmätning (8 mätningar)</div>
       <div class="phase-item" id="phase3" data-i18n="phase3">Fas 3 – Nedladdningshastighet</div>
     </div>
   </div>
@@ -342,7 +598,6 @@
         <div class="result-unit" style="margin-top: 6px; font-size: 13px; color: #605e5c;">
           <span data-i18n="jitterLabel">Jitter</span>: <span id="jitterVal">–</span> <span data-i18n="jitterUnit">ms</span>
         </div>
-        <div class="reference-latency" id="referenceLatencyBox"></div>
       </div>
       <div class="result-box">
         <div class="result-label" data-i18n="downloadLabel">Nedladdning</div>
@@ -354,22 +609,65 @@
     <div class="quality-badge" id="qualityBadge"></div>
     <p class="quality-desc" id="qualityDesc"></p>
 
-    <button class="retry-btn" onclick="resetTest()" data-i18n="retryBtn">Testa igen</button>
+    <div class="result-meta" id="resultMeta"></div>
+
+    <div class="advice-box" id="adviceBox">
+      <div class="advice-title" data-i18n="adviceTitle">Rekommenderade åtgärder</div>
+      <ul class="advice-list" id="adviceList"></ul>
+    </div>
+
+    <div class="action-row">
+      <button class="retry-btn" onclick="resetTest()" data-i18n="retryBtn">Testa igen</button>
+      <button class="copy-btn" id="copyBtn" onclick="copyResults()" data-i18n="copyResultsBtn" style="display: none;">Kopiera resultat</button>
+      <button class="copy-btn" id="sendBtn" onclick="sendResultsEmail()" data-i18n="sendResultsBtn">Skicka till IT</button>
+      <button class="retry-btn" id="advancedBtn" onclick="toggleAdvanced()">Advanced details</button>
+      <span class="copy-status" id="copyStatus"></span>
+    </div>
+
+    <div class="advanced-panel" id="advancedPanel">
+      <div class="advanced-title" data-i18n="advancedTitle">Advanced details</div>
+      <div id="advancedLatencyDetails"></div>
+      <div id="advancedReferenceDetails" style="margin-top: 10px;"></div>
+    </div>
 
     <div class="threshold-info">
-      <div class="threshold-title" data-i18n="thresholdTitle">Krav för Town Hall</div>
+      <div class="threshold-title" data-i18n="thresholdTitle">Riktvärden för deltagare</div>
       <div class="threshold-row">
         <div class="dot-good"></div>
-        <span data-i18n="thresholdGood"><strong>Bra:</strong> ≥ 3 Mbps &amp; latens ≤ 100 ms – optimalt för deltagare och presentatörer</span>
+        <span data-i18n="thresholdGood"><strong>Bra:</strong> ≥ 3 Mbps &amp; latens ≤ 150 ms – stabil visning för deltagare</span>
       </div>
       <div class="threshold-row">
         <div class="dot-ok"></div>
-        <span data-i18n="thresholdOk"><strong>OK:</strong> 1,5–3 Mbps eller latens 100–200 ms – acceptabelt för deltagare</span>
+        <span data-i18n="thresholdOk"><strong>OK:</strong> 2–3 Mbps eller latens 150–250 ms – bör fungera men kan ge viss buffring</span>
       </div>
       <div class="threshold-row">
         <div class="dot-bad"></div>
-        <span data-i18n="thresholdBad"><strong>Dålig:</strong> &lt; 1,5 Mbps eller latens &gt; 200 ms – problem kan uppstå</span>
+        <span data-i18n="thresholdBad"><strong>Svag:</strong> &lt; 2 Mbps eller latens &gt; 250 ms – hög risk för avbrott eller buffring</span>
       </div>
+    </div>
+  </div>
+
+  <p class="support-link">
+    <button type="button" id="technicalNotesBtn" onclick="toggleTechnicalNotes()">Technical notes (for IT/support)</button>
+  </p>
+
+  <div class="technical-notes-panel" id="technicalNotesPanel">
+    <div class="advanced-title" data-i18n="technicalNotesTitle">Technical notes</div>
+    <div class="technical-notes-block">
+      <strong data-i18n="technicalNotesMeasureTitle">What the test measures</strong>
+      <div data-i18n="technicalNotesMeasureBody">The test combines a Microsoft connectivity check, latency profiling against Microsoft-related endpoints, and a sustained download test.</div>
+    </div>
+    <div class="technical-notes-block">
+      <strong data-i18n="technicalNotesDownloadTitle">Download method</strong>
+      <div data-i18n="technicalNotesDownloadBody">Download speed is measured by fetching four smaller Microsoft CDN files in parallel for five rounds, then using the median result.</div>
+    </div>
+    <div class="technical-notes-block">
+      <strong data-i18n="technicalNotesWhyTitle">Why not one large file?</strong>
+      <div data-i18n="technicalNotesWhyBody">Parallel smaller files better reflect browser traffic during a Town Hall, avoid single-connection bottlenecks, and allow exact byte counting through stable CORS-enabled Microsoft endpoints.</div>
+    </div>
+    <div class="technical-notes-block">
+      <strong data-i18n="technicalNotesCaveatsTitle">Important caveats</strong>
+      <div data-i18n="technicalNotesCaveatsBody">This is a readiness estimate, not official Teams media telemetry. VPN, proxies, Wi-Fi conditions, browser policy, and endpoint reachability can all affect results.</div>
     </div>
   </div>
 </div>
@@ -378,132 +676,432 @@
 // ==================== TRANSLATIONS ====================
 const translations = {
   sv: {
-    title: "Nätverkshastighetstest<br>Microsoft Teams Town Hall",
-    subtitle: "Testa om din uppkoppling uppfyller kraven för att delta i eller arrangera en Microsoft Teams Town Hall. Testet mäter anslutningskvalitet mot Microsoft 365-infrastrukturen.",
+    title: "Town Hall Readiness Test<br>Microsoft Teams",
+    subtitle: "Bedöm om din uppkoppling är lämplig för att delta som åhörare i en Microsoft Teams Town Hall.",
+    technicalNotesShow: "Tekniska anteckningar (för IT/support)",
+    technicalNotesHide: "Dölj tekniska anteckningar",
+    technicalNotesTitle: "Tekniska anteckningar",
+    technicalNotesMeasureTitle: "Vad testet mäter",
+    technicalNotesMeasureBody: "Testet kombinerar en Microsoft-kontroll, latensprofilering mot Microsoft-relaterade slutpunkter och ett test av ihållande nedladdning.",
+    technicalNotesDownloadTitle: "Nedladdningsmetod",
+    technicalNotesDownloadBody: "Nedladdningshastigheten mäts genom att fyra mindre Microsoft CDN-filer hämtas parallellt i fem omgångar, och därefter används medianvärdet.",
+    technicalNotesWhyTitle: "Varför inte en enda stor fil?",
+    technicalNotesWhyBody: "Flera mindre filer i parallell hämtning liknar webbläsartrafiken under en Town Hall bättre, undviker flaskhalsar i en enda anslutning och gör exakt byte-räkning möjlig via stabila Microsoft-slutpunkter med CORS.",
+    technicalNotesCaveatsTitle: "Viktiga begränsningar",
+    technicalNotesCaveatsBody: "Det här är en uppskattning av beredskap, inte officiell Teams-media-telemetri. VPN, proxy, Wi-Fi-förhållanden, webbläsarpolicy och endpoint-tillgänglighet kan påverka resultaten.",
     startBtn: "Starta test",
+    locationTypeLabel: "Plats",
+    locationTypeUnknown: "Välj plats",
+    locationTypeOffice: "Office",
+    locationTypeHome: "Home",
+    locationTypeField: "Field",
+    locationTypeOther: "Annan plats",
+    connectionTypeLabel: "Anslutningstyp",
+    connectionTypeUnknown: "Välj anslutningstyp",
+    connectionTypeWifi: "Wi-Fi",
+    connectionTypeEthernet: "Kabel/Ethernet",
+    connectionTypeHotspot: "Mobil hotspot",
+    connectionTypeOther: "Annan",
     preparing: "Förbereder test…",
-    phase1: "Fas 1 – Anslutningstest mot Microsoft 365",
-    phase2: "Fas 2 – Latensmätning (6 mätningar)",
-    phase3: "Fas 3 – Nedladdningshastighet",
+    phase1: "Fas 1 – Kontroll av Microsoft-anslutning",
+    phase2: "Fas 2 – Svarstidsmätning (8 mätningar)",
+    phase3: "Fas 3 – Ihållande nedladdning",
     latencyLabel: "Latens",
     latencyUnit: "ms (median)",
     downloadLabel: "Nedladdning",
     downloadUnit: "Mbps",
     retryBtn: "Testa igen",
-    thresholdTitle: "Krav för Town Hall",
-    thresholdGood: "<strong>Bra:</strong> ≥ 3 Mbps &amp; latens ≤ 100 ms – optimalt för deltagare och presentatörer",
-    thresholdOk: "<strong>OK:</strong> 1,5–3 Mbps eller latens 100–200 ms – acceptabelt för deltagare",
-    thresholdBad: "<strong>Dålig:</strong> &lt; 1,5 Mbps eller latens &gt; 200 ms – problem kan uppstå",
-    qualityGood: "✓ Bra anslutning",
-    qualityOk: "⚠ Acceptabel anslutning",
-    qualityBad: "✗ Svag anslutning",
+    thresholdTitle: "Riktvärden för deltagare",
+    thresholdGood: "<strong>Bra:</strong> ≥ 3 Mbps &amp; latens ≤ 150 ms – stabil visning för deltagare",
+    thresholdOk: "<strong>OK:</strong> 2–3 Mbps eller latens 150–250 ms – bör fungera men kan ge viss buffring",
+    thresholdBad: "<strong>Svag:</strong> &lt; 2 Mbps eller latens &gt; 250 ms – hög risk för avbrott eller buffring",
+    qualityGood: "✓ Bra för deltagare",
+    qualityOk: "⚠ Begränsad marginal",
+    qualityBad: "✗ Svag för deltagare",
     qualityLowLatency: "✓ Låg latens",
     qualityMediumLatency: "⚠ Medelhög latens",
     qualityHighLatency: "✗ Hög latens",
-    descGood: "Din uppkoppling uppfyller kraven för att delta som åhörare och presentatör i Microsoft Teams Town Hall. Både video och ljud bör fungera utan problem.",
-    descOk: "Din uppkoppling är tillräcklig för att delta som åhörare i en Town Hall, men kan ibland ge buffring. För att presentera rekommenderas minst 3 Mbps och latens under 100 ms.",
-    descBad: "Din uppkoppling uppfyller inte minimikraven för Microsoft Teams Town Hall. Du kan uppleva störningar i video- och ljudströmmar. Kontakta IT-support eller försök från en annan nätverksanslutning.",
-    descLowLatency: "Latensmätningen visar bra resultat. Nedladdningstestet kunde inte slutföras – kontakta IT om du behöver fullständigt resultat.",
-    descMediumLatency: "Latensen är acceptabel men på gränsen. Nedladdningstestet kunde inte slutföras.",
-    descHighLatency: "Latensen är för hög för en bra Town Hall-upplevelse. Kontakta IT-support.",
+    descGood: "Din uppkoppling ser bra ut för att delta som åhörare i en Microsoft Teams Town Hall. Strömmen bör spela upp stabilt med god marginal.",
+    descOk: "Din uppkoppling bör fungera för att delta som åhörare, men du har begränsad marginal. Du kan få längre uppstartstid eller tillfällig buffring vid belastning.",
+    descBad: "Din uppkoppling ser svag ut för Town Hall som åhörare. Du riskerar buffring, sämre bildkvalitet eller avbrott. Försök med stabilare nätverk eller kontakta IT.",
+    descLowLatency: "Svarstiden ser bra ut, men nedladdningstestet kunde inte slutföras. Det går därför inte att bedöma faktisk Town Hall-visning fullt ut.",
+    descMediumLatency: "Svarstiden är acceptabel men nedladdningstestet kunde inte slutföras. Resultatet är därför osäkert för faktisk Town Hall-visning.",
+    descHighLatency: "Svarstiden är hög och nedladdningstestet kunde inte slutföras. Town Hall-visning kan därför bli instabil.",
     jitterLabel: "Jitter",
-    jitterUnit: "ms"
+    p95Label: "P95",
+    jitterUnit: "ms",
+    latencyProgress: "Latensmätning {current} av {total}…",
+    testDone: "Testet är klart!",
+    externalReferenceLabel: "Internetreferens",
+    internalReferenceLabel: "Intern referens",
+    referenceUnavailable: "Inte tillgänglig",
+    referenceNote: "Referenserna visas endast för jämförelse och påverkar inte Town Hall-resultatet direkt.",
+    compareMicrosoftPath: "Microsoft-svaret är märkbart långsammare än internetreferensen. Det kan tyda på problem i vägen mot Microsoft.",
+    compareLocalNetwork: "Både Microsoft och internetreferensen är långsamma. Det tyder oftare på problem i användarens anslutning, Wi-Fi, VPN eller ISP-väg.",
+    compareInternalPath: "Den interna referensen är märkbart långsammare än internetreferensen. Det kan tyda på problem i den interna nätverksvägen.",
+    compareBalanced: "Referensmätningarna ligger nära huvudresultatet. Det finns ingen tydlig avvikelse i jämförelsen.",
+    testTimeLabel: "Test kört",
+    resultConnectionLabel: "Nätverkskontext",
+    resultStabilityLabel: "Stabilitet",
+    resultSummaryLabel: "Bedömning",
+    stabilityStable: "Stabil",
+    stabilityVariable: "Varierande",
+    stabilityUnstable: "Instabil",
+    advancedTitle: "Avancerade detaljer",
+    advancedBtnShow: "Visa avancerat",
+    advancedBtnHide: "Dolj avancerat",
+    advancedLatencySummary: "Latensprofiler (median / p95 / jitter)",
+    advancedReferenceSummary: "Referenser och jämförelse",
+    endpointProfileGeneric: "Generic (Microsoft baseline)",
+    endpointProfileTownhallMedia: "TownHall-Media (stream CDN)",
+    endpointProfileTownhallMediaKey: "TownHall-Media+Key (stream + key delivery)",
+    adviceTitle: "Rekommenderade åtgärder",
+    adviceGeneralGood1: "Anslutningen ser tillräckligt stabil ut för Town Hall som deltagare.",
+    adviceGeneralGood2: "Anslut gärna några minuter innan sändningen startar så att videoströmmen hinner stabiliseras.",
+    adviceGeneralOk1: "Resultatet bör fungera, men du har begränsad marginal vid hög belastning.",
+    adviceGeneralOk2: "Stäng andra tunga nedladdningar, strömmar eller molnsynkningar innan du ansluter.",
+    adviceGeneralBad1: "Resultatet visar hög risk för buffring eller avbrott under Town Hall.",
+    adviceGeneralBad2: "Testa gärna igen efter att du har bytt nät eller minskat annan nätverkstrafik.",
+    adviceWifi1: "Om du använder Wi-Fi, försök komma närmare accesspunkten eller byt till 5 GHz om möjligt.",
+    adviceWifi2: "Om problemet kvarstår, testa med kabel för att utesluta trådlösa störningar.",
+    adviceEthernet1: "Om du redan använder kabel tyder ett svagt resultat oftare på extern väg, VPN eller annan belastning i nätet.",
+    adviceEthernet2: "Kontrollera om annan trafik eller säkerhetslösning på datorn använder mycket bandbredd under testet.",
+    adviceOther1: "Om anslutningstypen är okänd, jämför gärna resultatet från ett annat nät för att se om värdena förbättras.",
+    adviceOffice1: "På kontoret: kontrollera med IT om kända incidenter, VPN-routing eller proxy påverkar Teams-trafiken.",
+    adviceHome1: "Hemma: kontrollera att ingen annan belastar linan med streaming, backup eller större nedladdningar.",
+    adviceField1: "I fält: mobilnät kan variera snabbt. Testa gärna från en annan plats om resultatet är svagt.",
+    copyResultsBtn: "Kopiera resultat",
+    sendResultsBtn: "Skicka till IT",
+    sendNoResults: "Kör testet innan du skickar.",
+    sendOpenedMail: "E-postutkast öppnat.",
+    sendFailed: "Det gick inte att öppna e-postutkastet.",
+    copySuccess: "Resultatet kopierades.",
+    copyFailed: "Det gick inte att kopiera resultatet.",
+    errorTitle: "Testet kunde inte slutföras.",
+    errorBody1: "Kontrollera att du är ansluten till internet och att sidan inte blockeras av en brandvägg.",
+    errorBody2: "Om problemet kvarstår, kontakta IT-support.",
+    errorTechInfo: "Teknisk information:"
   },
   en: {
-    title: "Network Speed Test<br>Microsoft Teams Town Hall",
-    subtitle: "Test if your connection meets the requirements to join or host a Microsoft Teams Town Hall. The test measures connection quality against Microsoft 365 infrastructure.",
+    title: "Town Hall Readiness Test<br>Microsoft Teams",
+    subtitle: "Assess whether your connection is suitable for attending a Microsoft Teams Town Hall.",
+    technicalNotesShow: "Technical notes (for IT/support)",
+    technicalNotesHide: "Hide technical notes",
+    technicalNotesTitle: "Technical notes",
+    technicalNotesMeasureTitle: "What the test measures",
+    technicalNotesMeasureBody: "The test combines a Microsoft connectivity check, latency profiling against Microsoft-related endpoints, and a sustained download test.",
+    technicalNotesDownloadTitle: "Download method",
+    technicalNotesDownloadBody: "Download speed is measured by fetching four smaller Microsoft CDN files in parallel for five rounds, then using the median result.",
+    technicalNotesWhyTitle: "Why not one large file?",
+    technicalNotesWhyBody: "Parallel smaller files better reflect browser traffic during a Town Hall, avoid single-connection bottlenecks, and allow exact byte counting through stable CORS-enabled Microsoft endpoints.",
+    technicalNotesCaveatsTitle: "Important caveats",
+    technicalNotesCaveatsBody: "This is a readiness estimate, not official Teams media telemetry. VPN, proxies, Wi-Fi conditions, browser policy, and endpoint reachability can all affect results.",
     startBtn: "Start test",
+    locationTypeLabel: "Location",
+    locationTypeUnknown: "Select location",
+    locationTypeOffice: "Office",
+    locationTypeHome: "Home",
+    locationTypeField: "Field",
+    locationTypeOther: "Other location",
+    connectionTypeLabel: "Connection type",
+    connectionTypeUnknown: "Select connection type",
+    connectionTypeWifi: "Wi-Fi",
+    connectionTypeEthernet: "Cable/Ethernet",
+    connectionTypeHotspot: "Mobile hotspot",
+    connectionTypeOther: "Other",
     preparing: "Preparing test…",
-    phase1: "Phase 1 – Connection test to Microsoft 365",
-    phase2: "Phase 2 – Latency measurement (6 measurements)",
-    phase3: "Phase 3 – Download speed",
+    phase1: "Phase 1 – Microsoft connectivity check",
+    phase2: "Phase 2 – Response time measurement (8 measurements)",
+    phase3: "Phase 3 – Sustained download",
     latencyLabel: "Latency",
     latencyUnit: "ms (median)",
     downloadLabel: "Download",
     downloadUnit: "Mbps",
     retryBtn: "Test again",
-    thresholdTitle: "Requirements for Town Hall",
-    thresholdGood: "<strong>Good:</strong> ≥ 3 Mbps &amp; latency ≤ 100 ms – optimal for attendees and presenters",
-    thresholdOk: "<strong>OK:</strong> 1.5–3 Mbps or latency 100–200 ms – acceptable for attendees",
-    thresholdBad: "<strong>Poor:</strong> &lt; 1.5 Mbps or latency &gt; 200 ms – issues may occur",
-    qualityGood: "✓ Good connection",
-    qualityOk: "⚠ Acceptable connection",
-    qualityBad: "✗ Weak connection",
+    thresholdTitle: "Attendee guidance",
+    thresholdGood: "<strong>Good:</strong> ≥ 3 Mbps &amp; latency ≤ 150 ms – stable attendee playback",
+    thresholdOk: "<strong>OK:</strong> 2–3 Mbps or latency 150–250 ms – should work but may buffer at times",
+    thresholdBad: "<strong>Weak:</strong> &lt; 2 Mbps or latency &gt; 250 ms – high risk of buffering or interruptions",
+    qualityGood: "✓ Good for attendees",
+    qualityOk: "⚠ Limited headroom",
+    qualityBad: "✗ Weak for attendees",
     qualityLowLatency: "✓ Low latency",
     qualityMediumLatency: "⚠ Medium latency",
     qualityHighLatency: "✗ High latency",
-    descGood: "Your connection meets the requirements to participate as attendee and presenter in Microsoft Teams Town Hall. Both video and audio should work without issues.",
-    descOk: "Your connection is sufficient to attend a Town Hall as a listener, but may occasionally buffer. For presenting, at least 3 Mbps and latency under 100 ms is recommended.",
-    descBad: "Your connection does not meet the minimum requirements for Microsoft Teams Town Hall. You may experience disruptions in video and audio streams. Contact IT support or try from another network.",
-    descLowLatency: "The latency measurement shows good results. The download test could not be completed – contact IT if you need a full result.",
-    descMediumLatency: "The latency is acceptable but borderline. The download test could not be completed.",
-    descHighLatency: "The latency is too high for a good Town Hall experience. Contact IT support.",
+    descGood: "Your connection looks good for attending a Microsoft Teams Town Hall. Playback should be stable with comfortable headroom.",
+    descOk: "Your connection should work for attending, but headroom is limited. You may see slower startup or occasional buffering under load.",
+    descBad: "Your connection looks weak for Town Hall attendee playback. You may experience buffering, reduced quality, or interruptions. Try a more stable network or contact IT.",
+    descLowLatency: "Response time looks good, but the download test could not be completed. That means actual Town Hall viewing readiness could not be fully assessed.",
+    descMediumLatency: "Response time is acceptable, but the download test could not be completed. The result is therefore uncertain for actual Town Hall viewing.",
+    descHighLatency: "Response time is high and the download test could not be completed. Town Hall viewing may therefore be unstable.",
     jitterLabel: "Jitter",
-    jitterUnit: "ms"
+    p95Label: "P95",
+    jitterUnit: "ms",
+    latencyProgress: "Latency measurement {current} of {total}…",
+    testDone: "The test is complete!",
+    externalReferenceLabel: "Internet reference",
+    internalReferenceLabel: "Internal reference",
+    referenceUnavailable: "Unavailable",
+    referenceNote: "Reference checks are shown for comparison only and do not directly affect the Town Hall result.",
+    compareMicrosoftPath: "Microsoft response time is noticeably slower than the internet reference. That may indicate an issue on the path toward Microsoft.",
+    compareLocalNetwork: "Both Microsoft and the internet reference are slow. That more often points to the user's connection, Wi-Fi, VPN, or ISP path.",
+    compareInternalPath: "The internal reference is noticeably slower than the internet reference. That may indicate an issue on the internal network path.",
+    compareBalanced: "The reference checks are close to the main result. There is no clear deviation in the comparison.",
+    testTimeLabel: "Test run",
+    resultConnectionLabel: "Network context",
+    resultStabilityLabel: "Stability",
+    resultSummaryLabel: "Assessment",
+    stabilityStable: "Stable",
+    stabilityVariable: "Variable",
+    stabilityUnstable: "Unstable",
+    advancedTitle: "Advanced details",
+    advancedBtnShow: "Show advanced",
+    advancedBtnHide: "Hide advanced",
+    advancedLatencySummary: "Latency profiles (median / p95 / jitter)",
+    advancedReferenceSummary: "References and comparison",
+    endpointProfileGeneric: "Generic (Microsoft baseline)",
+    endpointProfileTownhallMedia: "TownHall-Media (stream CDN)",
+    endpointProfileTownhallMediaKey: "TownHall-Media+Key (stream + key delivery)",
+    adviceTitle: "Recommended actions",
+    adviceGeneralGood1: "The connection looks stable enough for attending a Town Hall.",
+    adviceGeneralGood2: "Join a few minutes before the event starts so the stream has time to stabilize.",
+    adviceGeneralOk1: "The result should work, but headroom is limited under heavier load.",
+    adviceGeneralOk2: "Close other heavy downloads, streams, or cloud sync jobs before joining.",
+    adviceGeneralBad1: "The result shows a high risk of buffering or interruptions during the Town Hall.",
+    adviceGeneralBad2: "Run the test again after changing network or reducing other traffic.",
+    adviceWifi1: "If you are on Wi-Fi, try moving closer to the access point or switching to 5 GHz if available.",
+    adviceWifi2: "If the issue remains, test with Ethernet to rule out wireless interference.",
+    adviceEthernet1: "If you are already on Ethernet, a weak result more often points to the external path, VPN, or other network load.",
+    adviceEthernet2: "Check whether other traffic or security software on the device is consuming bandwidth during the test.",
+    adviceOther1: "If the connection type is unknown, compare the result from another network to see whether the values improve.",
+    adviceOffice1: "At the office: check with IT for known incidents, VPN routing, or proxy behavior affecting Teams traffic.",
+    adviceHome1: "At home: confirm no one else is saturating the line with streaming, backups, or large downloads.",
+    adviceField1: "In the field: mobile network conditions can change quickly. If results are weak, retest from another nearby spot.",
+    copyResultsBtn: "Copy results",
+    sendResultsBtn: "Send to IT",
+    sendNoResults: "Run the test before sending.",
+    sendOpenedMail: "Draft email opened.",
+    sendFailed: "Unable to open the draft email.",
+    copySuccess: "Results copied.",
+    copyFailed: "Unable to copy results.",
+    errorTitle: "The test could not be completed.",
+    errorBody1: "Check that you are connected to the internet and that the page is not blocked by a firewall.",
+    errorBody2: "If the problem persists, contact IT support.",
+    errorTechInfo: "Technical information:"
   },
   nl: {
-    title: "Netwerk Snelheidstest<br>Microsoft Teams Town Hall",
-    subtitle: "Test of uw verbinding voldoet aan de vereisten om deel te nemen aan of te hosten van een Microsoft Teams Town Hall. De test meet de aansluitingskwaliteit tegen de Microsoft 365-infrastructuur.",
+    title: "Town Hall Readiness Test<br>Microsoft Teams",
+    subtitle: "Beoordeel of uw verbinding geschikt is om als deelnemer een Microsoft Teams Town Hall te volgen.",
+    technicalNotesShow: "Technische notities (voor IT/support)",
+    technicalNotesHide: "Verberg technische notities",
+    technicalNotesTitle: "Technische notities",
+    technicalNotesMeasureTitle: "Wat de test meet",
+    technicalNotesMeasureBody: "De test combineert een Microsoft-connectiviteitscontrole, latency-profielen naar Microsoft-gerelateerde eindpunten en een test van aanhoudende download.",
+    technicalNotesDownloadTitle: "Downloadmethode",
+    technicalNotesDownloadBody: "De downloadsnelheid wordt gemeten door vier kleinere Microsoft CDN-bestanden parallel op te halen in vijf rondes, waarna de mediaan wordt gebruikt.",
+    technicalNotesWhyTitle: "Waarom niet één groot bestand?",
+    technicalNotesWhyBody: "Meerdere kleinere bestanden die parallel worden opgehaald lijken beter op browserverkeer tijdens een Town Hall, vermijden bottlenecks van één verbinding en maken nauwkeurige byte-telling mogelijk via stabiele Microsoft-eindpunten met CORS.",
+    technicalNotesCaveatsTitle: "Belangrijke aandachtspunten",
+    technicalNotesCaveatsBody: "Dit is een gereedheidsschatting, geen officiële Teams-media-telemetrie. VPN, proxies, Wi-Fi-omstandigheden, browserbeleid en endpoint-beschikbaarheid kunnen allemaal invloed hebben op de resultaten.",
     startBtn: "Start test",
+    locationTypeLabel: "Locatie",
+    locationTypeUnknown: "Selecteer locatie",
+    locationTypeOffice: "Office",
+    locationTypeHome: "Home",
+    locationTypeField: "Field",
+    locationTypeOther: "Andere locatie",
+    connectionTypeLabel: "Verbindingstype",
+    connectionTypeUnknown: "Selecteer verbindingstype",
+    connectionTypeWifi: "Wi-Fi",
+    connectionTypeEthernet: "Kabel/Ethernet",
+    connectionTypeHotspot: "Mobiele hotspot",
+    connectionTypeOther: "Anders",
     preparing: "Test voorbereiden…",
-    phase1: "Fase 1 – Verbindingstest met Microsoft 365",
-    phase2: "Fase 2 – Latentie meting (6 metingen)",
-    phase3: "Fase 3 – Downloadsnelheid",
+    phase1: "Fase 1 – Microsoft-connectiviteitscontrole",
+    phase2: "Fase 2 – Reactietijdmeting (8 metingen)",
+    phase3: "Fase 3 – Aanhoudende download",
     latencyLabel: "Latency",
     latencyUnit: "ms (mediaan)",
     downloadLabel: "Download",
     downloadUnit: "Mbps",
     retryBtn: "Test opnieuw",
-    thresholdTitle: "Vereisten voor Town Hall",
-    thresholdGood: "<strong>Goed:</strong> ≥ 3 Mbps &amp; latency ≤ 100 ms – optimaal voor deelnemers en presentatoren",
-    thresholdOk: "<strong>OK:</strong> 1,5–3 Mbps of latency 100–200 ms – acceptabel voor deelnemers",
-    thresholdBad: "<strong>Slecht:</strong> &lt; 1,5 Mbps of latency &gt; 200 ms – problemen kunnen optreden",
-    qualityGood: "✓ Goede verbinding",
-    qualityOk: "⚠ Acceptabele verbinding",
-    qualityBad: "✗ Zwakke verbinding",
+    thresholdTitle: "Richtwaarden voor deelnemers",
+    thresholdGood: "<strong>Goed:</strong> ≥ 3 Mbps &amp; latency ≤ 150 ms – stabiele weergave voor deelnemers",
+    thresholdOk: "<strong>OK:</strong> 2–3 Mbps of latency 150–250 ms – zou moeten werken maar kan soms bufferen",
+    thresholdBad: "<strong>Zwak:</strong> &lt; 2 Mbps of latency &gt; 250 ms – hoog risico op buffering of onderbrekingen",
+    qualityGood: "✓ Goed voor deelnemers",
+    qualityOk: "⚠ Beperkte marge",
+    qualityBad: "✗ Zwak voor deelnemers",
     qualityLowLatency: "✓ Lage latency",
     qualityMediumLatency: "⚠ Gemiddelde latency",
     qualityHighLatency: "✗ Hoge latency",
-    descGood: "Uw verbinding voldoet aan de eisen om deel te nemen als toehoorder en presentator in Microsoft Teams Town Hall. Zowel video als audio zouden zonder problemen moeten werken.",
-    descOk: "Uw verbinding is voldoende om als toehoorder deel te nemen, maar kan soms bufferen. Voor presenteren wordt minimaal 3 Mbps en latency onder 100 ms aanbevolen.",
-    descBad: "Uw verbinding voldoet niet aan de minimumeisen voor Microsoft Teams Town Hall. U kunt storingen ervaren in video- en audiostreams. Neem contact op met IT-support of probeer vanaf een ander netwerk.",
-    descLowLatency: "De latencymeting toont goede resultaten. De downloadsnelheidstest kon niet worden voltooid – neem contact op met IT als u een volledig resultaat nodig heeft.",
-    descMediumLatency: "De latency is acceptabel maar op de grens. De downloadsnelheidstest kon niet worden voltooid.",
-    descHighLatency: "De latency is te hoog voor een goede Town Hall-ervaring. Neem contact op met IT-support.",
+    descGood: "Uw verbinding ziet er goed uit om als deelnemer een Microsoft Teams Town Hall te volgen. De stream zou stabiel moeten afspelen met voldoende marge.",
+    descOk: "Uw verbinding zou moeten werken voor deelname, maar de marge is beperkt. U kunt tragere opstart of af en toe buffering zien bij belasting.",
+    descBad: "Uw verbinding lijkt zwak voor Town Hall-weergave als deelnemer. U kunt buffering, lagere kwaliteit of onderbrekingen ervaren. Probeer een stabieler netwerk of neem contact op met IT.",
+    descLowLatency: "De reactietijd ziet er goed uit, maar de downloadtest kon niet worden voltooid. Daardoor kon de daadwerkelijke Town Hall-kijkervaring niet volledig worden beoordeeld.",
+    descMediumLatency: "De reactietijd is acceptabel, maar de downloadtest kon niet worden voltooid. Het resultaat blijft daarom onzeker voor echte Town Hall-weergave.",
+    descHighLatency: "De reactietijd is hoog en de downloadtest kon niet worden voltooid. Town Hall-weergave kan daardoor instabiel zijn.",
     jitterLabel: "Jitter",
-    jitterUnit: "ms"
+    p95Label: "P95",
+    jitterUnit: "ms",
+    latencyProgress: "Latentiemeting {current} van {total}…",
+    testDone: "De test is voltooid!",
+    externalReferenceLabel: "Internetreferentie",
+    internalReferenceLabel: "Interne referentie",
+    referenceUnavailable: "Niet beschikbaar",
+    referenceNote: "Referentiecontroles worden alleen ter vergelijking getoond en hebben geen directe invloed op het Town Hall-resultaat.",
+    compareMicrosoftPath: "De responstijd naar Microsoft is duidelijk langzamer dan de internetreferentie. Dat kan wijzen op een probleem in het pad naar Microsoft.",
+    compareLocalNetwork: "Zowel Microsoft als de internetreferentie zijn traag. Dat wijst vaker op de verbinding van de gebruiker, Wi-Fi, VPN of ISP-route.",
+    compareInternalPath: "De interne referentie is duidelijk langzamer dan de internetreferentie. Dat kan wijzen op een probleem op het interne netwerkpad.",
+    compareBalanced: "De referentiemetingen liggen dicht bij het hoofdresultaat. Er is geen duidelijke afwijking in de vergelijking.",
+    testTimeLabel: "Test uitgevoerd",
+    resultConnectionLabel: "Netwerkcontext",
+    resultStabilityLabel: "Stabiliteit",
+    resultSummaryLabel: "Beoordeling",
+    stabilityStable: "Stabiel",
+    stabilityVariable: "Variabel",
+    stabilityUnstable: "Instabiel",
+    advancedTitle: "Geavanceerde details",
+    advancedBtnShow: "Toon geavanceerd",
+    advancedBtnHide: "Verberg geavanceerd",
+    advancedLatencySummary: "Latency-profielen (mediaan / p95 / jitter)",
+    advancedReferenceSummary: "Referenties en vergelijking",
+    endpointProfileGeneric: "Generic (Microsoft-baseline)",
+    endpointProfileTownhallMedia: "TownHall-Media (stream-CDN)",
+    endpointProfileTownhallMediaKey: "TownHall-Media+Key (stream + key delivery)",
+    adviceTitle: "Aanbevolen acties",
+    adviceGeneralGood1: "De verbinding lijkt stabiel genoeg om een Town Hall als deelnemer te volgen.",
+    adviceGeneralGood2: "Sluit een paar minuten voor de start aan zodat de stream tijd heeft om te stabiliseren.",
+    adviceGeneralOk1: "Het resultaat zou moeten werken, maar de marge is beperkt bij hogere belasting.",
+    adviceGeneralOk2: "Sluit andere zware downloads, streams of cloudsynchronisaties voordat u deelneemt.",
+    adviceGeneralBad1: "Het resultaat wijst op een hoog risico op buffering of onderbrekingen tijdens de Town Hall.",
+    adviceGeneralBad2: "Voer de test opnieuw uit nadat u van netwerk bent gewisseld of andere netwerkbelasting hebt verminderd.",
+    adviceWifi1: "Als u Wi‑Fi gebruikt, probeer dan dichter bij het toegangspunt te gaan zitten of over te schakelen naar 5 GHz.",
+    adviceWifi2: "Als het probleem blijft, test dan met Ethernet om draadloze storing uit te sluiten.",
+    adviceEthernet1: "Als u al Ethernet gebruikt, wijst een zwak resultaat vaker op het externe pad, VPN of andere netwerkbelasting.",
+    adviceEthernet2: "Controleer of ander verkeer of beveiligingssoftware op het apparaat bandbreedte gebruikt tijdens de test.",
+    adviceOther1: "Als het verbindingstype onbekend is, vergelijk het resultaat dan met een andere verbinding om te zien of de waarden verbeteren.",
+    adviceOffice1: "Op kantoor: controleer bij IT of bekende incidenten, VPN-routing of proxygedrag Teams-verkeer beïnvloeden.",
+    adviceHome1: "Thuis: controleer of niemand anders de lijn verzadigt met streaming, back-ups of grote downloads.",
+    adviceField1: "In het veld: omstandigheden op het mobiele netwerk kunnen snel veranderen. Test opnieuw op een nabijgelegen locatie als het resultaat zwak is.",
+    copyResultsBtn: "Resultaten kopieren",
+    sendResultsBtn: "Verstuur naar IT",
+    sendNoResults: "Voer eerst de test uit.",
+    sendOpenedMail: "Conceptmail geopend.",
+    sendFailed: "Kon conceptmail niet openen.",
+    copySuccess: "Resultaten gekopieerd.",
+    copyFailed: "Resultaten konden niet worden gekopieerd.",
+    errorTitle: "De test kon niet worden voltooid.",
+    errorBody1: "Controleer of u met internet bent verbonden en of de pagina niet wordt geblokkeerd door een firewall.",
+    errorBody2: "Als het probleem aanhoudt, neem dan contact op met IT-support.",
+    errorTechInfo: "Technische informatie:"
   },
   pl: {
-    title: "Test prędkości sieci<br>Microsoft Teams Town Hall",
-    subtitle: "Sprawdź, czy Twoje połączenie spełnia wymagania do udziału lub prowadzenia Microsoft Teams Town Hall. Test mierzy jakość połączenia z infrastrukturą Microsoft 365.",
+    title: "Town Hall Readiness Test<br>Microsoft Teams",
+    subtitle: "Oceń, czy Twoje połączenie nadaje się do uczestnictwa jako widz w Microsoft Teams Town Hall.",
+    technicalNotesShow: "Informacje techniczne (dla IT/support)",
+    technicalNotesHide: "Ukryj informacje techniczne",
+    technicalNotesTitle: "Informacje techniczne",
+    technicalNotesMeasureTitle: "Co mierzy test",
+    technicalNotesMeasureBody: "Test łączy kontrolę łączności z Microsoft, profilowanie opóźnień względem punktów końcowych powiązanych z Microsoft oraz test utrzymanego pobierania.",
+    technicalNotesDownloadTitle: "Metoda pobierania",
+    technicalNotesDownloadBody: "Prędkość pobierania jest mierzona przez równoległe pobranie czterech mniejszych plików z Microsoft CDN w pięciu rundach, a następnie użycie wyniku mediany.",
+    technicalNotesWhyTitle: "Dlaczego nie jeden duży plik?",
+    technicalNotesWhyBody: "Kilka mniejszych plików pobieranych równolegle lepiej odzwierciedla ruch przeglądarki podczas Town Hall, unika wąskich gardeł pojedynczego połączenia i pozwala dokładnie liczyć bajty dzięki stabilnym punktom końcowym Microsoft z obsługą CORS.",
+    technicalNotesCaveatsTitle: "Ważne zastrzeżenia",
+    technicalNotesCaveatsBody: "To przybliżona ocena gotowości, a nie oficjalna telemetria multimediów Teams. VPN, proxy, warunki Wi-Fi, polityka przeglądarki i dostępność punktów końcowych mogą wpływać na wyniki.",
     startBtn: "Rozpocznij test",
+    locationTypeLabel: "Lokalizacja",
+    locationTypeUnknown: "Wybierz lokalizację",
+    locationTypeOffice: "Office",
+    locationTypeHome: "Home",
+    locationTypeField: "Field",
+    locationTypeOther: "Inna lokalizacja",
+    connectionTypeLabel: "Typ połączenia",
+    connectionTypeUnknown: "Wybierz typ połączenia",
+    connectionTypeWifi: "Wi-Fi",
+    connectionTypeEthernet: "Kabel/Ethernet",
+    connectionTypeHotspot: "Hotspot mobilny",
+    connectionTypeOther: "Inne",
     preparing: "Przygotowywanie testu…",
-    phase1: "Faza 1 – Test połączenia z Microsoft 365",
-    phase2: "Faza 2 – Pomiar opóźnień (6 pomiarów)",
-    phase3: "Faza 3 – Prędkość pobierania",
+    phase1: "Faza 1 – Sprawdzenie łączności z Microsoft",
+    phase2: "Faza 2 – Pomiar czasu odpowiedzi (8 pomiarów)",
+    phase3: "Faza 3 – Utrzymane pobieranie",
     latencyLabel: "Opóźnienie",
     latencyUnit: "ms (mediana)",
     downloadLabel: "Pobieranie",
     downloadUnit: "Mbps",
     retryBtn: "Testuj ponownie",
-    thresholdTitle: "Wymagania dla Town Hall",
-    thresholdGood: "<strong>Dobre:</strong> ≥ 3 Mbps &amp; opóźnienie ≤ 100 ms – optymalne dla uczestników i prezenterów",
-    thresholdOk: "<strong>OK:</strong> 1,5–3 Mbps lub opóźnienie 100–200 ms – akceptowalne dla uczestników",
-    thresholdBad: "<strong>Słabe:</strong> &lt; 1,5 Mbps lub opóźnienie &gt; 200 ms – mogą wystąpić problemy",
-    qualityGood: "✓ Dobre połączenie",
-    qualityOk: "⚠ Akceptowalne połączenie",
-    qualityBad: "✗ Słabe połączenie",
+    thresholdTitle: "Wskazówki dla uczestników",
+    thresholdGood: "<strong>Dobre:</strong> ≥ 3 Mbps &amp; opóźnienie ≤ 150 ms – stabilne odtwarzanie dla uczestników",
+    thresholdOk: "<strong>OK:</strong> 2–3 Mbps lub opóźnienie 150–250 ms – powinno działać, ale czasem może buforować",
+    thresholdBad: "<strong>Słabe:</strong> &lt; 2 Mbps lub opóźnienie &gt; 250 ms – wysokie ryzyko buforowania lub przerw",
+    qualityGood: "✓ Dobre dla uczestnika",
+    qualityOk: "⚠ Mały zapas",
+    qualityBad: "✗ Słabe dla uczestnika",
     qualityLowLatency: "✓ Niskie opóźnienie",
     qualityMediumLatency: "⚠ Średnie opóźnienie",
     qualityHighLatency: "✗ Wysokie opóźnienie",
-    descGood: "Twoje połączenie spełnia wymagania do udziału jako słuchacz i prezenter w Microsoft Teams Town Hall. Zarówno wideo jak i audio powinny działać bez problemów.",
-    descOk: "Twoje połączenie jest wystarczające do udziału jako słuchacz, ale może czasem buforować. Do prezentowania zalecane jest minimum 3 Mbps i opóźnienie poniżej 100 ms.",
-    descBad: "Twoje połączenie nie spełnia minimalnych wymagań dla Microsoft Teams Town Hall. Możesz doświadczyć zakłóceń w strumieniach wideo i audio. Skontaktuj się z działem IT lub spróbuj z innej sieci.",
-    descLowLatency: "Pomiar opóźnień pokazuje dobre wyniki. Test prędkości pobierania nie mógł zostać ukończony – skontaktuj się z IT jeśli potrzebujesz pełnego wyniku.",
-    descMediumLatency: "Opóźnienie jest akceptowalne, ale na granicy. Test prędkości pobierania nie mógł zostać ukończony.",
-    descHighLatency: "Opóźnienie jest zbyt wysokie dla dobrej jakości Town Hall. Skontaktuj się z działem IT.",
+    descGood: "Twoje połączenie wygląda dobrze do uczestnictwa w Microsoft Teams Town Hall jako widz. Odtwarzanie powinno być stabilne z bezpiecznym zapasem.",
+    descOk: "Twoje połączenie powinno wystarczyć do uczestnictwa, ale zapas jest niewielki. Przy obciążeniu możesz zauważyć wolniejszy start lub sporadyczne buforowanie.",
+    descBad: "Twoje połączenie wygląda słabo do oglądania Town Hall jako uczestnik. Może wystąpić buforowanie, niższa jakość lub przerwy. Spróbuj stabilniejszej sieci lub skontaktuj się z IT.",
+    descLowLatency: "Czas odpowiedzi wygląda dobrze, ale test pobierania nie został ukończony. Nie można więc w pełni ocenić gotowości do oglądania Town Hall.",
+    descMediumLatency: "Czas odpowiedzi jest akceptowalny, ale test pobierania nie został ukończony. Wynik pozostaje więc niepewny dla rzeczywistego oglądania Town Hall.",
+    descHighLatency: "Czas odpowiedzi jest wysoki, a test pobierania nie został ukończony. Oglądanie Town Hall może być niestabilne.",
     jitterLabel: "Jitter",
-    jitterUnit: "ms"
+    p95Label: "P95",
+    jitterUnit: "ms",
+    latencyProgress: "Pomiar opóźnienia {current} z {total}…",
+    testDone: "Test zakończony!",
+    externalReferenceLabel: "Referencja internetowa",
+    internalReferenceLabel: "Referencja wewnętrzna",
+    referenceUnavailable: "Niedostępne",
+    referenceNote: "Pomiary referencyjne są pokazywane wyłącznie do porównania i nie wpływają bezpośrednio na wynik Town Hall.",
+    compareMicrosoftPath: "Czas odpowiedzi do Microsoft jest wyraźnie gorszy niż referencja internetowa. To może wskazywać na problem na trasie do Microsoft.",
+    compareLocalNetwork: "Zarówno Microsoft, jak i referencja internetowa są wolne. Częściej wskazuje to na połączenie użytkownika, Wi-Fi, VPN lub trasę ISP.",
+    compareInternalPath: "Referencja wewnętrzna jest wyraźnie wolniejsza niż referencja internetowa. To może wskazywać na problem w wewnętrznej ścieżce sieciowej.",
+    compareBalanced: "Pomiary referencyjne są zbliżone do głównego wyniku. Brak wyraźnego odchylenia w porównaniu.",
+    testTimeLabel: "Czas testu",
+    resultConnectionLabel: "Kontekst sieci",
+    resultStabilityLabel: "Stabilnosc",
+    resultSummaryLabel: "Ocena",
+    stabilityStable: "Stabilne",
+    stabilityVariable: "Zmienne",
+    stabilityUnstable: "Niestabilne",
+    advancedTitle: "Szczegoly zaawansowane",
+    advancedBtnShow: "Pokaz zaawansowane",
+    advancedBtnHide: "Ukryj zaawansowane",
+    advancedLatencySummary: "Profile opoznienia (mediana / p95 / jitter)",
+    advancedReferenceSummary: "Referencje i porownanie",
+    endpointProfileGeneric: "Generic (Microsoft baseline)",
+    endpointProfileTownhallMedia: "TownHall-Media (CDN strumienia)",
+    endpointProfileTownhallMediaKey: "TownHall-Media+Key (strumien + dostarczanie kluczy)",
+    adviceTitle: "Zalecane działania",
+    adviceGeneralGood1: "Połączenie wygląda na wystarczająco stabilne do udziału w Town Hall jako uczestnik.",
+    adviceGeneralGood2: "Dołącz kilka minut przed rozpoczęciem wydarzenia, aby strumień zdążył się ustabilizować.",
+    adviceGeneralOk1: "Wynik powinien wystarczyć, ale zapas jest niewielki przy większym obciążeniu.",
+    adviceGeneralOk2: "Przed dołączeniem zamknij inne duże pobierania, transmisje i synchronizacje w chmurze.",
+    adviceGeneralBad1: "Wynik wskazuje na wysokie ryzyko buforowania lub przerw podczas Town Hall.",
+    adviceGeneralBad2: "Uruchom test ponownie po zmianie sieci lub zmniejszeniu innego ruchu w sieci.",
+    adviceWifi1: "Jeśli korzystasz z Wi‑Fi, spróbuj podejść bliżej punktu dostępowego lub przełączyć się na 5 GHz.",
+    adviceWifi2: "Jeśli problem pozostaje, przetestuj połączenie Ethernet, aby wykluczyć zakłócenia bezprzewodowe.",
+    adviceEthernet1: "Jeśli korzystasz już z Ethernetu, słaby wynik częściej wskazuje na trasę zewnętrzną, VPN lub inne obciążenie sieci.",
+    adviceEthernet2: "Sprawdź, czy inne aplikacje lub oprogramowanie zabezpieczające nie zużywają przepustowości podczas testu.",
+    adviceOther1: "Jeśli typ połączenia jest nieznany, porównaj wynik z inną siecią, aby sprawdzić, czy wartości się poprawiają.",
+    adviceOffice1: "W biurze: sprawdź z IT, czy znane incydenty, routing VPN lub proxy nie wpływają na ruch Teams.",
+    adviceHome1: "W domu: upewnij się, że nikt inny nie obciąża łącza streamingiem, backupem lub dużymi pobraniami.",
+    adviceField1: "W terenie: warunki sieci mobilnej mogą szybko się zmieniać. Przy słabym wyniku przetestuj ponownie z innego pobliskiego miejsca.",
+    copyResultsBtn: "Kopiuj wyniki",
+    sendResultsBtn: "Wyslij do IT",
+    sendNoResults: "Najpierw uruchom test.",
+    sendOpenedMail: "Otwarto szkic wiadomosci e-mail.",
+    sendFailed: "Nie udalo sie otworzyc szkicu wiadomosci e-mail.",
+    copySuccess: "Wyniki skopiowano.",
+    copyFailed: "Nie udało się skopiować wyników.",
+    errorTitle: "Nie udało się ukończyć testu.",
+    errorBody1: "Sprawdź, czy masz połączenie z internetem i czy strona nie jest blokowana przez zaporę sieciową.",
+    errorBody2: "Jeśli problem nadal występuje, skontaktuj się z działem IT.",
+    errorTechInfo: "Informacje techniczne:"
   }
 };
 
@@ -511,10 +1109,35 @@ const translations = {
 let lastLatencyMs = null;
 let lastDownloadMbps = null;
 let lastJitterMs = null;
-let lastReferenceLatencyMs = null;
+let lastP95Ms = null;
+let lastStabilityLevel = null;
+let lastQualityLevel = null;
+let lastReferenceResults = null;
+let lastLatencyProfileResults = null;
+let lastLocationType = 'unknown';
+let lastConnectionType = 'unknown';
+let lastTestTimestamp = null;
+let isAdvancedVisible = false;
+let isTechnicalNotesVisible = false;
 
 // ==================== LANGUAGE HANDLING ====================
-let currentLang = 'sv';
+let currentLang = 'en';
+
+function updateTechnicalNotesButtonLabel() {
+  const t = translations[currentLang] || translations.en;
+  const button = document.getElementById('technicalNotesBtn');
+  const panel = document.getElementById('technicalNotesPanel');
+  if (!button || !panel) return;
+
+  button.textContent = isTechnicalNotesVisible ? t.technicalNotesHide : t.technicalNotesShow;
+  button.setAttribute('aria-expanded', String(isTechnicalNotesVisible));
+  panel.classList.toggle('visible', isTechnicalNotesVisible);
+}
+
+function toggleTechnicalNotes() {
+  isTechnicalNotesVisible = !isTechnicalNotesVisible;
+  updateTechnicalNotesButtonLabel();
+}
 
 function setLanguage(lang) {
   currentLang = lang;
@@ -532,13 +1155,22 @@ function setLanguage(lang) {
   });
 
   if (document.getElementById('results').classList.contains('visible') && lastLatencyMs !== null) {
-    showResults(lastLatencyMs, lastDownloadMbps, lastJitterMs, lastReferenceLatencyMs);
+    showResults(
+      lastLatencyMs,
+      lastDownloadMbps,
+      lastJitterMs,
+      lastReferenceResults,
+      lastLatencyProfileResults,
+      lastP95Ms,
+      lastStabilityLevel
+    );
   }
+
+  updateAdvancedButtonLabel();
+  updateTechnicalNotesButtonLabel();
 }
 
 // ==================== TEST LOGIC ====================
-const LATENCY_URL = 'https://www.office.com/favicon.ico';
-
 // Microsoft AJAX CDN (ajax.aspnetcdn.com) – CORS-aktiverat, stabilt
 const DOWNLOAD_URLS = [
   'https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.7.1.js',                // ~285 KB – jQuery ohoptimerad
@@ -547,14 +1179,40 @@ const DOWNLOAD_URLS = [
   'https://ajax.aspnetcdn.com/ajax/modernizr/modernizr-2.8.3.js'           // ~47 KB – Modernizr
 ];
 
-const LATENCY_IMG_URL = 'https://www.microsoft.com/favicon.ico';
-const REFERENCE_LATENCY_URL = 'https://1.1.1.1/dns-query';
-const LATENCY_ROUNDS = 6;
+const LATENCY_PROFILES = {
+  generic: {
+    urls: ['https://www.microsoft.com/favicon.ico']
+  },
+  townhallMedia: {
+    urls: ['https://b.public-teams.prod.ml.cdn.office.net/favicon.ico']
+  },
+  townhallMediaKey: {
+    urls: [
+      'https://b.public-teams.prod.ml.cdn.office.net/favicon.ico',
+      'https://kd.public-teams.keys.ml.teams.microsoft.com/favicon.ico'
+    ]
+  }
+};
+const EXTERNAL_REFERENCE_IMG_URL = 'https://www.cloudflare.com/favicon.ico';
+const INTERNAL_REFERENCE_IMG_URL = 'https://marvin.corp.vattenfall.com/favicon.ico';
+const LATENCY_ROUNDS = 8;
+const GOOD_DOWNLOAD_MBPS = 3;
+const OK_DOWNLOAD_MBPS = 2;
+const GOOD_LATENCY_MS = 150;
+const OK_LATENCY_MS = 250;
+const REFERENCE_ROUNDS = 3;
 
 function median(arr) {
   const s = [...arr].sort((a, b) => a - b);
   const m = Math.floor(s.length / 2);
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+
+function percentile(arr, p) {
+  if (!arr.length) return null;
+  const s = [...arr].sort((a, b) => a - b);
+  const idx = Math.ceil((p / 100) * s.length) - 1;
+  return s[Math.max(0, Math.min(idx, s.length - 1))];
 }
 
 function calculateJitter(times) {
@@ -567,50 +1225,48 @@ function calculateJitter(times) {
 
 function computeLatencyStats(times) {
   if (times.length === 0) throw new Error('NO_LATENCY_MEASUREMENTS');
-  // Use measurements 2-6 (skip first warmup measurement)
-  const measuredTimes = times.slice(1);
+  // Use measurements 3+ to reduce first-run cold-start effects.
+  const measuredTimes = times.length > 2 ? times.slice(2) : [...times];
   return {
     median: median(measuredTimes),
+    p95: percentile(measuredTimes, 95),
     jitter: calculateJitter(measuredTimes)
   };
 }
 
-async function measureReferenceLatency() {
+function getStabilityLevel(latencyStats) {
+  if (!latencyStats || !Number.isFinite(latencyStats.median) || !Number.isFinite(latencyStats.jitter) || !Number.isFinite(latencyStats.p95)) {
+    return 'variable';
+  }
+
+  const p95Spread = latencyStats.p95 - latencyStats.median;
+  if (latencyStats.jitter <= 20 && p95Spread <= 60) return 'stable';
+  if (latencyStats.jitter <= 40 && p95Spread <= 120) return 'variable';
+  return 'unstable';
+}
+
+function getStabilityLabel(level, t) {
+  if (level === 'stable') return t.stabilityStable;
+  if (level === 'unstable') return t.stabilityUnstable;
+  return t.stabilityVariable;
+}
+
+function formatI18n(template, values) {
+  return String(template).replace(/\{(\w+)\}/g, (_, key) => {
+    return Object.prototype.hasOwnProperty.call(values, key) ? values[key] : '';
+  });
+}
+
+function withCacheBust(url, suffix) {
+  const separator = url.includes('?') ? '&' : '?';
+  return url + separator + 'v=' + suffix;
+}
+
+async function measureImageLatency(url, rounds) {
+  if (!url) return null;
+
   const times = [];
-  const rounds = 3;
   for (let i = 0; i < rounds; i++) {
-    const bust = '?v=' + Date.now() + '_' + i;
-    const t0 = performance.now();
-    try {
-      await fetch(REFERENCE_LATENCY_URL + bust, { cache: 'no-store', mode: 'cors' });
-    } catch (e) {
-      // Silently fail for reference test, return null
-      return null;
-    }
-    times.push(performance.now() - t0);
-  }
-  return median(times);
-}
-
-async function measureLatencyFetch() {
-  const times = [];
-  for (let i = 0; i < LATENCY_ROUNDS; i++) {
-    const bust = '?v=' + Date.now() + '_' + i;
-    const t0 = performance.now();
-    try {
-      await fetch(LATENCY_URL + bust, { cache: 'no-store', mode: 'cors' });
-    } catch (e) {
-      throw new Error('CORS_BLOCKED');
-    }
-    times.push(performance.now() - t0);
-    setProgress(10 + (i + 1) * 40 / LATENCY_ROUNDS, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
-  }
-  return computeLatencyStats(times);
-}
-
-async function measureLatencyImg() {
-  const times = [];
-  for (let i = 0; i < LATENCY_ROUNDS; i++) {
     await new Promise((resolve) => {
       const t0 = performance.now();
       const img = new Image();
@@ -618,11 +1274,437 @@ async function measureLatencyImg() {
         times.push(performance.now() - t0);
         resolve();
       };
-      img.src = LATENCY_IMG_URL + '?v=' + Date.now() + '_' + i;
+      img.src = withCacheBust(url, Date.now() + '_' + i);
     });
-    setProgress(10 + (i + 1) * 40 / LATENCY_ROUNDS, `Latensmätning ${i + 1} av ${LATENCY_ROUNDS}…`);
   }
-  return computeLatencyStats(times);
+
+  return median(times);
+}
+
+async function measureOpaqueFetchLatency(url, rounds) {
+  if (!url) return null;
+
+  const times = [];
+  for (let i = 0; i < rounds; i++) {
+    const t0 = performance.now();
+    try {
+      await fetch(withCacheBust(url, Date.now() + '_' + i), {
+        method: 'GET',
+        mode: 'no-cors',
+        credentials: 'omit',
+        cache: 'no-store'
+      });
+      times.push(performance.now() - t0);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  return median(times);
+}
+
+async function measureReferenceLatencies() {
+  const [externalMs, internalMs] = await Promise.all([
+    measureOpaqueFetchLatency(EXTERNAL_REFERENCE_IMG_URL, REFERENCE_ROUNDS),
+    measureOpaqueFetchLatency(INTERNAL_REFERENCE_IMG_URL, REFERENCE_ROUNDS)
+  ]);
+
+  return { externalMs, internalMs };
+}
+
+function getComparisonMessage(microsoftLatencyMs, referenceResults, t) {
+  if (!referenceResults) return '';
+
+  const { externalMs, internalMs } = referenceResults;
+
+  if (externalMs !== null && microsoftLatencyMs > externalMs + 80 && externalMs <= GOOD_LATENCY_MS) {
+    return t.compareMicrosoftPath;
+  }
+
+  if (externalMs !== null && externalMs > OK_LATENCY_MS && (internalMs === null || internalMs > OK_LATENCY_MS)) {
+    return t.compareLocalNetwork;
+  }
+
+  if (externalMs !== null && internalMs !== null && internalMs > externalMs + 80 && externalMs <= GOOD_LATENCY_MS) {
+    return t.compareInternalPath;
+  }
+
+  if (externalMs !== null || internalMs !== null) {
+    return t.compareBalanced;
+  }
+
+  return '';
+}
+
+function getConnectionTypeLabel(value, language = currentLang) {
+  const t = translations[language] || translations.sv;
+  const map = {
+    unknown: t.connectionTypeUnknown,
+    wifi: t.connectionTypeWifi,
+    ethernet: t.connectionTypeEthernet,
+    hotspot: t.connectionTypeHotspot,
+    other: t.connectionTypeOther
+  };
+  return map[value] || map.unknown;
+}
+
+function getLocationTypeLabel(value, language = currentLang) {
+  const t = translations[language] || translations.sv;
+  const map = {
+    unknown: t.locationTypeUnknown,
+    office: t.locationTypeOffice,
+    home: t.locationTypeHome,
+    field: t.locationTypeField,
+    other: t.locationTypeOther
+  };
+  return map[value] || map.unknown;
+}
+
+function getNetworkContextLabel(locationType, connectionType, language = currentLang) {
+  return `${getLocationTypeLabel(locationType, language)} - ${getConnectionTypeLabel(connectionType, language)}`;
+}
+
+function getEndpointProfileLabel(value, language = currentLang) {
+  const t = translations[language] || translations.sv;
+  const map = {
+    generic: t.endpointProfileGeneric,
+    townhallMedia: t.endpointProfileTownhallMedia,
+    townhallMediaKey: t.endpointProfileTownhallMediaKey
+  };
+  return map[value] || map.generic;
+}
+
+function getAdviceItems(qualityLevel, locationType, connectionType, t) {
+  const items = [];
+
+  if (qualityLevel === 'good') {
+    items.push(t.adviceGeneralGood1, t.adviceGeneralGood2);
+    // Keep guidance minimal when outcome is good to avoid creating false concerns.
+    return items;
+  } else if (qualityLevel === 'ok') {
+    items.push(t.adviceGeneralOk1, t.adviceGeneralOk2);
+    if (connectionType === 'wifi') {
+      items.push(t.adviceWifi1);
+    } else if (connectionType === 'ethernet') {
+      items.push(t.adviceEthernet1);
+    } else if (connectionType === 'hotspot') {
+      items.push(t.adviceField1);
+    } else {
+      items.push(t.adviceOther1);
+    }
+  } else {
+    items.push(t.adviceGeneralBad1, t.adviceGeneralBad2);
+    if (connectionType === 'wifi') {
+      items.push(t.adviceWifi1, t.adviceWifi2);
+    } else if (connectionType === 'ethernet') {
+      items.push(t.adviceEthernet1, t.adviceEthernet2);
+    } else if (connectionType === 'hotspot') {
+      items.push(t.adviceField1);
+    } else {
+      items.push(t.adviceOther1);
+    }
+  }
+
+  if (locationType === 'office') {
+    items.push(t.adviceOffice1);
+  } else if (locationType === 'home') {
+    items.push(t.adviceHome1);
+  } else if (locationType === 'field') {
+    items.push(t.adviceField1);
+  }
+
+  return items;
+}
+
+function formatTimestamp(timestamp, language = currentLang) {
+  if (!timestamp) return '';
+  return new Date(timestamp).toLocaleString(language);
+}
+
+function setCopyStatus(message) {
+  document.getElementById('copyStatus').textContent = message;
+}
+
+function toNumberOrNull(value, digits = null) {
+  if (!Number.isFinite(value)) return null;
+  return digits === null ? Number(value) : Number(value.toFixed(digits));
+}
+
+function buildEmailExportPayload() {
+  const qualityLabelMap = {
+    good: 'Good for attendees',
+    ok: 'Limited headroom',
+    bad: 'Weak for attendees'
+  };
+  const externalMs = lastReferenceResults ? lastReferenceResults.externalMs : null;
+  const internalMs = lastReferenceResults ? lastReferenceResults.internalMs : null;
+
+  return {
+    TestTimestamp: lastTestTimestamp ? new Date(lastTestTimestamp).toISOString() : null,
+    LocationType: lastLocationType,
+    ConnectionType: lastConnectionType,
+    QualityLevel: lastQualityLevel,
+    QualityLabel: qualityLabelMap[lastQualityLevel] || 'Weak for attendees',
+    LatencyMs: toNumberOrNull(lastLatencyMs),
+    JitterMs: toNumberOrNull(lastJitterMs, 1),
+    P95Ms: toNumberOrNull(lastP95Ms),
+    DownloadMbps: toNumberOrNull(lastDownloadMbps, 1),
+    StabilityLevel: lastStabilityLevel,
+    ExternalReferenceMs: toNumberOrNull(externalMs),
+    InternalReferenceMs: toNumberOrNull(internalMs)
+  };
+}
+
+function sendResultsEmail() {
+  const t = translations[currentLang] || translations.sv;
+  if (lastLatencyMs === null || !lastQualityLevel) {
+    setCopyStatus(t.sendNoResults || t.copyFailed);
+    return;
+  }
+
+  try {
+    const payload = buildEmailExportPayload();
+    const subject = '[TownhallTest] Result';
+    const body = [
+      'Townhall readiness result payload',
+      '',
+      '[TOWNHALL_JSON_START]',
+      JSON.stringify(payload),
+      '[TOWNHALL_JSON_END]'
+    ].join('\n');
+
+    const mailto = `mailto:sits@vattenfall.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+    setCopyStatus(t.sendOpenedMail || t.copySuccess);
+  } catch (e) {
+    setCopyStatus(t.sendFailed || t.copyFailed);
+  }
+}
+
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'absolute';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+}
+
+function buildCopyResultText() {
+  const t = translations[currentLang] || translations.sv;
+  const externalMs = lastReferenceResults ? lastReferenceResults.externalMs : null;
+  const internalMs = lastReferenceResults ? lastReferenceResults.internalMs : null;
+  const profileRows = [];
+
+  if (lastLatencyProfileResults) {
+    profileRows.push(t.advancedLatencySummary + ':');
+    Object.keys(LATENCY_PROFILES).forEach((profileKey) => {
+      const profileStats = lastLatencyProfileResults[profileKey];
+      if (profileStats && Number.isFinite(profileStats.median) && Number.isFinite(profileStats.p95) && Number.isFinite(profileStats.jitter)) {
+        profileRows.push(`- ${getEndpointProfileLabel(profileKey)}: ${Math.round(profileStats.median)} / ${Math.round(profileStats.p95)} / ${profileStats.jitter.toFixed(1)} ${t.jitterUnit}`);
+      }
+    });
+  }
+
+  return [
+    'Microsoft Teams Town Hall',
+    `${t.resultSummaryLabel}: ${document.getElementById('qualityBadge').textContent}`,
+    `${t.testTimeLabel}: ${formatTimestamp(lastTestTimestamp)}`,
+    `${t.resultConnectionLabel}: ${getNetworkContextLabel(lastLocationType, lastConnectionType)}`,
+    `${t.latencyLabel}: ${Math.round(lastLatencyMs)} ${t.jitterUnit}`,
+    `${t.jitterLabel}: ${lastJitterMs.toFixed(1)} ${t.jitterUnit}`,
+    `${t.p95Label}: ${Number.isFinite(lastP95Ms) ? Math.round(lastP95Ms) : '–'} ${t.jitterUnit}`,
+    `${t.resultStabilityLabel}: ${getStabilityLabel(lastStabilityLevel, t)}`,
+    `${t.downloadLabel}: ${lastDownloadMbps !== null ? lastDownloadMbps.toFixed(1) + ' ' + t.downloadUnit : '–'}`,
+    `${t.externalReferenceLabel}: ${externalMs !== null ? Math.round(externalMs) + ' ' + t.jitterUnit : t.referenceUnavailable}`,
+    `${t.internalReferenceLabel}: ${internalMs !== null ? Math.round(internalMs) + ' ' + t.jitterUnit : t.referenceUnavailable}`,
+    ...profileRows,
+    `${t.resultSummaryLabel}: ${document.getElementById('qualityDesc').textContent}`
+  ].join('\n');
+}
+
+async function copyResults() {
+  const t = translations[currentLang] || translations.sv;
+
+  if (lastLatencyMs === null) {
+    setCopyStatus(t.copyFailed);
+    return;
+  }
+
+  try {
+    await copyText(buildCopyResultText());
+    setCopyStatus(t.copySuccess);
+  } catch (e) {
+    setCopyStatus(t.copyFailed);
+  }
+}
+
+async function measureAllLatencyProfiles() {
+  const profileKeys = Object.keys(LATENCY_PROFILES);
+  const totalRounds = LATENCY_ROUNDS * profileKeys.length;
+  let completedRounds = 0;
+  const profileResults = {};
+  const progressTemplate = translations[currentLang].latencyProgress || 'Latency measurement {current} of {total}...';
+
+  for (const profileKey of profileKeys) {
+    const profile = LATENCY_PROFILES[profileKey];
+    const urls = profile.urls;
+    const times = [];
+
+    for (let i = 0; i < LATENCY_ROUNDS; i++) {
+      const url = urls[i % urls.length];
+      await new Promise((resolve) => {
+        const t0 = performance.now();
+        fetch(withCacheBust(url, Date.now() + '_' + profileKey + '_' + i), {
+          method: 'GET',
+          mode: 'no-cors',
+          credentials: 'omit',
+          cache: 'no-store'
+        }).then(() => {
+          times.push(performance.now() - t0);
+          resolve();
+        }).catch(() => {
+          resolve();
+        });
+      });
+
+      completedRounds += 1;
+      setProgress(
+        10 + completedRounds * 40 / totalRounds,
+        formatI18n(progressTemplate, { current: completedRounds, total: totalRounds })
+      );
+    }
+
+    if (times.length > 0) {
+      profileResults[profileKey] = computeLatencyStats(times);
+    }
+  }
+
+  if (!profileResults.townhallMediaKey && !profileResults.townhallMedia && !profileResults.generic) {
+    throw new Error('NO_LATENCY_MEASUREMENTS');
+  }
+
+  return profileResults;
+}
+
+function getPrimaryLatencyStats(profileResults) {
+  if (!profileResults) throw new Error('NO_LATENCY_MEASUREMENTS');
+  return profileResults.townhallMediaKey || profileResults.townhallMedia || profileResults.generic;
+}
+
+function updateAdvancedButtonLabel() {
+  const t = translations[currentLang] || translations.sv;
+  const btn = document.getElementById('advancedBtn');
+  if (!btn) return;
+  btn.textContent = isAdvancedVisible ? t.advancedBtnHide : t.advancedBtnShow;
+}
+
+function renderAdvancedLatencyDetails() {
+  const t = translations[currentLang] || translations.sv;
+  const panel = document.getElementById('advancedPanel');
+  const latencyDetails = document.getElementById('advancedLatencyDetails');
+  const referenceDetails = document.getElementById('advancedReferenceDetails');
+
+  latencyDetails.textContent = '';
+  referenceDetails.textContent = '';
+
+  const latencySummary = document.createElement('div');
+  latencySummary.style.marginBottom = '8px';
+  latencySummary.textContent = t.advancedLatencySummary;
+  latencyDetails.appendChild(latencySummary);
+
+  const stabilityRow = document.createElement('div');
+  stabilityRow.className = 'advanced-row';
+  const stabilityLabel = document.createElement('span');
+  stabilityLabel.textContent = t.resultStabilityLabel;
+  const stabilityValue = document.createElement('span');
+  stabilityValue.textContent = getStabilityLabel(lastStabilityLevel, t);
+  stabilityRow.appendChild(stabilityLabel);
+  stabilityRow.appendChild(stabilityValue);
+  latencyDetails.appendChild(stabilityRow);
+
+  const referenceSummary = document.createElement('div');
+  referenceSummary.style.marginBottom = '8px';
+  referenceSummary.style.fontWeight = '600';
+  referenceSummary.textContent = t.advancedReferenceSummary;
+  referenceDetails.appendChild(referenceSummary);
+
+  if (!lastLatencyProfileResults) {
+    panel.classList.remove('visible');
+    return;
+  }
+
+  Object.keys(LATENCY_PROFILES).forEach((profileKey) => {
+    const stats = lastLatencyProfileResults[profileKey];
+    const row = document.createElement('div');
+    row.className = 'advanced-row';
+
+    const label = document.createElement('span');
+    label.textContent = getEndpointProfileLabel(profileKey);
+
+    const value = document.createElement('span');
+    if (stats && Number.isFinite(stats.median) && Number.isFinite(stats.p95) && Number.isFinite(stats.jitter)) {
+      value.textContent = `${Math.round(stats.median)} / ${Math.round(stats.p95)} / ${stats.jitter.toFixed(1)} ${t.jitterUnit}`;
+    } else {
+      value.textContent = t.referenceUnavailable;
+    }
+
+    row.appendChild(label);
+    row.appendChild(value);
+    latencyDetails.appendChild(row);
+  });
+
+  const externalMs = lastReferenceResults ? lastReferenceResults.externalMs : null;
+  const internalMs = lastReferenceResults ? lastReferenceResults.internalMs : null;
+
+  const buildReferenceRow = (label, value) => {
+    const row = document.createElement('div');
+    row.className = 'advanced-row';
+
+    const labelEl = document.createElement('span');
+    labelEl.textContent = label;
+
+    const valueEl = document.createElement('span');
+    valueEl.textContent = value !== null ? Math.round(value) + ' ' + t.jitterUnit : t.referenceUnavailable;
+
+    row.appendChild(labelEl);
+    row.appendChild(valueEl);
+    return row;
+  };
+
+  referenceDetails.appendChild(buildReferenceRow(t.externalReferenceLabel, externalMs));
+  referenceDetails.appendChild(buildReferenceRow(t.internalReferenceLabel, internalMs));
+
+  const comparison = getComparisonMessage(lastLatencyMs, lastReferenceResults, t);
+  if (comparison) {
+    const note = document.createElement('div');
+    note.className = 'reference-note';
+    note.style.marginTop = '8px';
+    note.textContent = comparison;
+    referenceDetails.appendChild(note);
+  }
+
+  const disclaimer = document.createElement('div');
+  disclaimer.className = 'reference-note';
+  disclaimer.style.marginTop = '8px';
+  disclaimer.textContent = t.referenceNote;
+  referenceDetails.appendChild(disclaimer);
+
+  panel.classList.toggle('visible', isAdvancedVisible);
+}
+
+function toggleAdvanced() {
+  isAdvancedVisible = !isAdvancedVisible;
+  updateAdvancedButtonLabel();
+  renderAdvancedLatencyDetails();
 }
 
 async function measureSingleDownload() {
@@ -682,7 +1764,13 @@ function setPhase(n, state) {
 }
 
 async function startTest() {
+  lastLocationType = document.getElementById('locationType').value;
+  lastConnectionType = document.getElementById('connectionType').value;
+  lastTestTimestamp = Date.now();
+  setCopyStatus('');
+
   document.getElementById('startBtn').disabled = true;
+  document.getElementById('testSettings').style.display = '';
   document.getElementById('results').className = 'results';
   document.getElementById('errorBox').className = 'error-box';
   document.getElementById('progressSection').className = 'progress-section visible';
@@ -696,22 +1784,15 @@ async function startTest() {
     setPhase(1, 'done'); setPhase(2, 'active');
 
     setProgress(10, translations[currentLang].phase2 || 'Startar latensmätning…');
-    let latencyStats;
-    try {
-      latencyStats = await measureLatencyFetch();
-    } catch (e) {
-      if (e.message === 'CORS_BLOCKED') {
-        latencyStats = await measureLatencyImg();
-      } else {
-        throw e;
-      }
-    }
+    const latencyProfileResults = await measureAllLatencyProfiles();
+    const latencyStats = getPrimaryLatencyStats(latencyProfileResults);
 
     const latencyMs = latencyStats.median;
     const jitterMs = latencyStats.jitter;
+    const p95Ms = latencyStats.p95;
+    const stabilityLevel = getStabilityLevel(latencyStats);
 
-    // Measure reference latency in parallel
-    const referenceLatencyPromise = measureReferenceLatency();
+    const referencePromise = measureReferenceLatencies();
 
     setPhase(2, 'done'); setPhase(3, 'active');
 
@@ -722,25 +1803,37 @@ async function startTest() {
       // Keep download as null on failure
     }
 
-    // Wait for reference latency result
-    const referenceLatencyMs = await referenceLatencyPromise;
+    const referenceResults = await referencePromise;
 
     setPhase(3, 'done');
-    setProgress(100, 'Testet är klart!');
+    setProgress(100, translations[currentLang].testDone || 'The test is complete!');
 
     await new Promise(r => setTimeout(r, 400));
-    showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs);
+    showResults(latencyMs, downloadMbps, jitterMs, referenceResults, latencyProfileResults, p95Ms, stabilityLevel);
 
   } catch (err) {
     showError(err);
   }
 }
 
-function showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs) {
+function showResults(
+  latencyMs,
+  downloadMbps,
+  jitterMs,
+  referenceResults,
+  latencyProfileResults = lastLatencyProfileResults,
+  p95Ms = lastP95Ms,
+  stabilityLevel = lastStabilityLevel
+) {
+  const t = translations[currentLang];
+
   lastLatencyMs = latencyMs;
   lastDownloadMbps = downloadMbps;
   lastJitterMs = jitterMs;
-  lastReferenceLatencyMs = referenceLatencyMs;
+  lastP95Ms = p95Ms;
+  lastStabilityLevel = stabilityLevel;
+  lastReferenceResults = referenceResults;
+  lastLatencyProfileResults = latencyProfileResults;
 
   document.getElementById('progressSection').className = 'progress-section';
   document.getElementById('results').className = 'results visible';
@@ -748,32 +1841,29 @@ function showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs) {
   document.getElementById('latencyVal').textContent = Math.round(latencyMs);
   document.getElementById('jitterVal').textContent = jitterMs.toFixed(1);
 
-  // Display reference latency if available
-  const refBox = document.getElementById('referenceLatencyBox');
-  if (referenceLatencyMs !== null) {
-    refBox.textContent = 'Reference latency Cloudflare: ' + Math.round(referenceLatencyMs) + ' ms';
-  } else {
-    refBox.textContent = '';
-  }
+  const meta = document.getElementById('resultMeta');
+  const adviceList = document.getElementById('adviceList');
 
-  const t = translations[currentLang];
-  let quality, badgeClass, desc;
+  let quality, badgeClass, desc, qualityLevel;
 
   if (downloadMbps !== null) {
     document.getElementById('downloadVal').textContent = downloadMbps.toFixed(1);
 
-    if (downloadMbps >= 3 && latencyMs <= 100) {
+    if (downloadMbps >= GOOD_DOWNLOAD_MBPS && latencyMs <= GOOD_LATENCY_MS) {
       quality = t.qualityGood;
       badgeClass = 'good';
       desc = t.descGood;
-    } else if (downloadMbps >= 1.5 && latencyMs <= 200) {
+      qualityLevel = 'good';
+    } else if (downloadMbps >= OK_DOWNLOAD_MBPS && latencyMs <= OK_LATENCY_MS) {
       quality = t.qualityOk;
       badgeClass = 'ok';
       desc = t.descOk;
+      qualityLevel = 'ok';
     } else {
       quality = t.qualityBad;
       badgeClass = 'bad';
       desc = t.descBad;
+      qualityLevel = 'bad';
     }
   } else {
     document.getElementById('downloadVal').textContent = '–';
@@ -781,47 +1871,97 @@ function showResults(latencyMs, downloadMbps, jitterMs, referenceLatencyMs) {
       quality = t.qualityLowLatency;
       badgeClass = 'good';
       desc = t.descLowLatency;
+      qualityLevel = 'good';
     } else if (latencyMs <= 200) {
       quality = t.qualityMediumLatency;
       badgeClass = 'ok';
       desc = t.descMediumLatency;
+      qualityLevel = 'ok';
     } else {
       quality = t.qualityHighLatency;
       badgeClass = 'bad';
       desc = t.descHighLatency;
+      qualityLevel = 'bad';
     }
   }
+
+  lastQualityLevel = qualityLevel;
 
   const badge = document.getElementById('qualityBadge');
   badge.textContent = quality;
   badge.className = 'quality-badge ' + badgeClass;
   document.getElementById('qualityDesc').textContent = desc;
+
+  meta.innerHTML = `
+    <strong>${t.testTimeLabel}:</strong> ${formatTimestamp(lastTestTimestamp)}<br>
+    <strong>${t.resultSummaryLabel}:</strong> ${quality}<br>
+    <strong>${t.resultConnectionLabel}:</strong> ${getNetworkContextLabel(lastLocationType, lastConnectionType)}
+  `;
+
+  document.getElementById('testSettings').style.display = 'none';
+
+  renderAdvancedLatencyDetails();
+  updateAdvancedButtonLabel();
+
+  adviceList.textContent = '';
+  getAdviceItems(qualityLevel, lastLocationType, lastConnectionType, t).forEach((item) => {
+    const listItem = document.createElement('li');
+    listItem.textContent = item;
+    adviceList.appendChild(listItem);
+  });
 }
 
 function showError(err) {
   document.getElementById('progressSection').className = 'progress-section';
   document.getElementById('startBtn').disabled = false;
 
+  const t = translations[currentLang] || translations.sv;
   const box = document.getElementById('errorBox');
   box.className = 'error-box visible';
-  box.innerHTML = `
-    <strong>Testet kunde inte slutföras.</strong><br>
-    Kontrollera att du är ansluten till internet och att sidan inte blockeras av en brandvägg. 
-    Om problemet kvarstår, kontakta IT-support.<br><br>
-    <small>Teknisk information: ${err.message || String(err)}</small>
-  `;
+  box.textContent = '';
+
+  const title = document.createElement('strong');
+  title.textContent = t.errorTitle || 'The test could not be completed.';
+  box.appendChild(title);
+  box.appendChild(document.createElement('br'));
+
+  box.appendChild(document.createTextNode(t.errorBody1 || 'Check your internet connection and firewall settings.'));
+  box.appendChild(document.createElement('br'));
+  box.appendChild(document.createTextNode(t.errorBody2 || 'If the problem persists, contact IT support.'));
+  box.appendChild(document.createElement('br'));
+  box.appendChild(document.createElement('br'));
+
+  const technical = document.createElement('small');
+  const technicalInfo = err && err.message ? err.message : String(err);
+  technical.textContent = (t.errorTechInfo || 'Technical information:') + ' ' + technicalInfo;
+  box.appendChild(technical);
 }
 
 function resetTest() {
   document.getElementById('results').className = 'results';
   document.getElementById('errorBox').className = 'error-box';
   document.getElementById('startBtn').disabled = false;
+  document.getElementById('testSettings').style.display = '';
+  document.getElementById('resultMeta').textContent = '';
+  document.getElementById('adviceList').textContent = '';
+  document.getElementById('advancedLatencyDetails').textContent = '';
+  document.getElementById('advancedReferenceDetails').textContent = '';
+  document.getElementById('advancedPanel').className = 'advanced-panel';
+  isAdvancedVisible = false;
+  updateAdvancedButtonLabel();
+  setCopyStatus('');
   setPhase(1, ''); setPhase(2, ''); setPhase(3, '');
 
   lastLatencyMs = null;
   lastDownloadMbps = null;
   lastJitterMs = null;
-  lastReferenceLatencyMs = null;
+  lastP95Ms = null;
+  lastStabilityLevel = null;
+  lastQualityLevel = null;
+  lastReferenceResults = null;
+  lastLatencyProfileResults = null;
+  lastLocationType = 'unknown';
+  lastConnectionType = 'unknown';
 }
 
 // Language button listeners
@@ -830,7 +1970,7 @@ document.querySelectorAll('.lang-btn').forEach(btn => {
 });
 
 // Initialize
-setLanguage('sv');
+setLanguage('en');
 </script>
 </body>
 </html>
