@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Telefonbok – RIB Alunda 4300</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="logo" href="index.html">RIB Alunda<small>Station 4300</small></a>
+  <nav>
+    <a href="index.html">Beredskap</a>
+    <a href="aktiviteter.html">Aktiviteter</a>
+    <a href="nyheter.html">Nyhetsbrev</a>
+    <a href="telefonbok.html" aria-current="page">Telefonbok</a>
+  </nav>
+</div></header>
+<main>
+<h1>Telefonbok</h1>
+<p class="lead">Personal och viktiga nummer. Tryck på ett nummer för att ringa.</p>
+<div id="notice"></div>
+<input class="search" id="search" type="search" placeholder="Sök namn, kod, roll eller nummer…" aria-label="Sök i telefonboken">
+<div class="phonebook" id="phonebook"></div>
+</main>
+<footer>Räddningstjänsten · Station Alunda 4300 · Internt för personal</footer>
+<script src="data/beredskap.js"></script>
+<script src="app.js"></script>
+<script>withBeredskap(renderTelefonbok);</script>
+</body>
+</html>

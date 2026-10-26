@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beredskap – RIB Alunda 4300</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="logo" href="index.html">RIB Alunda<small>Station 4300</small></a>
+  <nav>
+    <a href="index.html" aria-current="page">Beredskap</a>
+    <a href="aktiviteter.html">Aktiviteter</a>
+    <a href="nyheter.html">Nyhetsbrev</a>
+    <a href="telefonbok.html">Telefonbok</a>
+  </nav>
+</div></header>
+<main>
+<div id="notice"></div>
+<div class="grid grid-main">
+  <div class="grid">
+    <section class="card" id="now" aria-live="polite"></section>
+    <section class="card">
+      <h2 id="year-title">Årsöversikt</h2>
+      <div class="year" id="year"></div>
+      <div class="legend" id="legend"></div>
+    </section>
+  </div>
+  <aside class="grid">
+    <section class="card">
+      <h2>Kommande aktiviteter</h2>
+      <ul class="list" id="upcoming"></ul>
+      <a href="aktiviteter.html">Alla aktiviteter →</a>
+    </section>
+    <section class="card">
+      <h2>Senaste nyhetsbrev</h2>
+      <ul class="list" id="news"></ul>
+      <a href="nyheter.html">Alla nyhetsbrev →</a>
+    </section>
+    <section class="card">
+      <h2>Storhelger</h2>
+      <ul class="list" id="helger"></ul>
+    </section>
+  </aside>
+</div>
+</main>
+<footer>Räddningstjänsten · Station Alunda 4300 · Internt för personal</footer>
+<script src="data/beredskap.js"></script>
+<script src="data/aktiviteter.js"></script>
+<script src="data/nyheter.js"></script>
+<script src="app.js"></script>
+<script>withBeredskap(renderBeredskap);
+renderUpcomingList(document.getElementById("upcoming"), 4);
+renderLatestNews(document.getElementById("news"), 3);</script>
+</body>
+</html>

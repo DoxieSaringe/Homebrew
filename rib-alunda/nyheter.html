@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nyhetsbrev – RIB Alunda 4300</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="logo" href="index.html">RIB Alunda<small>Station 4300</small></a>
+  <nav>
+    <a href="index.html">Beredskap</a>
+    <a href="aktiviteter.html">Aktiviteter</a>
+    <a href="nyheter.html" aria-current="page">Nyhetsbrev</a>
+    <a href="telefonbok.html">Telefonbok</a>
+  </nav>
+</div></header>
+<main>
+<h1>Nyhetsbrev</h1>
+<p class="lead">Information och nyheter från stationen.</p>
+<div id="list"></div>
+</main>
+<footer>Räddningstjänsten · Station Alunda 4300 · Internt för personal</footer>
+<script src="data/nyheter.js"></script>
+<script src="app.js"></script>
+<script>renderNyheter(document.getElementById("list"));</script>
+</body>
+</html>
